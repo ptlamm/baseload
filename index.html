@@ -30,7 +30,7 @@
   --on-volt: #13233B;   /* text on top of the accent  */
   --live:    #2E7D57;   /* "moves it forward" green   */
   --hold:    #B23A2E;   /* "holds it back" red        */
-  --band:    #E1E6DE;   /* alternate section band     */
+  --band:    #DFE5DC;   /* alternate section band     */
 
   --f-display: "Big Shoulders Display", "Arial Narrow", Impact, sans-serif;
   --f-body:    "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -419,7 +419,7 @@ section[id], details[id] { scroll-margin-top: 90px; }
    13d. SECTION BANDS — each section is a full-width band with a firm
    top rule; backgrounds alternate so neighbours never blur together
    ================================================================ */
-.band { background: var(--paper); border-top: 3px solid var(--ink); }
+.band { background: var(--paper); border-top: 1px solid color-mix(in srgb, var(--ink) 14%, transparent); }
 .band.alt { background: var(--band); }
 .band > .wrap { padding-block: 64px 72px; }
 .band-hero { border-top: 0; }
