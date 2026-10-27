@@ -19,22 +19,25 @@ Open `index.html` on GitHub and click the pencil icon, or use a code editor such
 | `const STAGES` | The five cycle stages and their wording |
 | `B. THEMES` | The cycle map: each theme and its stage |
 | `C. STORIES` | Your news summaries |
-| `const PRESETS` | The cost-of-capital calculator's example projects (Cycle map page) |
+| `G. LCOE CALCULATOR` | The solar farm calculator and its example projects |
 
 Commit the change on GitHub, and the live site updates in about a minute.
 
 ## 3. Open, add or pause a sector
 All sectors live in one list, `SECTIONS`. Each has a `status`:
 - `"live"`: shown on the site and in the menu, and included in the Sunday drafts.
-- `"planned"`: listed as "Coming later" on the About page.
+- `"planned"`: shown in "On the drawing board" as a sector coming later.
 
-To start covering a planned sector: change `"planned"` to `"live"`. It appears as a filter above the story list and in the Sunday drafts automatically.
+To start covering a planned sector: change `"planned"` to `"live"`. It gets its own block on the home page (three newest stories), a footer link and Sunday drafts automatically.
 
 To add a new idea: copy one line, give it a short unique `id` (lowercase, hyphens), a `name`, a one-line `blurb` and `status: "planned"`.
 
 To pause a sector: set it back to `"planned"`. Its stories stay in the file but are hidden until you switch it on again.
 
 The order of the list is the order on the page. Start with the sector you know best.
+
+### Thumbnails
+Every story gets a thumbnail drawn from its theme's `icon` (sun, globe, pylon, server, bond, battery, crane or chart) on graph paper. The yellow line rises when the story moves its theme forward, stays flat when it confirms the stage, and falls when it holds the theme back. Never use pictures copied from the source article; use your own charts or photos through `image`.
 
 ## 4. Move a theme along the cycle
 The site's question is: where is the next investment cycle forming? Every theme in `B. THEMES` sits at one of five stages:
@@ -49,7 +52,7 @@ The site's question is: where is the next investment cycle forming? Every theme 
 
 To move a theme, change its `stage` number. The wave in the hero, the cycle map and every card update by themselves. Review the stages once a month, not every week.
 
-To add a theme, copy one block and give it a short `id`, a `name`, a `stage`, a one-line `thesis` and a `watch` line (what would move it to the next stage). Five to seven themes is enough.
+To add a theme, copy one block and give it a short `id`, a `name`, a `stage`, an `icon`, a one-line `thesis` and a `watch` line (what would move it to the next stage). Five to seven themes is enough.
 
 ## 5. Add a story
 In `C. STORIES`, copy one `{ ... },` block, paste it at the top of the list and change:
@@ -59,11 +62,12 @@ In `C. STORIES`, copy one `{ ... },` block, paste it at the top of the list and 
 - `signal`: `"forward"` (moves the theme towards the next stage), `"confirms"` (fits its current stage) or `"back"` (holds it back)
 - `date`: the date of the original story
 - `minutes`: reading time
-- `featured: true` makes it the top story on the home page (the newest featured story is used)
+- `featured: true` to show it in the "On the wire" slider at the top
 - `title` and `summary`: one line each, in your own words
 - `body`: the key facts, one short paragraph per item
 - `cycleRead`: your view on what the story says about the cycle
 - `source`: the publisher's name and the link to the original
+- `image` (optional): your own picture for the thumbnail, such as `"images/my-chart.png"`. Upload the file to the repository first. Without it, a thumbnail is drawn for you.
 
 ### Rules for summarising other people's work
 1. **Use your own words.** Read the article, close it, then write. Never paste paragraphs.
