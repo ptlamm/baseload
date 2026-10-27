@@ -4,38 +4,33 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Baseload</title>
-<meta name="claude:viewport-fit-sides" content="cover">
-<meta name="description" content="A weekly briefing on where the next investment cycle is forming in energy, infrastructure and technology.">
+<meta name="description" content="A weekly briefing on where the next investment cycle is forming.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Martian+Mono:wght@400;600&family=Public+Sans:ital,wght@0,400;0,600;1,400&display=swap">
-
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@800;900&family=Martian+Mono:wght@500;600&family=Public+Sans:wght@400;600;700&display=swap">
 <style>
 /* ================================================================
    1. DESIGN TOKENS
-   Layout idea: the page is drawn like an electrical single-line
-   diagram. A busbar (the thick vertical line) runs down the page and
-   each section hangs off it as a node. The investment cycle is drawn
-   as one wave on grid paper.
+   One reading column. Each screen does one job:
+   Stories (home), Cycle map, About.
    Change colours and fonts here and the whole site follows.
    ================================================================ */
 :root {
-  --paper:   #ECEFEA;   /* page background            */
-  --panel:   #F7F8F4;   /* cards and panels           */
-  --ink:     #13233B;   /* main text and lines        */
-  --muted:   #56627A;   /* secondary text             */
-  --rule:    #CDD3CA;   /* thin lines, grid paper     */
-  --volt:    #E8A900;   /* the one accent colour      */
-  --volt-ink:#7A5000;   /* accent when used as text   */
-  --on-volt: #13233B;   /* text on top of the accent  */
-  --live:    #2E7D57;   /* "moves it forward" green   */
-  --hold:    #B23A2E;   /* "holds it back" red        */
+  --paper:   #F2F3EE;   /* page background           */
+  --panel:   #FBFBF8;   /* boxes                     */
+  --ink:     #13233B;   /* main text                 */
+  --muted:   #5A6579;   /* secondary text            */
+  --rule:    #D5DAD1;   /* thin lines                */
+  --volt:    #E8A900;   /* the one accent colour     */
+  --volt-ink:#7A5000;   /* accent used as text       */
+  --on-volt: #13233B;   /* text on the accent        */
+  --live:    #2E7D57;   /* "moves it forward"        */
+  --hold:    #B23A2E;   /* "holds it back"           */
 
   --f-display: "Big Shoulders Display", "Arial Narrow", Impact, sans-serif;
   --f-body:    "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --f-mono:    "Martian Mono", ui-monospace, Menlo, Consolas, monospace;
 }
-/* Dark theme: same token names, new values */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --paper:#0F1724; --panel:#162234; --ink:#E7EBE3; --muted:#9BA7B8;
@@ -52,553 +47,289 @@
 }
 
 /* ================================================================
-   2. BASE STYLES
+   2. BASE
    ================================================================ */
 * { box-sizing: border-box; }
-body {
-  background: var(--paper);
-  color: var(--ink);
-  font: 16px/1.6 var(--f-body);
-}
-body::before { /* paints the phone's status-bar area above the sticky header */
-  content: ""; position: fixed; inset: 0 0 auto;
-  height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--paper);
-}
+[hidden] { display: none !important; }
+html, body { margin: 0; }
+body { background: var(--paper); color: var(--ink); font: 17px/1.6 var(--f-body); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--paper); }
 a { color: inherit; }
-h1, h2, h3 { font-family: var(--f-display); text-transform: uppercase; line-height: .95; margin: 0; text-wrap: balance; }
-p { margin: 0; }
+h1, h2, h3, p { margin: 0; }
+h1, h2 { font-family: var(--f-display); font-weight: 900; text-transform: uppercase; line-height: .95; letter-spacing: .01em; text-wrap: balance; }
+h1 { font-size: clamp(40px, 6vw, 56px); }
+h2 { font-size: 30px; }
 :focus-visible { outline: 3px solid var(--volt); outline-offset: 2px; }
+.wrap { max-width: 820px; margin: 0 auto; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
+.muted { color: var(--muted); }
+.small { font-size: 14px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.btn { display: inline-flex; align-items: center; gap: 8px; font: 600 15px/1 var(--f-body); padding: 12px 18px; border: 2px solid var(--ink); background: transparent; color: var(--ink); text-decoration: none; cursor: pointer; }
+.btn:hover { background: var(--ink); color: var(--paper); }
+.btn.primary { background: var(--volt); color: var(--on-volt); }
+.btn.primary:hover { background: var(--ink); color: var(--paper); }
 
-.wrap {
-  max-width: 1120px; margin: 0 auto;
-  padding-left: max(16px, env(safe-area-inset-left, 0px));
-  padding-right: max(16px, env(safe-area-inset-right, 0px));
-}
-.mono { font-family: var(--f-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
-.eyebrow { font-family: var(--f-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+/* Stage tag: the one piece of "cycle" information on every story */
+.stage { display: inline-block; font: 600 11px/1 var(--f-mono); letter-spacing: .06em; text-transform: uppercase; padding: 5px 7px; border: 1px solid var(--ink); white-space: nowrap; }
 
-.btn {
-  display: inline-flex; align-items: center; gap: 8px;
-  font: 600 12px/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase;
-  padding: 13px 18px; border: 2px solid var(--ink); background: transparent; color: var(--ink);
-  text-decoration: none; cursor: pointer;
-  transition: transform .15s ease, box-shadow .15s ease;
-}
-.btn:hover { transform: translate(-2px,-2px); box-shadow: 4px 4px 0 var(--ink); }
-.btn.primary { background: var(--volt); color: var(--on-volt); border-color: var(--ink); }
+/* ================================================================
+   3. HEADER
+   ================================================================ */
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--paper); border-bottom: 2px solid var(--ink); }
+.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px 24px; padding-block: 14px; flex-wrap: wrap; }
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; font: 900 26px/1 var(--f-display); letter-spacing: .04em; text-transform: uppercase; }
+.nav { display: flex; gap: 22px; }
+.nav a { font-weight: 600; font-size: 15px; text-decoration: none; padding-block: 6px; border-bottom: 2px solid transparent; }
+.nav a:hover { border-bottom-color: var(--volt); }
+.nav a[aria-current="page"] { border-bottom-color: var(--ink); }
 
-.code { display: inline-block; background: var(--volt); color: var(--on-volt); font: 600 11px/1 var(--f-mono); letter-spacing: .08em; padding: 5px 7px; }
-.stage { display: inline-block; border: 1px solid var(--ink); font: 600 10px/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; padding: 5px 7px; white-space: nowrap; }
-.sig { font: 600 10px/1.4 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; }
+/* ================================================================
+   4. VIEWS
+   ================================================================ */
+.view { padding-block: 40px 64px; display: grid; gap: 40px; }
+.intro { display: grid; gap: 12px; }
+.intro p { font-size: 19px; color: var(--muted); max-width: 52ch; }
+
+/* Home: top story */
+.lead { border: 2px solid var(--ink); background: var(--panel); padding: 24px; display: grid; gap: 14px; justify-items: start; }
+.lead .kicker { font: 600 12px/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.lead h2 { font-size: clamp(30px, 4.6vw, 40px); text-transform: none; line-height: 1; }
+.lead h2 a { text-decoration: none; }
+.lead p { max-width: 62ch; }
+
+/* Home: sector filter and story list */
+.filters { display: flex; flex-wrap: wrap; gap: 4px 20px; border-bottom: 1px solid var(--rule); }
+.filters button { appearance: none; border: 0; background: none; color: var(--muted); font: 600 15px/1 var(--f-body); padding: 10px 0; border-bottom: 3px solid transparent; margin-bottom: -1px; cursor: pointer; }
+.filters button:hover { color: var(--ink); }
+.filters button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--volt); }
+.list { list-style: none; margin: 0; padding: 0; }
+.row { display: grid; grid-template-columns: 172px minmax(0, 1fr); gap: 6px 20px; align-items: baseline; padding: 18px 0; border-bottom: 1px solid var(--rule); text-decoration: none; }
+.row:hover .row-title { text-decoration: underline; text-decoration-color: var(--volt); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.row-title { font-weight: 700; font-size: 18px; line-height: 1.35; }
+.row-meta { grid-column: 2; font-size: 14px; color: var(--muted); }
+.list-foot { padding-top: 20px; }
+
+.subscribe { border-top: 2px solid var(--ink); padding-top: 28px; display: grid; gap: 12px; }
+.subscribe form { display: flex; flex-wrap: wrap; gap: 10px; }
+.subscribe input { flex: 1 1 240px; min-width: 0; padding: 12px 14px; font: 16px var(--f-body); border: 2px solid var(--ink); background: var(--panel); color: var(--ink); }
+.subscribe .msg { font-size: 14px; color: var(--volt-ink); }
+
+/* Cycle map view */
+.figure { border: 2px solid var(--ink); background-color: var(--panel); background-image: linear-gradient(var(--rule) 1px, transparent 1px), linear-gradient(90deg, var(--rule) 1px, transparent 1px); background-size: 20px 20px; padding: 16px; margin: 0; max-width: 100%; }
+.figure svg { display: block; width: 100%; height: auto; }
+.wave-area { fill: var(--volt); fill-opacity: .18; }
+.wave { fill: none; stroke: var(--ink); stroke-width: 3; }
+.band { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 2 4; }
+.axis { stroke: var(--ink); stroke-width: 2; }
+.lbl { fill: var(--muted); font: 600 9px var(--f-mono); letter-spacing: .1em; }
+.dot { fill: var(--volt); stroke: var(--ink); stroke-width: 2; }
+.dot-t { fill: var(--on-volt); font: 600 10px var(--f-mono); }
+.num { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--volt); color: var(--on-volt); border: 2px solid var(--ink); font: 600 10px/1 var(--f-mono); flex: none; }
+
+.stages { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--rule); }
+.stages li { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 4px 20px; padding: 12px 0; border-bottom: 1px solid var(--rule); }
+.stages b { font-weight: 700; }
+.stages .n { font: 600 12px var(--f-mono); color: var(--muted); margin-right: 6px; }
+
+.themes { border-top: 1px solid var(--rule); }
+.themes details { border-bottom: 1px solid var(--rule); }
+.themes summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: minmax(0, 1fr) auto 14px; gap: 14px; align-items: center; padding: 14px 0; }
+.themes summary::-webkit-details-marker { display: none; }
+.themes .tname { display: flex; align-items: center; gap: 10px; font-weight: 700; }
+.themes .chev { font-size: 11px; color: var(--muted); transition: transform .15s ease; }
+.themes details[open] .chev { transform: rotate(90deg); }
+.themes .open { padding: 0 0 18px 32px; display: grid; gap: 10px; }
+.themes .open p { font-size: 16px; }
+.themes .open ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+.themes .open a { font-size: 15px; }
+
+.calc { border: 2px solid var(--ink); background: var(--panel); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.calc-in { padding: 20px; display: grid; gap: 14px; border-right: 2px solid var(--ink); }
+.calc-out { padding: 20px; display: grid; gap: 10px; align-content: start; }
+.presets { display: flex; flex-wrap: wrap; gap: 6px; }
+.presets button { font: 600 13px/1 var(--f-body); padding: 8px 10px; border: 1px solid var(--ink); background: transparent; color: var(--ink); cursor: pointer; }
+.presets button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.field { display: grid; gap: 4px; }
+.field label { display: flex; justify-content: space-between; gap: 8px; font-size: 14px; }
+.field output, .calc-out b { font: 600 13px var(--f-mono); font-variant-numeric: tabular-nums; }
+input[type="range"] { width: 100%; accent-color: var(--volt); }
+.lcoe { font: 900 64px/.9 var(--f-display); font-variant-numeric: tabular-nums; }
+.lcoe small { font-size: .32em; color: var(--muted); }
+.calc-out div.r { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; border-top: 1px solid var(--rule); padding-top: 8px; }
+
+/* About view */
+.about-text { display: grid; gap: 14px; max-width: 62ch; }
+.facts { margin: 0; display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 8px 20px; border-top: 1px solid var(--rule); padding-top: 16px; font-size: 15px; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; }
+
+footer { border-top: 1px solid var(--rule); }
+footer .wrap { padding-block: 24px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; font-size: 14px; color: var(--muted); }
+
+/* ================================================================
+   5. STORY READER (opens over the page)
+   ================================================================ */
+.reader { position: fixed; inset: 0; z-index: 50; background: var(--paper); overflow-y: auto; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.reader-bar { position: sticky; top: 0; background: var(--paper); border-bottom: 2px solid var(--ink); }
+.reader-bar .wrap { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-block: 10px; }
+.reader article { max-width: 680px; margin: 0 auto; padding-block: 40px 72px; display: grid; gap: 20px; }
+.reader h1 { text-transform: none; font-size: clamp(34px, 5vw, 48px); line-height: 1; }
+.reader .tags { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; font-size: 14px; color: var(--muted); }
+.reader .standfirst { font-size: 20px; color: var(--muted); }
+.reader .body { display: grid; gap: 16px; font-size: 18px; line-height: 1.7; }
+.reader .read { border-left: 4px solid var(--volt); background: var(--panel); padding: 16px 20px; display: grid; gap: 6px; }
+.reader .read b { font: 600 12px var(--f-mono); letter-spacing: .08em; text-transform: uppercase; }
+.reader .src a { color: var(--volt-ink); font-weight: 600; }
+.reader .next { border-top: 1px solid var(--rule); padding-top: 20px; display: grid; gap: 8px; justify-items: start; }
+.sig { font-weight: 600; }
 .sig.forward { color: var(--live); }
-.sig.confirms { color: var(--muted); }
 .sig.back { color: var(--hold); }
 
 /* ================================================================
-   3. TICKER (the scrolling strip at the very top)
+   6. PHONE LAYOUT
    ================================================================ */
-.ticker { background: var(--ink); color: var(--paper); overflow: hidden; white-space: nowrap; padding-block: 8px; }
-.ticker-track { display: inline-flex; animation: tick 50s linear infinite; }
-.ticker-track span { font: 500 11px/1 var(--f-mono); letter-spacing: .1em; text-transform: uppercase; padding-right: 32px; }
-.ticker-track b { color: var(--volt); font-weight: 600; }
-@keyframes tick { to { transform: translateX(-50%); } }
-
-/* ================================================================
-   4. HEADER AND NAVIGATION
-   ================================================================ */
-.top {
-  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
-  background: var(--paper); border-bottom: 2px solid var(--ink);
-}
-.top .wrap { display: flex; align-items: center; gap: 12px 24px; padding-block: 12px; flex-wrap: wrap; }
-.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; font: 900 28px/1 var(--f-display); letter-spacing: .04em; text-transform: uppercase; }
-.logo svg { flex: none; }
-.nav { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-left: auto; align-items: center; }
-.nav a { font: 600 11px/1 var(--f-mono); letter-spacing: .1em; text-transform: uppercase; text-decoration: none; padding-block: 8px; border-bottom: 2px solid transparent; }
-.nav a:hover { border-bottom-color: var(--volt); }
-.nav .btn { padding: 10px 14px; }
-
-/* ================================================================
-   5. HERO AND THE CYCLE WAVE
-   ================================================================ */
-.hero { display: grid; grid-template-columns: 1.15fr 1fr; gap: 40px; align-items: center; padding-block: 56px 40px; }
-.hero h1 { font-size: clamp(48px, 7.4vw, 96px); font-weight: 900; letter-spacing: .005em; margin-block: 14px 20px; }
-.hero h1 em { font-style: normal; color: var(--volt-ink); }
-.hero .lead { font-size: 18px; max-width: 46ch; color: var(--muted); }
-.hero .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
-.status { display: inline-flex; align-items: center; gap: 8px; }
-.status i { width: 8px; height: 8px; border-radius: 50%; background: var(--live); box-shadow: 0 0 0 3px color-mix(in srgb, var(--live) 25%, transparent); }
-
-.sld {
-  border: 2px solid var(--ink); background-color: var(--panel);
-  background-image: linear-gradient(var(--rule) 1px, transparent 1px), linear-gradient(90deg, var(--rule) 1px, transparent 1px);
-  background-size: 20px 20px; padding: 16px; max-width: 100%; margin: 0;
-}
-.sld svg { display: block; width: 100%; height: auto; }
-.wave-area { fill: var(--volt); fill-opacity: .16; stroke: none; }
-.wave      { fill: none; stroke: var(--ink); stroke-width: 3; }
-.flow      { fill: none; stroke: var(--volt); stroke-width: 3; stroke-dasharray: 3 9; animation: flow 1.1s linear infinite; }
-.band      { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 2 4; }
-.axis      { stroke: var(--ink); stroke-width: 2; }
-.lbl       { fill: var(--muted); font: 600 9px var(--f-mono); letter-spacing: .1em; }
-.dot       { fill: var(--volt); stroke: var(--ink); stroke-width: 2; }
-.dot-t     { fill: var(--on-volt); font: 600 10px var(--f-mono); }
-@keyframes flow { to { stroke-dashoffset: -12; } }
-
-.legend { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 16px; }
-.legend li { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
-.num { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--volt); color: var(--on-volt); border: 2px solid var(--ink); font: 600 10px/1 var(--f-mono); flex: none; }
-
-/* ================================================================
-   6. INTRO: the five stages of the cycle
-   ================================================================ */
-.intro { border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink); padding-block: 28px; display: grid; gap: 20px; }
-.intro-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 8px 24px; }
-.intro-head h2 { font-size: clamp(28px, 4vw, 40px); font-weight: 800; }
-.intro-head p { color: var(--muted); max-width: 52ch; font-size: 15px; }
-.stages { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0; border: 2px solid var(--ink); background: var(--panel); }
-.stage-item { padding: 16px; display: grid; gap: 8px; align-content: start; border-right: 1px solid var(--rule); }
-.stage-item:last-child { border-right: 0; }
-.stage-item h3 { font-size: 24px; font-weight: 800; }
-.stage-item p { font-size: 14px; color: var(--muted); }
-.stage-item .who { font-size: 13px; color: var(--ink); border-top: 1px dashed var(--rule); padding-top: 8px; }
-.stage-item .who b { font: 600 10px/1.6 var(--f-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); display: block; }
-
-/* ================================================================
-   7. THE BUSBAR LAYOUT (sections hang off a vertical line)
-   ================================================================ */
-.bus { position: relative; border-left: 3px solid var(--ink); margin-left: 7px; padding-left: 30px; display: grid; gap: 72px; padding-block: 56px; }
-.node { position: relative; display: grid; gap: 8px; margin-bottom: 24px; }
-.node::before {
-  content: ""; position: absolute; left: -41px; top: 4px; width: 16px; height: 16px;
-  background: var(--volt); border: 3px solid var(--ink);
-}
-.node h2 { font-size: clamp(36px, 5vw, 56px); font-weight: 800; }
-.node p { color: var(--muted); max-width: 60ch; }
-
-/* ================================================================
-   8. CYCLE MAP (one row per theme)
-   ================================================================ */
-.themes { display: grid; gap: 16px; }
-.theme {
-  display: grid; grid-template-columns: minmax(0, 250px) minmax(0, 1fr) minmax(0, 260px); gap: 20px 28px;
-  border: 2px solid var(--ink); background: var(--panel); padding: 20px;
-}
-.theme-name { display: grid; gap: 12px; align-content: start; }
-.theme-name h3 { font-size: 28px; font-weight: 800; display: flex; align-items: center; gap: 10px; }
-.track { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px; }
-.track span { height: 10px; border: 1px solid var(--ink); }
-.track span.past { background: var(--ink); }
-.track span.now { background: var(--volt); border-width: 2px; }
-.theme-body { display: grid; gap: 10px; align-content: start; }
-.theme-body p { font-size: 15px; }
-.theme-body .watch { color: var(--muted); }
-.theme-body .watch b { color: var(--ink); font-weight: 600; }
-.evidence { display: grid; gap: 8px; align-content: start; border-left: 1px dashed var(--rule); padding-left: 20px; }
-.evidence ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
-.evidence a { font-size: 14px; text-decoration: none; display: grid; gap: 2px; }
-.evidence a:hover span:last-child { text-decoration: underline; text-decoration-color: var(--volt); text-decoration-thickness: 2px; }
-.evidence .none { font-size: 14px; color: var(--muted); }
-
-/* ================================================================
-   9. FEATURED SLIDER
-   ================================================================ */
-.feature { display: grid; grid-template-columns: 220px minmax(0, 1fr); border: 2px solid var(--ink); background: var(--panel); }
-.feature-plate { background: var(--volt); color: var(--on-volt); padding: 20px; display: flex; flex-direction: column; justify-content: space-between; gap: 16px; border-right: 2px solid var(--ink); }
-.feature-plate .big { font: 900 96px/.8 var(--f-display); }
-.feature-body { padding: 28px; display: grid; gap: 14px; align-content: start; min-width: 0; }
-.feature-body h3 { font-size: clamp(30px, 4vw, 46px); }
-.feature-body h3 a { text-decoration: none; }
-.feature-body h3 a:hover { text-decoration: underline; text-decoration-color: var(--volt); text-decoration-thickness: 3px; }
-.feature-body p { max-width: 60ch; }
-.slider-ctrl { display: flex; align-items: center; gap: 12px; margin-top: 14px; }
-.slider-ctrl button { width: 40px; height: 40px; border: 2px solid var(--ink); background: var(--panel); color: var(--ink); font-size: 14px; cursor: pointer; }
-.slider-ctrl button:hover { background: var(--volt); color: var(--on-volt); }
-
-/* ================================================================
-   10. STORY CARDS
-   ================================================================ */
-.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
-.card {
-  display: flex; flex-direction: column; gap: 10px; padding: 18px;
-  background: var(--panel); border: 2px solid var(--ink); text-decoration: none;
-  transition: transform .15s ease, box-shadow .15s ease; min-width: 0;
-}
-.card:hover { transform: translate(-3px,-3px); box-shadow: 6px 6px 0 var(--volt); }
-.card .meta { display: flex; justify-content: space-between; gap: 8px; align-items: center; color: var(--muted); }
-.card h3 { font-size: 27px; font-weight: 800; }
-.card p { font-size: 15px; color: var(--muted); }
-.card .foot { margin-top: auto; padding-top: 12px; border-top: 1px dashed var(--rule); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 12px; color: var(--muted); }
-.card .foot b { color: var(--ink); font-weight: 600; }
-.more { margin-top: 20px; }
-.board { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
-.planned { border: 2px dashed var(--muted); padding: 16px; display: grid; gap: 8px; align-content: start; }
-.planned h3 { font-size: 24px; font-weight: 800; color: var(--muted); }
-.planned p { font-size: 14px; color: var(--muted); }
-
-/* ================================================================
-   11. LCOE CALCULATOR
-   ================================================================ */
-.calc { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); border: 2px solid var(--ink); background: var(--panel); }
-.calc-in { padding: 24px; display: grid; gap: 18px; border-right: 2px solid var(--ink); }
-.presets { display: flex; flex-wrap: wrap; gap: 8px; }
-.presets button { font: 600 10px/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; padding: 9px 10px; border: 1px solid var(--ink); background: transparent; color: var(--ink); cursor: pointer; }
-.presets button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
-.field { display: grid; gap: 6px; }
-.field label { display: flex; justify-content: space-between; gap: 8px; font-size: 14px; }
-.field output { font: 600 13px var(--f-mono); font-variant-numeric: tabular-nums; }
-input[type="range"] { width: 100%; accent-color: var(--volt); }
-.calc-out { padding: 24px; display: grid; gap: 16px; align-content: start; }
-.lcoe { font: 900 clamp(56px, 8vw, 88px)/.9 var(--f-display); font-variant-numeric: tabular-nums; }
-.lcoe small { font-size: .32em; font-weight: 600; color: var(--muted); }
-.split { display: flex; height: 18px; border: 2px solid var(--ink); }
-.split span:first-child { background: var(--volt); }
-.split span:last-child { background: var(--rule); }
-.split-key { display: flex; justify-content: space-between; gap: 8px; color: var(--muted); }
-.readout { display: grid; gap: 6px; border-top: 1px dashed var(--rule); padding-top: 14px; }
-.readout div { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; }
-.readout b { font: 600 13px var(--f-mono); font-variant-numeric: tabular-nums; }
-.note { font-size: 13px; color: var(--muted); }
-
-/* ================================================================
-   12. SUBSCRIBE, ABOUT, FOOTER
-   ================================================================ */
-.subscribe { background: var(--ink); color: var(--paper); padding: 32px; display: grid; gap: 16px; }
-.subscribe h2 { font-size: clamp(34px, 5vw, 52px); }
-.subscribe form { display: flex; flex-wrap: wrap; gap: 10px; }
-.subscribe input { flex: 1 1 240px; min-width: 0; padding: 14px; font: 15px var(--f-body); border: 2px solid var(--paper); background: var(--paper); color: var(--ink); }
-.subscribe .btn { border-color: var(--paper); }
-.subscribe .msg { color: var(--volt); font-size: 14px; }
-.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-
-.about { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 32px; align-items: start; }
-.about-text { display: grid; gap: 14px; max-width: 60ch; }
-.plate { border: 2px solid var(--ink); background: var(--panel); padding: 18px; position: relative; }
-.plate::before, .plate::after { content: ""; position: absolute; top: 8px; width: 7px; height: 7px; border-radius: 50%; background: var(--ink); }
-.plate::before { left: 8px; } .plate::after { right: 8px; }
-.plate h3 { font-size: 20px; text-align: center; padding-bottom: 10px; border-bottom: 2px solid var(--ink); margin-bottom: 8px; }
-.plate dl { margin: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px 16px; }
-.plate dt { font: 600 10px/1.8 var(--f-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
-.plate dd { margin: 0; font-size: 14px; }
-
-footer { border-top: 2px solid var(--ink); margin-top: 24px; }
-footer .wrap { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; padding-block: 32px; }
-footer ul { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 6px; }
-footer a { text-decoration: none; font-size: 14px; }
-footer a:hover { text-decoration: underline; }
-footer .logo { font-size: 22px; }
-
-/* ================================================================
-   13. STORY READER (opens when you click a story)
-   ================================================================ */
-.reader {
-  position: fixed; inset: 0; z-index: 50; background: var(--paper); overflow-y: auto;
-  padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
-}
-.reader-bar { position: sticky; top: 0; background: var(--paper); border-bottom: 2px solid var(--ink); }
-.reader-bar .wrap { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-block: 10px; }
-.reader article { max-width: 68ch; margin: 0 auto; padding-block: 48px 72px; display: grid; gap: 20px; }
-.reader h1 { font-size: clamp(40px, 6vw, 68px); font-weight: 900; }
-.reader .tags { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
-.reader .standfirst { font-size: 20px; color: var(--muted); }
-.reader .body { display: grid; gap: 18px; font-size: 18px; line-height: 1.7; }
-.reader .body h2 { font-size: 28px; margin-top: 12px; }
-.reader .read { border: 2px solid var(--ink); background: var(--panel); padding: 18px 20px; display: grid; gap: 10px; justify-items: start; }
-.reader .read p { font-size: 17px; }
-.reader .src { color: var(--muted); }
-.reader .src a { color: var(--volt-ink); }
-.reader .end { border-top: 2px solid var(--ink); padding-top: 20px; display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center; }
-
-/* ================================================================
-   13b. CALMER LAYOUT — detail opens on demand, one thing at a time
-   ================================================================ */
-.intro { gap: 14px; padding-block: 24px; }
-.stepper { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border: 2px solid var(--ink); background: var(--panel); }
-.stepper button { appearance: none; background: transparent; border: 0; border-right: 1px solid var(--rule); padding: 12px 12px; text-align: left; cursor: pointer; color: var(--ink); display: grid; gap: 6px; min-width: 0; }
-.stepper button:last-child { border-right: 0; }
-.stepper .n { font: 600 10px/1 var(--f-mono); letter-spacing: .1em; color: var(--muted); }
-.stepper .nm { font: 800 20px/1 var(--f-display); text-transform: uppercase; }
-.stepper button:hover { background: color-mix(in srgb, var(--volt) 14%, transparent); }
-.stepper button[aria-selected="true"] { background: var(--volt); color: var(--on-volt); }
-.stepper button[aria-selected="true"] .n { color: var(--on-volt); }
-.stage-detail { display: grid; gap: 4px; max-width: 70ch; }
-.stage-detail p { font-size: 16px; }
-.stage-detail .who { color: var(--muted); font-size: 14px; }
-
-.cmap { border: 2px solid var(--ink); background: var(--panel); }
-.cmap details { border-bottom: 1px solid var(--rule); }
-.cmap details:last-child { border-bottom: 0; }
-.cmap summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: minmax(0, 1fr) 150px auto 16px; gap: 16px; align-items: center; padding: 14px 18px; }
-.cmap summary::-webkit-details-marker { display: none; }
-.cmap summary:hover { background: color-mix(in srgb, var(--volt) 10%, transparent); }
-.cmap .tname { display: flex; align-items: center; gap: 10px; font: 800 22px/1.05 var(--f-display); min-width: 0; }
-.cmap .stage { justify-self: start; }
-.cmap .chev { font: 600 11px var(--f-mono); color: var(--muted); transition: transform .15s ease; }
-.cmap details[open] .chev { transform: rotate(90deg); }
-.cmap .open { padding: 2px 18px 20px 48px; display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 16px 28px; }
-.cmap .open p { font-size: 15px; }
-.cmap .watch { color: var(--muted); }
-.cmap .watch b { color: var(--ink); font-weight: 600; }
-
-.tabs { display: flex; flex-wrap: wrap; gap: 8px; }
-.tabs button { font: 600 11px/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; padding: 10px 12px; border: 2px solid var(--ink); background: transparent; color: var(--ink); cursor: pointer; }
-.tabs button:hover { background: color-mix(in srgb, var(--volt) 14%, transparent); }
-.tabs button[aria-selected="true"] { background: var(--ink); color: var(--paper); }
-.tab-blurb { color: var(--muted); font-size: 15px; margin-block: 12px 18px; max-width: 60ch; }
-
-.card { gap: 14px; padding: 18px 18px 14px; }
-.card h3, .feature-body h3, .reader h1, .evidence a span:last-child { text-transform: none; }
-.card h3 { font-size: 26px; line-height: 1.02; }
-.card .foot { align-items: center; }
-.card .foot .sig { font-size: 13px; }
-
-.board { display: flex; flex-wrap: wrap; gap: 10px; }
-.planned { border: 2px dashed var(--muted); padding: 10px 14px; display: block; }
-.planned h3 { font-size: 20px; color: var(--muted); }
-
-@media (max-width: 760px) {
-  .stepper button { padding: 10px 6px; }
-  .stepper .nm { font-size: 14px; }
-  .cmap summary { grid-template-columns: minmax(0, 1fr) auto 16px; padding: 14px; }
-  .cmap summary .track { display: none; }
-  .cmap .tname { font-size: 20px; }
-  .cmap .open { grid-template-columns: minmax(0, 1fr); padding: 2px 14px 18px; }
-}
-
-/* ================================================================
-   14. PHONE AND TABLET LAYOUT
-   ================================================================ */
-@media (max-width: 980px) {
-  .stages { grid-template-columns: minmax(0, 1fr); }
-  .stage-item { border-right: 0; border-bottom: 1px solid var(--rule); grid-template-columns: 72px minmax(0, 1fr); column-gap: 16px; }
-  .stage-item:last-child { border-bottom: 0; }
-  .stage-item > * { grid-column: 2; }
-  .stage-item > .code { grid-column: 1; grid-row: 1 / span 3; justify-self: start; align-self: start; }
-  .theme { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
-  .evidence { grid-column: 1 / -1; border-left: 0; padding-left: 0; border-top: 1px dashed var(--rule); padding-top: 14px; }
-}
-@media (max-width: 860px) {
-  .hero, .about, .calc { grid-template-columns: minmax(0, 1fr); }
-  .calc-in { border-right: 0; border-bottom: 2px solid var(--ink); }
-}
 @media (max-width: 640px) {
-  .theme { grid-template-columns: minmax(0, 1fr); }
-  .feature { grid-template-columns: minmax(0, 1fr); }
-  .feature-plate { border-right: 0; border-bottom: 2px solid var(--ink); flex-direction: row; align-items: end; }
-  .feature-plate .big { font-size: 64px; }
-  .stage-item { grid-template-columns: minmax(0, 1fr); }
-  .stage-item > *, .stage-item > .code { grid-column: 1; grid-row: auto; }
-  .bus { padding-left: 22px; }
-  .node::before { left: -33px; }
-  .nav { margin-left: 0; width: 100%; }
+  .view { padding-block: 28px 48px; gap: 32px; }
+  .lead { padding: 18px; }
+  .row { grid-template-columns: minmax(0, 1fr); gap: 6px; padding: 16px 0; }
+  .row .stage { justify-self: start; }
+  .row-meta { grid-column: 1; }
+  .stages li { grid-template-columns: minmax(0, 1fr); }
+  .calc { grid-template-columns: minmax(0, 1fr); }
+  .calc-in { border-right: 0; border-bottom: 2px solid var(--ink); }
+  .facts { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .facts dd { margin-bottom: 8px; }
+  .nav { gap: 16px; }
 }
-@media (prefers-reduced-motion: reduce) {
-  .ticker-track, .flow { animation: none; }
-  .btn, .card { transition: none; }
-}
+@media (prefers-reduced-motion: reduce) { .themes .chev { transition: none; } }
 </style>
 </head>
 <body>
-<!-- ================================================================
-     PAGE MARKUP
-     Most content (stories, themes, sections, slider, cycle wave) is
-     filled in by the JavaScript at the bottom, from the THEMES and
-     POSTS lists.
-     ================================================================ -->
-
-<div class="ticker" aria-hidden="true"><div class="ticker-track" id="ticker"></div></div>
 
 <header class="top">
   <div class="wrap">
-    <a class="logo" href="#top" aria-label="Baseload home">
-      <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true">
+    <a class="logo" href="#stories" aria-label="Baseload home">
+      <svg width="28" height="28" viewBox="0 0 30 30" aria-hidden="true">
         <rect x="1" y="1" width="28" height="28" fill="var(--volt)" stroke="var(--ink)" stroke-width="2"/>
         <path d="M6 15 q4.5 -8 9 0 t9 0" fill="none" stroke="var(--on-volt)" stroke-width="2.5"/>
       </svg>
       <span>Baseload</span>
     </a>
     <nav class="nav" aria-label="Main">
-      <a href="#stories">Stories</a>
-      <a href="#cycle">Cycle map</a>
-      <a href="#about">About</a>
-      <a class="btn primary" href="#subscribe">Subscribe ▶</a>
+      <a href="#stories" data-nav="stories">Stories</a>
+      <a href="#cycle" data-nav="cycle">Cycle map</a>
+      <a href="#about" data-nav="about">About</a>
     </nav>
   </div>
 </header>
 
-<main id="top">
-  <div class="wrap">
+<main class="wrap">
 
-    <!-- HERO -->
-    <section class="hero">
-      <div>
-        <p class="eyebrow status"><i></i> Weekly briefing · Every Sunday</p>
-        <h1>Finding the <em>next investment cycle</em></h1>
-        <p class="lead">Each week's deals and reports, placed on the investment cycle to show where capital goes next.</p>
-        <div class="actions">
-          <a class="btn primary" href="#latest">Read this week ▶</a>
-          <a class="btn" href="#cycle">See the cycle map</a>
-        </div>
-      </div>
-
-      <figure class="sld">
-        <svg id="wave" viewBox="0 0 360 262" role="img" aria-label="The investment cycle drawn as a wave, with each tracked theme placed at its current stage."></svg>
-        <figcaption>
-          <ul class="legend" id="legend"></ul>
-        </figcaption>
-      </figure>
-    </section>
-
-    <!-- INTRO: the five stages -->
-    <section class="intro" aria-labelledby="stages-h">
-      <div class="intro-head">
-        <h2 id="stages-h">How the cycle works</h2>
-      </div>
-      <div class="stepper" role="tablist" aria-label="The five stages" id="stepper"></div>
-      <div class="stage-detail" role="tabpanel" id="stage-detail" aria-live="polite"></div>
-    </section>
-
-    <!-- EVERYTHING BELOW HANGS OFF THE BUSBAR -->
-    <div class="bus">
-
-      <section id="latest" aria-labelledby="latest-h">
-        <header class="node">
-          <span class="eyebrow">This week · Strongest signals</span>
-          <h2 id="latest-h">On the wire</h2>
-        </header>
-        <div id="feature"></div>
-        <div class="slider-ctrl">
-          <button type="button" id="prev" aria-label="Previous featured story">◀</button>
-          <span class="mono" id="slide-count" aria-live="polite"></span>
-          <button type="button" id="next" aria-label="Next featured story">▶</button>
-        </div>
-      </section>
-
-      <section id="stories" aria-labelledby="stories-h">
-        <header class="node">
-          <span class="eyebrow">All coverage</span>
-          <h2 id="stories-h">Latest stories</h2>
-        </header>
-        <div class="tabs" role="tablist" aria-label="Sectors" id="tabs"></div>
-        <p class="tab-blurb" id="tab-blurb"></p>
-        <div class="cards" id="cards"></div>
-        <button class="btn more" type="button" id="more" hidden>Show more ▼</button>
-      </section>
-
-      <section id="cycle" aria-labelledby="cycle-h">
-        <header class="node">
-          <span class="eyebrow">Cycle map · Updated weekly</span>
-          <h2 id="cycle-h">Where each theme sits</h2>
-          <p>Open a theme to see the thesis, what would move it, and the stories behind it.</p>
-        </header>
-        <div class="cmap" id="themes"></div>
-      </section>
-
-
-      <section id="bonus" aria-labelledby="bonus-h">
-        <header class="node">
-          <span class="eyebrow">Bonus · Try it yourself</span>
-          <h2 id="bonus-h">What a maturing cycle is worth</h2>
-          <p>Investors accept lower returns as a theme matures. Lower the cost of capital (WACC) to see how much cheaper that makes a solar or wind farm's power.</p>
-        </header>
-        <div class="calc">
-          <div class="calc-in">
-            <div class="presets" id="presets" aria-label="Example projects"></div>
-            <div class="field"><label for="capex">Build cost (£ per kW) <output id="capex-o"></output></label><input type="range" id="capex" min="300" max="2000" step="10"></div>
-            <div class="field"><label for="cf">Capacity factor (%) <output id="cf-o"></output></label><input type="range" id="cf" min="5" max="60" step="1"></div>
-            <div class="field"><label for="opex">Running cost (£ per kW per year) <output id="opex-o"></output></label><input type="range" id="opex" min="5" max="60" step="1"></div>
-            <div class="field"><label for="wacc">Cost of capital, WACC (%) <output id="wacc-o"></output></label><input type="range" id="wacc" min="2" max="14" step="0.5"></div>
-            <div class="field"><label for="life">Project life (years) <output id="life-o"></output></label><input type="range" id="life" min="15" max="40" step="1"></div>
-          </div>
-          <div class="calc-out" aria-live="polite">
-            <span class="eyebrow">Levelised cost</span>
-            <div class="lcoe"><span id="lcoe"></span> <small>£ / MWh</small></div>
-            <div class="split" aria-hidden="true"><span id="split-cap"></span><span id="split-op"></span></div>
-            <div class="split-key mono"><span id="key-cap"></span><span id="key-op"></span></div>
-            <div class="readout">
-              <div><span>Output per kW each year</span><b id="r-out"></b></div>
-              <div><span>Capital recovery factor</span><b id="r-crf"></b></div>
-              <div><span>If WACC falls by 2 points</span><b id="r-sens"></b></div>
-            </div>
-            <p class="note">Simple model in real terms: no tax, panel degradation, inflation or financing fees. The example projects use illustrative inputs, not market data.</p>
-          </div>
-        </div>
-      </section>
-
-      <section id="drawing-board" aria-labelledby="board-h">
-        <header class="node">
-          <span class="eyebrow">Coming later</span>
-          <h2 id="board-h">On the drawing board</h2>
-        </header>
-        <div class="board" id="board"></div>
-      </section>
-
-      <section id="subscribe" class="subscribe" aria-labelledby="sub-h">
-        <span class="mono" style="color:var(--volt)">Stay connected</span>
-        <h2 id="sub-h">One cycle briefing every Sunday</h2>
-        <p>The week's strongest signals, and where each theme now sits.</p>
-        <form id="sub-form">
-          <label for="email" class="sr-only">Email address</label>
-          <input type="email" id="email" required placeholder="you@example.com" autocomplete="email">
-          <button class="btn primary" type="submit">Connect ▶</button>
-        </form>
-        <p class="msg" id="sub-msg" hidden></p>
-      </section>
-
-      <section id="about" aria-labelledby="about-h">
-        <header class="node">
-          <span class="eyebrow">Operator</span>
-          <h2 id="about-h">About me</h2>
-        </header>
-        <div class="about">
-          <div class="about-text">
-            <p>I'm Liam, an environmental engineer turned sustainable finance graduate, based in London and originally from Vietnam.</p>
-            <p>Each week, Baseload places public news on the investment cycle to show where capital goes next, with a focus on emerging markets and ASEAN. Summaries are my reading of other people's reporting, and every story links to its source. Nothing here is investment advice.</p>
-          </div>
-          <div class="plate" aria-label="Profile summary">
-            <h3>Rating plate</h3>
-            <dl>
-              <dt>Based</dt><dd>London, UK</dd>
-              <dt>Origin</dt><dd>Vietnam</dd>
-              <dt>Training</dt><dd>Environmental engineering</dd>
-              <dt>Study</dt><dd>MSc Sustainable Management &amp; Finance, Bayes Business School</dd>
-              <dt>Credentials</dt><dd>CFA Level I · CFA Certificate in ESG Investing</dd>
-              <dt>Focus</dt><dd>Energy transition, infrastructure, ASEAN</dd>
-            </dl>
-          </div>
-        </div>
-      </section>
-
+  <!-- VIEW 1: STORIES (home) -->
+  <section class="view" id="view-stories" data-view="stories" aria-labelledby="home-h">
+    <div class="intro">
+      <h1 id="home-h">Where the next investment cycle is forming</h1>
+      <p>A weekly briefing on sustainable finance, energy, infrastructure and technology. New stories every Sunday.</p>
     </div>
-  </div>
+
+    <div id="lead"></div>
+
+    <div>
+      <h2 class="sr-only" id="list-h">All stories</h2>
+      <div class="filters" role="tablist" aria-labelledby="list-h" id="filters"></div>
+      <ul class="list" id="list"></ul>
+      <div class="list-foot"><button class="btn" type="button" id="more" hidden>Show more</button></div>
+    </div>
+
+    <section class="subscribe" aria-labelledby="sub-h">
+      <h2 id="sub-h">Get it every Sunday</h2>
+      <form id="sub-form">
+        <label for="email" class="sr-only">Email address</label>
+        <input type="email" id="email" required placeholder="you@example.com" autocomplete="email">
+        <button class="btn primary" type="submit">Subscribe</button>
+      </form>
+      <p class="msg" id="sub-msg" hidden></p>
+    </section>
+  </section>
+
+  <!-- VIEW 2: CYCLE MAP -->
+  <section class="view" id="view-cycle" data-view="cycle" aria-labelledby="cycle-h" hidden>
+    <div class="intro">
+      <h1 id="cycle-h">Cycle map</h1>
+      <p>Every story is filed under a theme, and every theme sits at one of five stages. The next cycle forms where themes move from Signal to Build-out.</p>
+    </div>
+
+    <figure class="figure">
+      <svg id="wave" viewBox="0 0 360 262" role="img" aria-label="The investment cycle drawn as a wave, with each theme placed at its current stage."></svg>
+    </figure>
+
+    <div>
+      <h2>Themes</h2>
+      <p class="muted small" style="margin-block:8px 12px">Open a theme to see the thesis, what would move it, and its stories.</p>
+      <div class="themes" id="themes"></div>
+    </div>
+
+    <div>
+      <h2 style="margin-bottom:12px">The five stages</h2>
+      <ol class="stages" id="stages"></ol>
+    </div>
+
+    <div>
+      <h2>Try it: cost of capital</h2>
+      <p class="muted small" style="margin-block:8px 12px">Investors accept lower returns as a theme matures. Lower the WACC to see how much cheaper that makes a solar or wind farm's power (levelised cost of electricity, LCOE).</p>
+      <div class="calc">
+        <div class="calc-in">
+          <div class="presets" id="presets" aria-label="Example projects"></div>
+          <div class="field"><label for="capex">Build cost (£ per kW) <output id="capex-o"></output></label><input type="range" id="capex" min="300" max="2000" step="10"></div>
+          <div class="field"><label for="cf">Capacity factor (%) <output id="cf-o"></output></label><input type="range" id="cf" min="5" max="60" step="1"></div>
+          <div class="field"><label for="opex">Running cost (£ per kW per year) <output id="opex-o"></output></label><input type="range" id="opex" min="5" max="60" step="1"></div>
+          <div class="field"><label for="wacc">Cost of capital, WACC (%) <output id="wacc-o"></output></label><input type="range" id="wacc" min="2" max="14" step="0.5"></div>
+          <div class="field"><label for="life">Project life (years) <output id="life-o"></output></label><input type="range" id="life" min="15" max="40" step="1"></div>
+        </div>
+        <div class="calc-out" aria-live="polite">
+          <span class="muted small">Levelised cost</span>
+          <div class="lcoe"><span id="lcoe"></span> <small>£ / MWh</small></div>
+          <div class="r"><span>Share from capital costs</span><b id="r-cap"></b></div>
+          <div class="r"><span>If WACC falls by 2 points</span><b id="r-sens"></b></div>
+          <p class="muted" style="font-size:13px">Simple model in real terms: no tax, degradation, inflation or fees. Example inputs are illustrative.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VIEW 3: ABOUT -->
+  <section class="view" id="view-about" data-view="about" aria-labelledby="about-h" hidden>
+    <div class="intro"><h1 id="about-h">About</h1></div>
+    <div class="about-text">
+      <p>I'm Liam, an environmental engineer turned sustainable finance graduate, based in London and originally from Vietnam.</p>
+      <p>Each week, Baseload places public news on the investment cycle to show where capital goes next, with a focus on emerging markets and ASEAN. Summaries are my reading of other people's reporting, and every story links to its source. Nothing here is investment advice.</p>
+      <p class="muted" id="coming"></p>
+    </div>
+    <dl class="facts">
+      <dt>Based</dt><dd>London, UK</dd>
+      <dt>Origin</dt><dd>Vietnam</dd>
+      <dt>Training</dt><dd>Environmental engineering</dd>
+      <dt>Study</dt><dd>MSc Sustainable Management &amp; Finance, Bayes Business School</dd>
+      <dt>Credentials</dt><dd>CFA Level I · CFA Certificate in ESG Investing</dd>
+      <dt>Focus</dt><dd>Energy transition, infrastructure, ASEAN</dd>
+    </dl>
+    <p id="linkedin-p" hidden><a class="btn" id="linkedin" href="#" target="_blank" rel="noopener">LinkedIn</a></p>
+  </section>
+
 </main>
 
 <footer>
   <div class="wrap">
-    <div>
-      <a class="logo" href="#top"><span>Baseload</span></a>
-      <p style="color:var(--muted);font-size:14px;margin-top:8px;max-width:32ch">A weekly briefing on where the next investment cycle is forming.</p>
-    </div>
-    <div>
-      <span class="eyebrow">Site map</span>
-      <ul id="sitemap"></ul>
-    </div>
-    <div>
-      <span class="eyebrow">System</span>
-      <ul>
-        <li class="mono">Est. 2026 · Build v0.5</li>
-        <li class="mono">© <span id="year"></span> Baseload</li>
-        <li id="linkedin-li" hidden><a id="linkedin" href="#" target="_blank" rel="noopener">LinkedIn ▶</a></li>
-      </ul>
-    </div>
+    <span>Baseload · A weekly briefing · © <span id="year"></span></span>
+    <span>Build v0.6</span>
   </div>
 </footer>
 
 <!-- STORY READER: hidden until a story is opened -->
 <div class="reader" id="reader" hidden role="dialog" aria-modal="true" aria-labelledby="reader-title">
   <div class="reader-bar"><div class="wrap">
-    <span class="mono" id="reader-crumb"></span>
-    <button class="btn" type="button" id="reader-close">Close ✕</button>
+    <span class="muted small" id="reader-crumb"></span>
+    <button class="btn" type="button" id="reader-close">Close</button>
   </div></div>
   <div class="wrap"><article id="reader-article"></article></div>
 </div>
@@ -973,40 +704,66 @@ const byNewest = (a, b) => b.date.localeCompare(a.date);
 const pad = (n) => String(n).padStart(2, "0");
 const themesInOrder = [...THEMES].sort((a, b) => a.stage - b.stage);
 const themeNumber = (id) => themesInOrder.findIndex(t => t.id === id) + 1;
+const liveStories = () => POSTS.filter(p => LIVE.some(s => s.id === p.section)).sort(byNewest);
 
 function formatDate(iso) {
-  return new Date(iso + "T12:00:00")
-    .toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
-    .toUpperCase();
+  return new Date(iso + "T12:00:00").toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
 }
 function stageTag(theme) {
   const s = stageOf(theme.stage);
-  return `<span class="stage">${pad(s.n)} · ${s.name}</span>`;
-}
-function signalTag(p) {
-  return `<span class="sig ${p.signal}">${SIGNALS[p.signal].label}</span>`;
+  return `<span class="stage s${s.n}">${pad(s.n)} · ${s.name}</span>`;
 }
 
 /* ================================================================
-   E. BUILD THE PAGE
+   E. HOME: top story and story list
    ================================================================ */
-function renderTicker() {
-  const latest = [...POSTS].sort(byNewest)[0];
-  const items = ["<b>▲ Latest:</b> " + latest.title]
-    .concat(themesInOrder.map(t => "<b>" + t.name + ":</b> " + pad(t.stage) + " " + stageOf(t.stage).name))
-    .concat(["<b>New briefing</b> every Sunday"]);
-  const once = items.map(t => "<span>" + t + " ◆</span>").join("");
-  $("ticker").innerHTML = once + once; // twice, so the loop is seamless
+const PAGE = 8;            // stories shown before "Show more"
+let tab = "all", shown = PAGE;
+
+function topStory() {
+  const all = liveStories();
+  return all.find(p => p.featured) || all[0];
 }
 
-// The cycle wave in the hero. Drawn from STAGES and THEMES, so it updates itself.
+function renderLead() {
+  const p = topStory();
+  if (!p) return;
+  const t = themeOf(p.theme);
+  $("lead").innerHTML = `
+    <article class="lead">
+      <span class="kicker">Top story · ${formatDate(p.date)}</span>
+      ${stageTag(t)}
+      <h2><a href="#${p.slug}" data-slug="${p.slug}">${p.title}</a></h2>
+      <p>${p.summary}</p>
+      <a class="btn primary" href="#${p.slug}" data-slug="${p.slug}">Read the summary</a>
+    </article>`;
+}
+
+function renderList() {
+  const tabs = [{ id: "all", name: "All" }].concat(LIVE);
+  $("filters").innerHTML = tabs.map(s =>
+    `<button type="button" role="tab" aria-selected="${s.id === tab}" data-tab="${s.id}">${s.name}</button>`).join("");
+  const lead = topStory();
+  const list = liveStories().filter(p => (tab === "all" ? p !== lead : p.section === tab));
+  $("list").innerHTML = list.slice(0, shown).map(p => {
+    const t = themeOf(p.theme);
+    return `<li><a class="row" href="#${p.slug}" data-slug="${p.slug}">
+      ${stageTag(t)}
+      <span class="row-title">${p.title}</span>
+      <span class="row-meta">${t.name} · ${formatDate(p.date)}</span>
+    </a></li>`;
+  }).join("");
+  $("more").hidden = list.length <= shown;
+}
+
+/* ================================================================
+   F. CYCLE MAP
+   ================================================================ */
 function renderWave() {
   const left = 20, width = 64, base = 228;
-  const xs = STAGES.map((_, i) => left + width * i + width / 2);   // centre of each stage
-  const ys = [196, 168, 104, 62, 118];                              // capital flowing in at each stage
+  const xs = STAGES.map((_, i) => left + width * i + width / 2);
+  const ys = [196, 168, 104, 62, 118];
   const pts = [[left, 212]].concat(xs.map((x, i) => [x, ys[i]])).concat([[left + width * 5, 124]]);
-
-  // Smooth line through the points (Catmull-Rom curve)
   let d = `M${pts[0][0]},${pts[0][1]}`;
   for (let i = 0; i < pts.length - 1; i++) {
     const p0 = pts[i - 1] || pts[i], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2] || p2;
@@ -1014,18 +771,14 @@ function renderWave() {
     const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
     d += ` C${c1[0].toFixed(1)},${c1[1].toFixed(1)} ${c2[0].toFixed(1)},${c2[1].toFixed(1)} ${p2[0]},${p2[1]}`;
   }
-  const area = d + ` L${left + width * 5},${base} L${left},${base} Z`;
-
   let svg = `<text class="lbl" x="${left}" y="16">CAPITAL IN ↑</text>`;
-  svg += `<text class="lbl" x="${left + width * 5}" y="16" text-anchor="end">FIG. 1</text>`;
   for (let i = 1; i < 5; i++) svg += `<line class="band" x1="${left + width * i}" y1="28" x2="${left + width * i}" y2="${base}"/>`;
-  svg += `<path class="wave-area" d="${area}"/><path class="wave" d="${d}"/><path class="flow" d="${d}"/>`;
+  svg += `<path class="wave-area" d="${d} L${left + width * 5},${base} L${left},${base} Z"/><path class="wave" d="${d}"/>`;
   svg += `<line class="axis" x1="${left}" y1="${base}" x2="${left + width * 5}" y2="${base}"/>`;
   STAGES.forEach((s, i) => {
     svg += `<text class="lbl" x="${xs[i]}" y="${base + 15}" text-anchor="middle">${pad(s.n)}</text>`;
     svg += `<text class="lbl" x="${xs[i]}" y="${base + 28}" text-anchor="middle">${s.short}</text>`;
   });
-  // Theme dots, stacked upwards when several share a stage
   const used = {};
   themesInOrder.forEach(t => {
     const k = used[t.stage] = (used[t.stage] || 0) + 1;
@@ -1034,52 +787,33 @@ function renderWave() {
     svg += `<circle class="dot" cx="${x}" cy="${y}" r="10"/><text class="dot-t" x="${x}" y="${y + 3.5}" text-anchor="middle">${themeNumber(t.id)}</text>`;
   });
   $("wave").innerHTML = svg;
-
-  $("legend").innerHTML = themesInOrder.map(t =>
-    `<li><span class="num">${themeNumber(t.id)}</span><a href="#theme-${t.id}" style="text-decoration:none">${t.name}</a></li>`).join("");
-}
-
-let stageSel = 1; // the stage shown under "How the cycle works"
-
-function renderStages() {
-  $("stepper").innerHTML = STAGES.map(s => `
-    <button type="button" role="tab" aria-selected="${s.n === stageSel}" aria-controls="stage-detail" data-stage="${s.n}">
-      <span class="n">${pad(s.n)}</span><span class="nm">${s.name}</span>
-    </button>`).join("");
-  const s = stageOf(stageSel);
-  const here = THEMES.filter(t => t.stage === s.n).map(t => t.name);
-  $("stage-detail").innerHTML = `<p>${s.text}</p>
-    <p class="who">Typical capital: ${s.who}${here.length ? " · Themes here now: " + here.join(", ") : ""}</p>`;
 }
 
 function renderThemes() {
   $("themes").innerHTML = themesInOrder.map(t => {
-    const posts = POSTS.filter(p => p.theme === t.id).sort(byNewest);
-    const track = STAGES.map(s =>
-      `<span class="${s.n < t.stage ? "past" : s.n === t.stage ? "now" : ""}"></span>`).join("");
+    const posts = POSTS.filter(p => p.theme === t.id && LIVE.some(s => s.id === p.section)).sort(byNewest);
     const list = posts.length
-      ? `<ul>${posts.map(p => `<li><a href="#${p.slug}" data-slug="${p.slug}">${signalTag(p)}<span>${p.title}</span></a></li>`).join("")}</ul>`
-      : `<p class="none">No stories filed yet.</p>`;
+      ? `<ul>${posts.map(p => `<li><a href="#${p.slug}" data-slug="${p.slug}">${p.title}</a></li>`).join("")}</ul>`
+      : `<p class="muted small">No stories yet.</p>`;
     return `
       <details id="theme-${t.id}">
         <summary>
           <span class="tname"><span class="num">${themeNumber(t.id)}</span>${t.name}</span>
-          <span class="track" role="img" aria-label="Stage ${t.stage} of 5: ${stageOf(t.stage).name}">${track}</span>
           ${stageTag(t)}
           <span class="chev" aria-hidden="true">▶</span>
         </summary>
         <div class="open">
-          <div class="theme-body">
-            <p>${t.thesis}</p>
-            <p class="watch"><b>Watch for:</b> ${t.watch}</p>
-          </div>
-          <div class="evidence">
-            <span class="eyebrow">Evidence · ${posts.length} ${posts.length === 1 ? "story" : "stories"}</span>
-            ${list}
-          </div>
+          <p>${t.thesis}</p>
+          <p class="muted"><b style="color:var(--ink)">Watch for:</b> ${t.watch}</p>
+          ${list}
         </div>
       </details>`;
   }).join("");
+}
+
+function renderStages() {
+  $("stages").innerHTML = STAGES.map(s => `
+    <li><b><span class="n">${pad(s.n)}</span>${s.name}</b><span>${s.text} <span class="muted">Typical capital: ${s.who}.</span></span></li>`).join("");
 }
 
 function openTheme(id) {
@@ -1087,105 +821,55 @@ function openTheme(id) {
   if (d) { d.open = true; d.scrollIntoView({ block: "center" }); }
 }
 
-// Story cards show the headline only; the summary is one click away.
-function cardHTML(p) {
-  const t = themeOf(p.theme);
-  const sig = SIGNALS[p.signal].label;
-  return `
-    <a class="card" href="#${p.slug}" data-slug="${p.slug}">
-      <div class="meta mono">${stageTag(t)}<span>${formatDate(p.date)}</span></div>
-      <h3>${p.title}</h3>
-      <div class="foot mono"><span>${t.name}</span><span class="sig ${p.signal}" title="${sig}" aria-label="${sig}">${sig.split(" ")[0]}</span></div>
-    </a>`;
+/* LCOE = (build cost × capital recovery factor + yearly running cost) ÷ yearly output */
+const PRESETS = [
+  { name: "UK solar",               capex: 600,  cf: 11, opex: 12, wacc: 6,  life: 30 },
+  { name: "UK onshore wind",        capex: 1300, cf: 28, opex: 30, wacc: 6,  life: 25 },
+  { name: "Southern Vietnam solar", capex: 550,  cf: 17, opex: 9,  wacc: 10, life: 25 }
+];
+const FIELDS = ["capex", "cf", "opex", "wacc", "life"];
+function crf(r, n) { return r === 0 ? 1 / n : r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1); }
+function lcoe(v, w) {
+  const capital = v.capex * crf((w ?? v.wacc) / 100, v.life);
+  return { total: (capital + v.opex) / (8.76 * v.cf / 100), capital };
 }
-
-function renderNav() {
-  $("sitemap").innerHTML = [`<li><a href="#cycle">00 · Cycle map</a></li>`]
-    .concat(LIVE.map((s, i) => `<li><a href="#${s.id}">${pad(i + 1)} · ${s.name}</a></li>`))
-    .concat([`<li><a href="#about">${pad(LIVE.length + 1)} · About</a></li>`]).join("");
+function updateCalc() {
+  const v = {}; FIELDS.forEach(f => v[f] = parseFloat($(f).value));
+  const res = lcoe(v), down = lcoe(v, Math.max(0, v.wacc - 2)).total;
+  $("capex-o").textContent = "£" + v.capex.toLocaleString("en-GB");
+  $("cf-o").textContent = v.cf + "%";
+  $("opex-o").textContent = "£" + v.opex;
+  $("wacc-o").textContent = v.wacc.toFixed(1) + "%";
+  $("life-o").textContent = v.life + " yrs";
+  $("lcoe").textContent = res.total.toFixed(1);
+  $("r-cap").textContent = Math.round(res.capital / (res.capital + v.opex) * 100) + "%";
+  $("r-sens").textContent = "£" + down.toFixed(1) + " (" + ((down / res.total - 1) * 100).toFixed(1) + "%)";
+  document.querySelectorAll("#presets button").forEach((b, i) =>
+    b.setAttribute("aria-pressed", FIELDS.every(f => PRESETS[i][f] === v[f]) ? "true" : "false"));
 }
-
-function renderBoard() {
-  if (!PLANNED.length) { $("drawing-board").hidden = true; return; }
-  $("board").innerHTML = PLANNED.map(s => `
-    <div class="planned" title="${s.blurb}"><h3>${s.name}</h3></div>`).join("");
-}
-
-// Latest stories: one list, filtered by sector tabs
-const PAGE = 6; // stories shown before "Show more"
-let tab = "all", shown = PAGE;
-
-function renderStories() {
-  const tabs = [{ id: "all", name: "All" }].concat(LIVE);
-  $("tabs").innerHTML = tabs.map(s =>
-    `<button type="button" role="tab" aria-selected="${s.id === tab}" data-tab="${s.id}">${s.name}</button>`).join("");
-  const sec = LIVE.find(s => s.id === tab);
-  $("tab-blurb").textContent = sec ? sec.blurb : "Every story, newest first.";
-  const list = POSTS
-    .filter(p => tab === "all" ? LIVE.some(s => s.id === p.section) : p.section === tab)
-    .sort(byNewest);
-  $("cards").innerHTML = list.slice(0, shown).map(cardHTML).join("");
-  const left = list.length - Math.min(shown, list.length);
-  $("more").hidden = left <= 0;
-  $("more").textContent = `Show ${Math.min(left, PAGE)} more ▼`;
-}
-
-function selectTab(id) { tab = id; shown = PAGE; renderStories(); }
-
-// Featured slider
-const FEATURED_MAX = 6; // how many featured stories the slider shows, newest first
-const featured = POSTS.filter(p => p.featured).sort(byNewest).slice(0, FEATURED_MAX);
-let slide = 0;
-
-function renderFeature() {
-  if (!featured.length) { $("latest").hidden = true; return; }
-  const p = featured[slide];
-  const t = themeOf(p.theme);
-  const s = stageOf(t.stage);
-  $("feature").innerHTML = `
-    <article class="feature">
-      <div class="feature-plate">
-        <span class="mono">Stage · ${s.name}</span>
-        <span class="big">${pad(s.n)}</span>
-      </div>
-      <div class="feature-body">
-        <span class="eyebrow">${t.name} · ${formatDate(p.date)}</span>
-        <h3><a href="#${p.slug}" data-slug="${p.slug}">${p.title}</a></h3>
-        <p>${p.summary}</p>
-        <div>${signalTag(p)}</div>
-        <div><a class="btn primary" href="#${p.slug}" data-slug="${p.slug}">Read the summary ▶</a></div>
-      </div>
-    </article>`;
-  $("slide-count").textContent = pad(slide + 1) + " / " + pad(featured.length);
-}
-
-$("prev").addEventListener("click", () => { slide = (slide - 1 + featured.length) % featured.length; renderFeature(); });
-$("next").addEventListener("click", () => { slide = (slide + 1) % featured.length; renderFeature(); });
+function applyPreset(p) { FIELDS.forEach(f => $(f).value = p[f]); updateCalc(); }
+$("presets").innerHTML = PRESETS.map((p, i) => `<button type="button" data-preset="${i}">${p.name}</button>`).join("");
+FIELDS.forEach(f => $(f).addEventListener("input", updateCalc));
 
 /* ================================================================
-   F. STORY READER
+   G. STORY READER
    ================================================================ */
 let lastFocus = null;
-
 function openPost(slug) {
   const p = POSTS.find(x => x.slug === slug);
   if (!p) return;
   const t = themeOf(p.theme);
-  const ordered = [...POSTS].sort(byNewest);
-  const next = ordered[(ordered.indexOf(p) + 1) % ordered.length];
-  $("reader-crumb").textContent = sectionOf(p.section).name + " · " + t.name;
+  const all = liveStories();
+  const next = all[(all.indexOf(p) + 1) % all.length];
+  $("reader-crumb").textContent = sectionOf(p.section).name;
   $("reader-article").innerHTML = `
-    <span class="eyebrow">${formatDate(p.date)} · Via ${p.source.name} · ${p.minutes} min read</span>
+    <div class="tags">${stageTag(t)}<span>${t.name}</span><span>${formatDate(p.date)}</span></div>
     <h1 id="reader-title">${p.title}</h1>
-    <div class="tags">${stageTag(t)}<span class="mono">${t.name}</span>${signalTag(p)}</div>
     <p class="standfirst">${p.summary}</p>
     <div class="body">${p.body.map(b => b.startsWith("<h2") ? b : "<p>" + b + "</p>").join("")}</div>
-    <aside class="read"><span class="code">Cycle read</span><p>${p.cycleRead}</p></aside>
-    <p class="src mono">Source: ${p.source.name} · <a href="${p.source.url}" target="_blank" rel="noopener">Read the original ▶</a></p>
-    <div class="end">
-      <span class="mono">Next on the wire</span>
-      <a class="btn" href="#${next.slug}" data-slug="${next.slug}">${next.title} ▶</a>
-    </div>`;
+    <aside class="read"><b>Cycle read · <span class="sig ${p.signal}">${SIGNALS[p.signal].label}</span></b><p>${p.cycleRead}</p></aside>
+    <p class="src">Source: ${p.source.name} · <a href="${p.source.url}" target="_blank" rel="noopener">Read the original</a></p>
+    ${next && next !== p ? `<div class="next"><span class="muted small">Next story</span><a class="btn" href="#${next.slug}" data-slug="${next.slug}">${next.title}</a></div>` : ""}`;
   lastFocus = document.activeElement;
   $("reader").hidden = false;
   $("reader").scrollTop = 0;
@@ -1193,107 +877,49 @@ function openPost(slug) {
   $("reader-close").focus();
   try { history.replaceState(null, "", "#" + slug); } catch (e) {}
 }
-
 function closePost() {
   $("reader").hidden = true;
   document.body.style.overflow = "";
-  try { history.replaceState(null, "", location.pathname); } catch (e) {}
+  try { history.replaceState(null, "", "#" + currentView); } catch (e) {}
   if (lastFocus) lastFocus.focus();
 }
-
 $("reader-close").addEventListener("click", closePost);
 document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("reader").hidden) closePost(); });
 
-// One click handler for story links, sector tabs, stage buttons and "Show more"
+/* ================================================================
+   H. VIEWS AND LINKS
+   #stories, #cycle, #about switch views. #story-slug opens a story.
+   #sector-id filters the story list. #theme-id opens a theme.
+   ================================================================ */
+let currentView = "stories";
+function showView(name) {
+  currentView = name;
+  document.querySelectorAll("[data-view]").forEach(v => v.hidden = v.dataset.view !== name);
+  document.querySelectorAll("[data-nav]").forEach(a => {
+    if (a.dataset.nav === name) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
+  });
+}
+function route() {
+  const h = decodeURIComponent(location.hash.slice(1));
+  if (POSTS.some(p => p.slug === h)) { if (!$("reader").hidden) return; showView(currentView); openPost(h); return; }
+  if (!$("reader").hidden) closePost();
+  if (h === "cycle" || h === "about") { showView(h); window.scrollTo(0, 0); return; }
+  if (h.startsWith("theme-")) { showView("cycle"); openTheme(h.slice(6)); return; }
+  if (LIVE.some(s => s.id === h)) { showView("stories"); tab = h; shown = PAGE; renderList(); $("filters").scrollIntoView(); return; }
+  showView("stories"); if (h === "stories") window.scrollTo(0, 0);
+}
+window.addEventListener("hashchange", route);
+
 document.addEventListener("click", e => {
   const link = e.target.closest("[data-slug]");
   if (link) { e.preventDefault(); openPost(link.dataset.slug); return; }
   const t = e.target.closest("[data-tab]");
-  if (t) { selectTab(t.dataset.tab); return; }
-  const st = e.target.closest("[data-stage]");
-  if (st) { stageSel = +st.dataset.stage; renderStages(); return; }
-  if (e.target.closest("#more")) { shown += PAGE; renderStories(); }
+  if (t) { tab = t.dataset.tab; shown = PAGE; renderList(); return; }
+  const pr = e.target.closest("[data-preset]");
+  if (pr) { applyPreset(PRESETS[+pr.dataset.preset]); return; }
+  if (e.target.closest("#more")) { shown += PAGE; renderList(); }
 });
 
-// Links ending in #story-slug open the story; #sector-id picks that tab; #theme-id opens that theme
-function handleHash() {
-  const h = decodeURIComponent(location.hash.slice(1));
-  if (POSTS.some(p => p.slug === h)) { openPost(h); return; }
-  if (LIVE.some(s => s.id === h)) { selectTab(h); $("stories").scrollIntoView(); return; }
-  if (h.startsWith("theme-")) openTheme(h.slice(6));
-}
-window.addEventListener("hashchange", handleHash);
-
-/* ================================================================
-   G. LCOE CALCULATOR
-   LCOE = (build cost × capital recovery factor + yearly running cost)
-          ÷ yearly output
-   Capital recovery factor = r(1+r)^n / ((1+r)^n − 1)
-   ================================================================ */
-const PRESETS = [
-  { name: "UK solar",               capex: 600,  cf: 11, opex: 12, wacc: 6,  life: 30 },
-  { name: "UK onshore wind",        capex: 1300, cf: 28, opex: 30, wacc: 6,  life: 25 },
-  { name: "Southern Vietnam solar", capex: 550,  cf: 17, opex: 9,  wacc: 10, life: 25 }
-];
-const FIELDS = ["capex", "cf", "opex", "wacc", "life"];
-
-function crf(r, n) { return r === 0 ? 1 / n : r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1); }
-
-function lcoe(v, waccOverride) {
-  const r = (waccOverride ?? v.wacc) / 100;
-  const capital = v.capex * crf(r, v.life);   // £ per kW per year
-  const mwhPerKw = 8.76 * v.cf / 100;          // 8,760 hours × capacity factor ÷ 1,000
-  return { total: (capital + v.opex) / mwhPerKw, capital, mwhPerKw, crf: crf(r, v.life) };
-}
-
-function readInputs() {
-  const v = {};
-  FIELDS.forEach(f => v[f] = parseFloat($(f).value));
-  return v;
-}
-
-function updateCalc() {
-  const v = readInputs();
-  const res = lcoe(v);
-  const down = lcoe(v, Math.max(0, v.wacc - 2)).total;
-  const capShare = res.capital / (res.capital + v.opex) * 100;
-
-  $("capex-o").textContent = "£" + v.capex.toLocaleString("en-GB");
-  $("cf-o").textContent = v.cf + "%";
-  $("opex-o").textContent = "£" + v.opex;
-  $("wacc-o").textContent = v.wacc.toFixed(1) + "%";
-  $("life-o").textContent = v.life + " yrs";
-
-  $("lcoe").textContent = res.total.toFixed(1);
-  $("split-cap").style.width = capShare + "%";
-  $("split-op").style.width = (100 - capShare) + "%";
-  $("key-cap").textContent = "Capital " + Math.round(capShare) + "%";
-  $("key-op").textContent = "Running " + Math.round(100 - capShare) + "%";
-  $("r-out").textContent = Math.round(res.mwhPerKw * 1000).toLocaleString("en-GB") + " kWh";
-  $("r-crf").textContent = (res.crf * 100).toFixed(2) + "%";
-  $("r-sens").textContent = "£" + down.toFixed(1) + " (" + ((down / res.total - 1) * 100).toFixed(1) + "%)";
-
-  // Highlight a preset only while the inputs still match it
-  document.querySelectorAll("#presets button").forEach((b, i) => {
-    const p = PRESETS[i];
-    b.setAttribute("aria-pressed", FIELDS.every(f => p[f] === v[f]) ? "true" : "false");
-  });
-}
-
-function applyPreset(p) { FIELDS.forEach(f => $(f).value = p[f]); updateCalc(); }
-
-$("presets").innerHTML = PRESETS.map((p, i) => `<button type="button" data-preset="${i}">${p.name}</button>`).join("");
-$("presets").addEventListener("click", e => {
-  const b = e.target.closest("[data-preset]");
-  if (b) applyPreset(PRESETS[+b.dataset.preset]);
-});
-FIELDS.forEach(f => $(f).addEventListener("input", updateCalc));
-
-/* ================================================================
-   H. SUBSCRIBE FORM
-   To collect real emails, replace this with your newsletter
-   service's embed code (Substack, Buttondown, Mailchimp...).
-   ================================================================ */
 $("sub-form").addEventListener("submit", e => {
   e.preventDefault();
   $("sub-msg").textContent = SITE.newsletterNote;
@@ -1304,19 +930,16 @@ $("sub-form").addEventListener("submit", e => {
 /* ================================================================
    I. START
    ================================================================ */
-renderNav();
-renderBoard();
-renderTicker();
+renderLead();
+renderList();
 renderWave();
-renderStages();
 renderThemes();
-renderFeature();
-renderStories();
+renderStages();
 applyPreset(PRESETS[2]);
+if (PLANNED.length) $("coming").textContent = "Coming later: " + PLANNED.map(s => s.name).join(", ") + ".";
 $("year").textContent = new Date().getFullYear();
-if (SITE.linkedin) { $("linkedin").href = SITE.linkedin; $("linkedin-li").hidden = false; }
-
-handleHash();
+if (SITE.linkedin) { $("linkedin").href = SITE.linkedin; $("linkedin-p").hidden = false; }
+route();
 </script>
 </body>
 </html>
