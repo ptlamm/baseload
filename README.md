@@ -19,16 +19,16 @@ Open `index.html` on GitHub and click the pencil icon, or use a code editor such
 | `const STAGES` | The five cycle stages and their wording |
 | `B. THEMES` | The cycle map: each theme and its stage |
 | `C. STORIES` | Your news summaries |
-| `G. LCOE CALCULATOR` | The solar farm calculator and its example projects |
+| `const PRESETS` | The cost-of-capital calculator's example projects (Cycle map page) |
 
 Commit the change on GitHub, and the live site updates in about a minute.
 
 ## 3. Open, add or pause a sector
 All sectors live in one list, `SECTIONS`. Each has a `status`:
 - `"live"`: shown on the site and in the menu, and included in the Sunday drafts.
-- `"planned"`: shown in "On the drawing board" as a sector coming later.
+- `"planned"`: listed as "Coming later" on the About page.
 
-To start covering a planned sector: change `"planned"` to `"live"`. It appears as a tab under "Latest stories", in the footer and in the Sunday drafts automatically.
+To start covering a planned sector: change `"planned"` to `"live"`. It appears as a filter above the story list and in the Sunday drafts automatically.
 
 To add a new idea: copy one line, give it a short unique `id` (lowercase, hyphens), a `name`, a one-line `blurb` and `status: "planned"`.
 
@@ -59,7 +59,7 @@ In `C. STORIES`, copy one `{ ... },` block, paste it at the top of the list and 
 - `signal`: `"forward"` (moves the theme towards the next stage), `"confirms"` (fits its current stage) or `"back"` (holds it back)
 - `date`: the date of the original story
 - `minutes`: reading time
-- `featured: true` to show it in the Strongest signals slider
+- `featured: true` makes it the top story on the home page (the newest featured story is used)
 - `title` and `summary`: one line each, in your own words
 - `body`: the key facts, one short paragraph per item
 - `cycleRead`: your view on what the story says about the cycle
