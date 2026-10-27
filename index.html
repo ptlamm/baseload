@@ -30,6 +30,7 @@
   --on-volt: #13233B;   /* text on top of the accent  */
   --live:    #2E7D57;   /* "moves it forward" green   */
   --hold:    #B23A2E;   /* "holds it back" red        */
+  --band:    #E1E6DE;   /* alternate section band     */
 
   --f-display: "Big Shoulders Display", "Arial Narrow", Impact, sans-serif;
   --f-body:    "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -40,14 +41,14 @@
   :root:not([data-theme="light"]) {
     --paper:#0F1724; --panel:#162234; --ink:#E7EBE3; --muted:#9BA7B8;
     --rule:#26364B; --volt:#F2B705; --volt-ink:#F2B705; --on-volt:#13233B;
-    --live:#4CC38A; --hold:#F07A6B;
+    --live:#4CC38A; --hold:#F07A6B; --band:#132033;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --paper:#0F1724; --panel:#162234; --ink:#E7EBE3; --muted:#9BA7B8;
   --rule:#26364B; --volt:#F2B705; --volt-ink:#F2B705; --on-volt:#13233B;
-  --live:#4CC38A; --hold:#F07A6B;
+  --live:#4CC38A; --hold:#F07A6B; --band:#132033;
   color-scheme: dark;
 }
 
@@ -56,6 +57,7 @@
    ================================================================ */
 * { box-sizing: border-box; }
 body {
+  margin: 0;
   background: var(--paper);
   color: var(--ink);
   font: 16px/1.6 var(--f-body);
@@ -138,7 +140,7 @@ p { margin: 0; }
 .wave-area { fill: var(--volt); fill-opacity: .16; stroke: none; }
 .wave      { fill: none; stroke: var(--ink); stroke-width: 3; }
 .flow      { fill: none; stroke: var(--volt); stroke-width: 3; stroke-dasharray: 3 9; animation: flow 1.1s linear infinite; }
-.band      { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 2 4; }
+.stage-sep { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 2 4; }
 .axis      { stroke: var(--ink); stroke-width: 2; }
 .lbl       { fill: var(--muted); font: 600 9px var(--f-mono); letter-spacing: .1em; }
 .dot       { fill: var(--volt); stroke: var(--ink); stroke-width: 2; }
@@ -414,6 +416,32 @@ section[id], details[id] { scroll-margin-top: 90px; }
 }
 
 /* ================================================================
+   13d. SECTION BANDS — each section is a full-width band with a firm
+   top rule; backgrounds alternate so neighbours never blur together
+   ================================================================ */
+.band { background: var(--paper); border-top: 3px solid var(--ink); }
+.band.alt { background: var(--band); }
+.band > .wrap { padding-block: 64px 72px; }
+.band-hero { border-top: 0; }
+.band-hero > .wrap { padding-block: 0 8px; }
+.band-hero .intro { border-bottom: 0; }
+.band.ink { background: var(--ink); color: var(--paper); }
+.band.ink > .wrap { padding-block: 56px; }
+.band.ink .subscribe { padding: 0; background: transparent; }
+.node { padding-left: 30px; margin-bottom: 28px; }
+.node::before { left: 0; top: 2px; }
+.topic-head { margin-bottom: 4px; }
+.topic .cards { margin-top: 16px; }
+.band.alt .card, .band.alt .cmap, .band.alt .calc, .band.alt .feature, .band.alt .plate { background: var(--panel); }
+
+@media (max-width: 640px) {
+  .band > .wrap { padding-block: 44px 52px; }
+  .band.ink > .wrap { padding-block: 40px; }
+  .node { padding-left: 26px; }
+  .node::before { left: 0; }
+}
+
+/* ================================================================
    14. PHONE AND TABLET LAYOUT
    ================================================================ */
 @media (max-width: 980px) {
@@ -437,7 +465,7 @@ section[id], details[id] { scroll-margin-top: 90px; }
   .stage-item { grid-template-columns: minmax(0, 1fr); }
   .stage-item > *, .stage-item > .code { grid-column: 1; grid-row: auto; }
   .bus { padding-left: 22px; }
-  .node::before { left: -33px; }
+  .node::before { left: 0; }
   .nav { margin-left: 0; width: 100%; }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -475,8 +503,7 @@ section[id], details[id] { scroll-margin-top: 90px; }
 </header>
 
 <main id="top">
-  <div class="wrap">
-
+  <div class="band band-hero"><div class="wrap">
     <!-- HERO -->
     <section class="hero">
       <div>
@@ -505,10 +532,9 @@ section[id], details[id] { scroll-margin-top: 90px; }
       <div class="stepper" role="tablist" aria-label="The five stages" id="stepper"></div>
       <div class="stage-detail" role="tabpanel" id="stage-detail" aria-live="polite"></div>
     </section>
+  </div></div>
 
-    <!-- EVERYTHING BELOW HANGS OFF THE BUSBAR -->
-    <div class="bus">
-
+  <div class="band"><div class="wrap">
       <section id="latest" aria-labelledby="latest-h">
         <header class="node">
           <span class="eyebrow">This week · Strongest signals</span>
@@ -521,10 +547,12 @@ section[id], details[id] { scroll-margin-top: 90px; }
           <button type="button" id="next" aria-label="Next featured story">▶</button>
         </div>
       </section>
+  </div></div>
 
-      <!-- One block per live topic, three newest headlines each. Built by JavaScript. -->
-      <div class="topics" id="stories"></div>
+  <!-- One band per live topic, three newest headlines each. Built by JavaScript. -->
+  <div id="stories"></div>
 
+  <div class="band"><div class="wrap">
       <section id="cycle" aria-labelledby="cycle-h">
         <header class="node">
           <span class="eyebrow">Cycle map · Updated weekly</span>
@@ -533,8 +561,9 @@ section[id], details[id] { scroll-margin-top: 90px; }
         </header>
         <div class="cmap" id="themes"></div>
       </section>
+  </div></div>
 
-
+  <div class="band"><div class="wrap">
       <section id="bonus" aria-labelledby="bonus-h">
         <header class="node">
           <span class="eyebrow">Bonus · Try it yourself</span>
@@ -564,7 +593,9 @@ section[id], details[id] { scroll-margin-top: 90px; }
           </div>
         </div>
       </section>
+  </div></div>
 
+  <div class="band"><div class="wrap">
       <section id="drawing-board" aria-labelledby="board-h">
         <header class="node">
           <span class="eyebrow">Coming later</span>
@@ -572,7 +603,9 @@ section[id], details[id] { scroll-margin-top: 90px; }
         </header>
         <div class="board" id="board"></div>
       </section>
+  </div></div>
 
+  <div class="band ink"><div class="wrap">
       <section id="subscribe" class="subscribe" aria-labelledby="sub-h">
         <span class="mono" style="color:var(--volt)">Stay connected</span>
         <h2 id="sub-h">One cycle briefing every Sunday</h2>
@@ -584,7 +617,9 @@ section[id], details[id] { scroll-margin-top: 90px; }
         </form>
         <p class="msg" id="sub-msg" hidden></p>
       </section>
+  </div></div>
 
+  <div class="band"><div class="wrap">
       <section id="about" aria-labelledby="about-h">
         <header class="node">
           <span class="eyebrow">Operator</span>
@@ -608,9 +643,8 @@ section[id], details[id] { scroll-margin-top: 90px; }
           </div>
         </div>
       </section>
+  </div></div>
 
-    </div>
-  </div>
 </main>
 
 <footer>
@@ -626,7 +660,7 @@ section[id], details[id] { scroll-margin-top: 90px; }
     <div>
       <span class="eyebrow">System</span>
       <ul>
-        <li class="mono">Est. 2026 · Build v0.7</li>
+        <li class="mono">Est. 2026 · Build v0.8</li>
         <li class="mono">Photos: <a href="https://unsplash.com" target="_blank" rel="noopener">Unsplash</a></li>
         <li class="mono">© <span id="year"></span> Baseload</li>
         <li id="linkedin-li" hidden><a id="linkedin" href="#" target="_blank" rel="noopener">LinkedIn ▶</a></li>
@@ -1078,7 +1112,7 @@ function renderWave() {
 
   let svg = `<text class="lbl" x="${left}" y="16">CAPITAL IN ↑</text>`;
   svg += `<text class="lbl" x="${left + width * 5}" y="16" text-anchor="end">FIG. 1</text>`;
-  for (let i = 1; i < 5; i++) svg += `<line class="band" x1="${left + width * i}" y1="28" x2="${left + width * i}" y2="${base}"/>`;
+  for (let i = 1; i < 5; i++) svg += `<line class="stage-sep" x1="${left + width * i}" y1="28" x2="${left + width * i}" y2="${base}"/>`;
   svg += `<path class="wave-area" d="${area}"/><path class="wave" d="${d}"/><path class="flow" d="${d}"/>`;
   svg += `<line class="axis" x1="${left}" y1="${base}" x2="${left + width * 5}" y2="${base}"/>`;
   STAGES.forEach((s, i) => {
@@ -1219,7 +1253,7 @@ function renderNav() {
 }
 
 function renderBoard() {
-  if (!PLANNED.length) { $("drawing-board").hidden = true; return; }
+  if (!PLANNED.length) { $("drawing-board").closest(".band").hidden = true; return; }
   $("board").innerHTML = PLANNED.map(s => `
     <div class="planned" title="${s.blurb}"><h3>${s.name}</h3></div>`).join("");
 }
@@ -1231,7 +1265,7 @@ function renderTopics() {
   $("stories").innerHTML = LIVE.map((s, i) => {
     const posts = POSTS.filter(p => p.section === s.id).sort(byNewest);
     return `
-      <section class="topic" id="${s.id}" aria-labelledby="${s.id}-h">
+      <section class="band topic" id="${s.id}" aria-labelledby="${s.id}-h"><div class="wrap">
         <div class="topic-head">
           <header class="node">
             <span class="eyebrow">Topic ${pad(i + 1)} · ${posts.length} ${posts.length === 1 ? "story" : "stories"}</span>
@@ -1240,8 +1274,14 @@ function renderTopics() {
           ${posts.length > PER_TOPIC ? `<button class="btn" type="button" data-more="${s.id}">See all ${posts.length} ▼</button>` : ""}
         </div>
         <div class="cards" id="${s.id}-cards">${posts.slice(0, PER_TOPIC).map(cardHTML).join("") || '<p class="note">No stories yet.</p>'}</div>
-      </section>`;
+      </div></section>`;
   }).join("");
+}
+
+// Alternate band backgrounds so each section stands apart
+function stripeBands() {
+  document.querySelectorAll("main .band:not(.band-hero):not(.ink):not([hidden])")
+    .forEach((b, i) => b.classList.toggle("alt", i % 2 === 0));
 }
 
 // Featured slider
@@ -1427,6 +1467,7 @@ renderStages();
 renderThemes();
 renderFeature();
 renderTopics();
+stripeBands();
 applyPreset(PRESETS[2]);
 $("year").textContent = new Date().getFullYear();
 if (SITE.linkedin) { $("linkedin").href = SITE.linkedin; $("linkedin-li").hidden = false; }
