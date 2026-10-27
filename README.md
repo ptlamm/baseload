@@ -28,7 +28,7 @@ All sectors live in one list, `SECTIONS`. Each has a `status`:
 - `"live"`: shown on the site and in the menu, and included in the Sunday drafts.
 - `"planned"`: shown in "On the drawing board" as a sector coming later.
 
-To start covering a planned sector: change `"planned"` to `"live"`, and give it a `label` (the section heading, for example `"Capital & rules"`). The menu, footer and Sunday drafts pick it up automatically.
+To start covering a planned sector: change `"planned"` to `"live"`. It appears as a tab under "Latest stories", in the footer and in the Sunday drafts automatically.
 
 To add a new idea: copy one line, give it a short unique `id` (lowercase, hyphens), a `name`, a one-line `blurb` and `status: "planned"`.
 
