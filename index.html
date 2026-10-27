@@ -442,6 +442,28 @@ section[id], details[id] { scroll-margin-top: 90px; }
 }
 
 /* ================================================================
+   13e. TAGS
+   ================================================================ */
+.tag-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag {
+  display: inline-flex; align-items: center; gap: 6px; padding: 5px 9px;
+  font: 600 12px/1.1 var(--f-body); color: var(--ink); text-decoration: none; cursor: pointer;
+  background: transparent; border: 1px solid color-mix(in srgb, var(--ink) 28%, transparent); border-radius: 999px;
+}
+.tag:hover { border-color: var(--ink); background: color-mix(in srgb, var(--volt) 20%, transparent); }
+.tag.on { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.tag .n { font: 600 10px var(--f-mono); color: var(--muted); }
+.tag.on .n { color: inherit; opacity: .75; }
+.card .tag { font-size: 11px; padding: 4px 8px; }
+.tag-groups { display: grid; gap: 16px; }
+.tag-group { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 8px 20px; align-items: start; }
+.tag-group h3 { font: 600 11px/2.2 var(--f-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+#tag-results { margin-top: 32px; padding-top: 24px; border-top: 1px solid color-mix(in srgb, var(--ink) 14%, transparent); }
+.tag-results-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 18px; }
+.tag-results-head h3 { font: 800 30px/1 var(--f-display); text-transform: uppercase; }
+@media (max-width: 640px) { .tag-group { grid-template-columns: minmax(0, 1fr); gap: 6px; } }
+
+/* ================================================================
    14. PHONE AND TABLET LAYOUT
    ================================================================ */
 @media (max-width: 980px) {
@@ -496,6 +518,7 @@ section[id], details[id] { scroll-margin-top: 90px; }
     <nav class="nav" aria-label="Main">
       <a href="#stories">Stories</a>
       <a href="#cycle">Cycle map</a>
+      <a href="#tags">Tags</a>
       <a href="#about">About</a>
       <a class="btn primary" href="#subscribe">Subscribe ▶</a>
     </nav>
@@ -551,6 +574,24 @@ section[id], details[id] { scroll-margin-top: 90px; }
 
   <!-- One band per live topic, three newest headlines each. Built by JavaScript. -->
   <div id="stories"></div>
+
+  <div class="band"><div class="wrap">
+      <section id="tags" aria-labelledby="tags-h">
+        <header class="node">
+          <span class="eyebrow">Browse</span>
+          <h2 id="tags-h">Browse by tag</h2>
+          <p>Pick a region, a deal type or an asset to see every story with that tag.</p>
+        </header>
+        <div class="tag-groups" id="tag-groups"></div>
+        <div id="tag-results" hidden>
+          <div class="tag-results-head">
+            <h3 id="tag-results-h"></h3>
+            <button class="btn" type="button" data-tag-clear>Clear</button>
+          </div>
+          <div class="cards" id="tag-cards"></div>
+        </div>
+      </section>
+  </div></div>
 
   <div class="band"><div class="wrap">
       <section id="cycle" aria-labelledby="cycle-h">
@@ -660,7 +701,7 @@ section[id], details[id] { scroll-margin-top: 90px; }
     <div>
       <span class="eyebrow">System</span>
       <ul>
-        <li class="mono">Est. 2026 · Build v0.8</li>
+        <li class="mono">Est. 2026 · Build v0.9</li>
         <li class="mono">Photos: <a href="https://unsplash.com" target="_blank" rel="noopener">Unsplash</a></li>
         <li class="mono">© <span id="year"></span> Baseload</li>
         <li id="linkedin-li" hidden><a id="linkedin" href="#" target="_blank" rel="noopener">LinkedIn ▶</a></li>
@@ -783,10 +824,29 @@ const SIGNALS = {
 };
 
 /* ================================================================
+   B2. TAGS — every story gets exactly three: one region, one deal
+   type, and one asset from its own section's list. Readers can click
+   a tag to see every story that has it. To add a tag, add it here.
+   ================================================================ */
+const TAGS = {
+  region: ["UK", "Europe", "US", "Vietnam", "ASEAN", "India", "Australia", "Other emerging markets", "Global"],
+  deal: ["Fund raise", "Stake sale / M&A", "Debt & project finance", "Bond issue", "Contract / PPA",
+         "Tender / auction", "Policy & regulation", "Report & data"],
+  asset: {
+    "sustainable-finance": ["Green & transition bonds", "Blended finance", "Development finance (DFIs)",
+                            "Taxonomies & disclosure", "Carbon markets", "ESG fund flows"],
+    "energy":              ["Solar", "Wind", "Battery storage", "Gas & LNG", "Hydrogen", "Nuclear", "Power markets"],
+    "infrastructure":      ["Grids & transmission", "Ports", "Airports", "Water & utilities", "Transport", "Digital infrastructure"],
+    "technology":          ["Data centres", "Grid equipment", "Subsea cables", "Grid software"]
+  }
+};
+
+/* ================================================================
    C. STORIES — this list is your blog.
    Each item summarises one public article in your own words.
    To add a story, copy one block, change the text, and save.
    - section:  the id of a live section, e.g. "sustainable-finance"
+   - tags:     { region: "...", deal: "...", asset: "..." } from the TAGS lists
    - theme:    the id of a theme above, e.g. "compute"
    - signal:   "forward", "confirms" or "back"
    - date:     date of the original story, "YYYY-MM-DD"
@@ -802,6 +862,7 @@ const SIGNALS = {
 const POSTS = [
   {
     slug: "world-bank-imf-bangkok-climate-sidelined",
+    tags: { region: "Global", deal: "Policy & regulation", asset: "Development finance (DFIs)" },
     section: "sustainable-finance", theme: "em-finance", signal: "back",
     date: "2026-10-22", minutes: 3, featured: true,
     title: "Climate slips down the agenda at the World Bank and IMF meetings",
@@ -817,6 +878,7 @@ const POSTS = [
   },
   {
     slug: "vietnam-pm-power-supply-2027-2030-order",
+    tags: { region: "Vietnam", deal: "Policy & regulation", asset: "Solar" },
     section: "energy", theme: "asean", signal: "confirms",
     date: "2026-10-22", minutes: 3, featured: true,
     title: "Vietnam orders a rooftop solar and battery push to avoid power shortages",
@@ -832,6 +894,7 @@ const POSTS = [
   },
   {
     slug: "ofgem-hornsea-3-ofto-tender",
+    tags: { region: "UK", deal: "Tender / auction", asset: "Grids & transmission" },
     section: "infrastructure", theme: "grids", signal: "forward",
     date: "2026-10-22", minutes: 3,
     title: "Ofgem puts £3.5bn of Hornsea 3 grid links up for private bidders",
@@ -846,6 +909,7 @@ const POSTS = [
   },
   {
     slug: "ifm-buys-majority-of-associated-british-ports",
+    tags: { region: "UK", deal: "Stake sale / M&A", asset: "Ports" },
     section: "infrastructure", theme: "core", signal: "confirms",
     date: "2026-10-21", minutes: 3, featured: true,
     title: "IFM buys control of Associated British Ports from two Canadian pension funds",
@@ -860,6 +924,7 @@ const POSTS = [
   },
   {
     slug: "nextera-federal-gas-hubs-16-5gw",
+    tags: { region: "US", deal: "Contract / PPA", asset: "Data centres" },
     section: "technology", theme: "compute", signal: "confirms",
     date: "2026-10-21", minutes: 3, featured: true,
     title: "NextEra signs 16.5 GW of gas hubs paid for with government money",
@@ -874,6 +939,7 @@ const POSTS = [
   },
   {
     slug: "tata-power-2-8gw-india-data-centres",
+    tags: { region: "India", deal: "Report & data", asset: "Data centres" },
     section: "technology", theme: "compute", signal: "forward",
     date: "2026-10-21", minutes: 2,
     title: "Tata Power lines up 2.8 GW of power for India's data centres",
@@ -887,6 +953,7 @@ const POSTS = [
   },
   {
     slug: "ignitis-inaugural-european-green-bond",
+    tags: { region: "Europe", deal: "Bond issue", asset: "Green & transition bonds" },
     section: "sustainable-finance", theme: "eugb", signal: "confirms",
     date: "2026-10-20", minutes: 2,
     title: "Lithuania's Ignitis sells its first European Green Bond, 3.3 times covered",
@@ -901,6 +968,7 @@ const POSTS = [
   },
   {
     slug: "akaysha-au1-75bn-bess-refinancing",
+    tags: { region: "Australia", deal: "Debt & project finance", asset: "Battery storage" },
     section: "energy", theme: "storage", signal: "confirms",
     date: "2026-10-20", minutes: 3,
     title: "Eleven banks lend Akaysha A$1.75bn to refinance Australian batteries",
@@ -915,6 +983,7 @@ const POSTS = [
   },
   {
     slug: "eu-green-bond-standard-issuance-2026",
+    tags: { region: "Europe", deal: "Report & data", asset: "Green & transition bonds" },
     section: "sustainable-finance", theme: "eugb", signal: "forward",
     date: "2026-10-20", minutes: 3, featured: true,
     title: "EU green bond issuance nearly doubles under the new standard",
@@ -929,6 +998,7 @@ const POSTS = [
   },
   {
     slug: "vifc-hcmc-green-transition-finance-hub",
+    tags: { region: "Vietnam", deal: "Policy & regulation", asset: "Green & transition bonds" },
     section: "sustainable-finance", theme: "em-finance", signal: "confirms",
     date: "2026-08-07", minutes: 3,
     title: "Ho Chi Minh City wants to be Southeast Asia's transition finance hub",
@@ -943,6 +1013,7 @@ const POSTS = [
   },
   {
     slug: "ggbi-blended-green-bond-fund-amundi",
+    tags: { region: "Other emerging markets", deal: "Fund raise", asset: "Blended finance" },
     section: "sustainable-finance", theme: "em-finance", signal: "forward",
     date: "2026-04-27", minutes: 3,
     title: "EU backs a €3bn blended fund for first-time green bonds in emerging markets",
@@ -957,6 +1028,7 @@ const POSTS = [
   },
   {
     slug: "blackstone-energy-transition-fund-v",
+    tags: { region: "Global", deal: "Fund raise", asset: "Power markets" },
     section: "energy", theme: "grids", signal: "forward",
     date: "2026-10-19", minutes: 3, featured: true,
     title: "Blackstone closes an $8.7bn energy transition fund",
@@ -971,6 +1043,7 @@ const POSTS = [
   },
   {
     slug: "microsoft-nisource-indiana-power-deal",
+    tags: { region: "US", deal: "Contract / PPA", asset: "Data centres" },
     section: "technology", theme: "compute", signal: "confirms",
     date: "2026-10-19", minutes: 3, featured: true,
     title: "Microsoft signs a 20-year power deal in Indiana, and pays for the new plants",
@@ -984,6 +1057,7 @@ const POSTS = [
   },
   {
     slug: "ls-electric-us-data-centre-switchgear",
+    tags: { region: "US", deal: "Contract / PPA", asset: "Grid equipment" },
     section: "technology", theme: "compute", signal: "confirms",
     date: "2026-10-19", minutes: 2,
     title: "LS Electric wins a $125m switchgear order from US big tech",
@@ -997,6 +1071,7 @@ const POSTS = [
   },
   {
     slug: "macquarie-tif-exits-perth-airport",
+    tags: { region: "Australia", deal: "Stake sale / M&A", asset: "Airports" },
     section: "infrastructure", theme: "core", signal: "confirms",
     date: "2026-10-16", minutes: 2,
     title: "Macquarie fund sells its Perth Airport stake after 25 years",
@@ -1010,6 +1085,7 @@ const POSTS = [
   },
   {
     slug: "ieefa-vietnam-renewables-vs-lng",
+    tags: { region: "Vietnam", deal: "Report & data", asset: "Gas & LNG" },
     section: "energy", theme: "asean", signal: "forward",
     date: "2026-10-15", minutes: 4, featured: true,
     title: "Solar and wind beat LNG on cost and speed in Vietnam, says IEEFA",
@@ -1025,6 +1101,7 @@ const POSTS = [
   },
   {
     slug: "asean-energy-transition-investment-roadmap",
+    tags: { region: "ASEAN", deal: "Report & data", asset: "Grids & transmission" },
     section: "infrastructure", theme: "asean", signal: "confirms",
     date: "2026-10-14", minutes: 3, featured: true,
     title: "New ASEAN roadmap puts net zero at about £520bn a year",
@@ -1039,6 +1116,7 @@ const POSTS = [
   },
   {
     slug: "aurora-europe-battery-saturation",
+    tags: { region: "Europe", deal: "Report & data", asset: "Battery storage" },
     section: "energy", theme: "storage", signal: "confirms",
     date: "2026-05-14", minutes: 3,
     title: "Too many batteries: Europe's storage revenues set to fall",
@@ -1231,6 +1309,52 @@ function thumbHTML(p) {
   </svg></span>`;
 }
 
+// ---- Tags -------------------------------------------------------
+const tagSlug = (name) => name.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+const tagsOf = (p) => p.tags ? [p.tags.region, p.tags.deal, p.tags.asset].filter(Boolean) : [];
+const ALL_TAGS = [...TAGS.region, ...TAGS.deal, ...Object.values(TAGS.asset).flat()];
+const tagBySlug = (slug) => ALL_TAGS.find(t => tagSlug(t) === slug);
+let activeTag = null;
+
+// Chips inside a card are spans (a card is already a link); elsewhere they are links.
+function tagChips(p, inCard) {
+  return `<div class="tag-row">${tagsOf(p).map(t => inCard
+    ? `<span class="tag" role="link" tabindex="0" data-tag="${t}">${t}</span>`
+    : `<a class="tag" href="#tag-${tagSlug(t)}" data-tag="${t}">${t}</a>`).join("")}</div>`;
+}
+
+function renderTagIndex() {
+  const count = (t) => LIVE_POSTS.filter(p => tagsOf(p).includes(t)).length;
+  const groups = [
+    ["Region", TAGS.region],
+    ["Deal type", TAGS.deal],
+    ["Asset", LIVE.flatMap(s => TAGS.asset[s.id] || [])]
+  ];
+  $("tag-groups").innerHTML = groups.map(([label, list]) => {
+    const used = list.filter(t => count(t) > 0);
+    if (!used.length) return "";
+    return `<div class="tag-group"><h3>${label}</h3><div class="tag-row">${used.map(t =>
+      `<a class="tag${t === activeTag ? " on" : ""}" href="#tag-${tagSlug(t)}" data-tag="${t}">${t} <span class="n">${count(t)}</span></a>`).join("")}</div></div>`;
+  }).join("");
+}
+
+function showTag(name, scroll) {
+  activeTag = name;
+  const list = LIVE_POSTS.filter(p => tagsOf(p).includes(name)).sort(byNewest);
+  $("tag-results-h").textContent = `${name} · ${list.length} ${list.length === 1 ? "story" : "stories"}`;
+  $("tag-cards").innerHTML = list.map(cardHTML).join("");
+  $("tag-results").hidden = false;
+  renderTagIndex();
+  if (scroll) $("tags").scrollIntoView();
+}
+
+function clearTag() {
+  activeTag = null;
+  $("tag-results").hidden = true;
+  renderTagIndex();
+  try { history.replaceState(null, "", location.pathname); } catch (e) {}
+}
+
 // Story cards: thumbnail and headline; the summary is one click away.
 function cardHTML(p) {
   const t = themeOf(p.theme);
@@ -1241,6 +1365,7 @@ function cardHTML(p) {
       <div class="card-body">
         <div class="meta mono">${stageTag(t)}<span>${formatDate(p.date)}</span></div>
         <h3>${p.title}</h3>
+        ${tagChips(p, true)}
         <div class="foot mono"><span>${t.name}</span><span class="sig ${p.signal}" title="${sig}" aria-label="${sig}">${sig.split(" ")[0]}</span></div>
       </div>
     </a>`;
@@ -1329,6 +1454,7 @@ function openPost(slug) {
     <span class="eyebrow">${formatDate(p.date)} · Via ${p.source.name} · ${p.minutes} min read</span>
     <h1 id="reader-title">${p.title}</h1>
     <div class="tags">${stageTag(t)}<span class="mono">${t.name}</span>${signalTag(p)}</div>
+    ${tagChips(p, false)}
     <p class="standfirst">${p.summary}</p>
     <div class="body">${p.body.map(b => b.startsWith("<h2") ? b : "<p>" + b + "</p>").join("")}</div>
     <aside class="read"><span class="code">Cycle read</span><p>${p.cycleRead}</p></aside>
@@ -1353,10 +1479,23 @@ function closePost() {
 }
 
 $("reader-close").addEventListener("click", closePost);
-document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("reader").hidden) closePost(); });
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && !$("reader").hidden) closePost();
+  // Tag chips inside cards open with Enter, like links
+  if (e.key === "Enter" && e.target.matches && e.target.matches("span.tag[data-tag]")) { e.preventDefault(); e.target.click(); }
+});
 
 // One click handler for story links, stage buttons and "See all"
 document.addEventListener("click", e => {
+  const tag = e.target.closest("[data-tag]");
+  if (tag) {
+    e.preventDefault();
+    if (!$("reader").hidden) closePost();
+    showTag(tag.dataset.tag, true);
+    try { history.replaceState(null, "", "#tag-" + tagSlug(tag.dataset.tag)); } catch (err) {}
+    return;
+  }
+  if (e.target.closest("[data-tag-clear]")) { clearTag(); return; }
   const link = e.target.closest("[data-slug]");
   if (link) { e.preventDefault(); openPost(link.dataset.slug); return; }
   const more = e.target.closest("[data-more]");
@@ -1375,7 +1514,8 @@ function handleHash() {
   const h = decodeURIComponent(location.hash.slice(1));
   if (POSTS.some(p => p.slug === h)) { openPost(h); return; }
   if (LIVE.some(s => s.id === h)) { $(h).scrollIntoView(); return; }
-  if (h.startsWith("theme-")) openTheme(h.slice(6));
+  if (h.startsWith("theme-")) { openTheme(h.slice(6)); return; }
+  if (h.startsWith("tag-") && tagBySlug(h.slice(4))) showTag(tagBySlug(h.slice(4)), true);
 }
 window.addEventListener("hashchange", handleHash);
 
@@ -1467,6 +1607,7 @@ renderStages();
 renderThemes();
 renderFeature();
 renderTopics();
+renderTagIndex();
 stripeBands();
 applyPreset(PRESETS[2]);
 $("year").textContent = new Date().getFullYear();
