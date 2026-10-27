@@ -1,0 +1,7 @@
+# Netlify settings for Baseload.
+# Before every deploy, Netlify runs the story check. If a story is broken
+# (missing theme, bad section, typo in the code), the deploy stops and the
+# live site stays as it was.
+[build]
+  publish = "."
+  command = "node scripts/check-stories.js"

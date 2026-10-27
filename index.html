@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Baseload</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="A weekly briefing on where the next investment cycle is forming in energy, infrastructure and technology.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Martian+Mono:wght@400;600&family=Public+Sans:ital,wght@0,400;0,600;1,400&display=swap">
+
+<style>
+/* ================================================================
+   1. DESIGN TOKENS
+   Layout idea: the page is drawn like an electrical single-line
+   diagram. A busbar (the thick vertical line) runs down the page and
+   each section hangs off it as a node. The investment cycle is drawn
+   as one wave on grid paper.
+   Change colours and fonts here and the whole site follows.
+   ================================================================ */
+:root {
+  --paper:   #ECEFEA;   /* page background            */
+  --panel:   #F7F8F4;   /* cards and panels           */
+  --ink:     #13233B;   /* main text and lines        */
+  --muted:   #56627A;   /* secondary text             */
+  --rule:    #CDD3CA;   /* thin lines, grid paper     */
+  --volt:    #E8A900;   /* the one accent colour      */
+  --volt-ink:#7A5000;   /* accent when used as text   */
+  --on-volt: #13233B;   /* text on top of the accent  */
+  --live:    #2E7D57;   /* "moves it forward" green   */
+  --hold:    #B23A2E;   /* "holds it back" red        */
+
+  --f-display: "Big Shoulders Display", "Arial Narrow", Impact, sans-serif;
+  --f-body:    "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono:    "Martian Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+/* Dark theme: same token names, new values */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper:#0F1724; --panel:#162234; --ink:#E7EBE3; --muted:#9BA7B8;
+    --rule:#26364B; --volt:#F2B705; --volt-ink:#F2B705; --on-volt:#13233B;
+    --live:#4CC38A; --hold:#F07A6B;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper:#0F1724; --panel:#162234; --ink:#E7EBE3; --muted:#9BA7B8;
+  --rule:#26364B; --volt:#F2B705; --volt-ink:#F2B705; --on-volt:#13233B;
+  --live:#4CC38A; --hold:#F07A6B;
+  color-scheme: dark;
+}
+
+/* ================================================================
+   2. BASE STYLES
+   ================================================================ */
+* { box-sizing: border-box; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font: 16px/1.6 var(--f-body);
+}
+body::before { /* paints the phone's status-bar area above the sticky header */
+  content: ""; position: fixed; inset: 0 0 auto;
+  height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--paper);
+}
+a { color: inherit; }
+h1, h2, h3 { font-family: var(--f-display); text-transform: uppercase; line-height: .95; margin: 0; text-wrap: balance; }
+p { margin: 0; }
+:focus-visible { outline: 3px solid var(--volt); outline-offset: 2px; }
+
+.wrap {
+  max-width: 1120px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.mono { font-family: var(--f-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+.eyebrow { font-family: var(--f-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  font: 600 12px/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase;
+  padding: 13px 18px; border: 2px solid var(--ink); background: transparent; color: var(--ink);
+  text-decoration: none; cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.btn:hover { transform: translate(-2px,-2px); box-shadow: 4px 4px 0 var(--ink); }
+.btn.primary { background: var(--volt); color: var(--on-volt); border-color: var(--ink); }
+
+.code { display: inline-block; background: var(--volt); color: var(--on-volt); font: 600 11px/1 var(--f-mono); letter-spacing: .08em; padding: 5px 7px; }
+.stage { display: inline-block; border: 1px solid var(--ink); font: 600 10px/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; padding: 5px 7px; white-space: nowrap; }
+.sig { font: 600 10px/1.4 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; }
+.sig.forward { color: var(--live); }
+.sig.confirms { color: var(--muted); }
+.sig.back { color: var(--hold); }
+
+/* ================================================================
+   3. TICKER (the scrolling strip at the very top)
+   ================================================================ */
+.ticker { background: var(--ink); color: var(--paper); overflow: hidden; white-space: nowrap; padding-block: 8px; }
+.ticker-track { display: inline-flex; animation: tick 50s linear infinite; }
+.ticker-track span { font: 500 11px/1 var(--f-mono); letter-spacing: .1em; text-transform: uppercase; padding-right: 32px; }
+.ticker-track b { color: var(--volt); font-weight: 600; }
+@keyframes tick { to { transform: translateX(-50%); } }
+
+/* ================================================================
+   4. HEADER AND NAVIGATION
+   ================================================================ */
+.top {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
+  background: var(--paper); border-bottom: 2px solid var(--ink);
+}
+.top .wrap { display: flex; align-items: center; gap: 12px 24px; padding-block: 12px; flex-wrap: wrap; }
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; font: 900 28px/1 var(--f-display); letter-spacing: .04em; text-transform: uppercase; }
+.logo svg { flex: none; }
+.nav { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-left: auto; align-items: center; }
+.nav a { font: 600 11px/1 var(--f-mono); letter-spacing: .1em; text-transform: uppercase; text-decoration: none; padding-block: 8px; border-bottom: 2px solid transparent; }
+.nav a:hover { border-bottom-color: var(--volt); }
+.nav .btn { padding: 10px 14px; }
+
+/* ================================================================
+   5. HERO AND THE CYCLE WAVE
+   ================================================================ */
+.hero { display: grid; grid-template-columns: 1.15fr 1fr; gap: 40px; align-items: center; padding-block: 56px 40px; }
+.hero h1 { font-size: clamp(48px, 7.4vw, 96px); font-weight: 900; letter-spacing: .005em; margin-block: 14px 20px; }
+.hero h1 em { font-style: normal; color: var(--volt-ink); }
+.hero .lead { font-size: 18px; max-width: 46ch; color: var(--muted); }
+.hero .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+.status { display: inline-flex; align-items: center; gap: 8px; }
+.status i { width: 8px; height: 8px; border-radius: 50%; background: var(--live); box-shadow: 0 0 0 3px color-mix(in srgb, var(--live) 25%, transparent); }
+
+.sld {
+  border: 2px solid var(--ink); background-color: var(--panel);
+  background-image: linear-gradient(var(--rule) 1px, transparent 1px), linear-gradient(90deg, var(--rule) 1px, transparent 1px);
+  background-size: 20px 20px; padding: 16px; max-width: 100%; margin: 0;
+}
+.sld svg { display: block; width: 100%; height: auto; }
+.wave-area { fill: var(--volt); fill-opacity: .16; stroke: none; }
+.wave      { fill: none; stroke: var(--ink); stroke-width: 3; }
+.flow      { fill: none; stroke: var(--volt); stroke-width: 3; stroke-dasharray: 3 9; animation: flow 1.1s linear infinite; }
+.band      { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 2 4; }
+.axis      { stroke: var(--ink); stroke-width: 2; }
+.lbl       { fill: var(--muted); font: 600 9px var(--f-mono); letter-spacing: .1em; }
+.dot       { fill: var(--volt); stroke: var(--ink); stroke-width: 2; }
+.dot-t     { fill: var(--on-volt); font: 600 10px var(--f-mono); }
+@keyframes flow { to { stroke-dashoffset: -12; } }
+
+.legend { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 16px; }
+.legend li { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
+.num { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--volt); color: var(--on-volt); border: 2px solid var(--ink); font: 600 10px/1 var(--f-mono); flex: none; }
+
+/* ================================================================
+   6. INTRO: the five stages of the cycle
+   ================================================================ */
+.intro { border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink); padding-block: 28px; display: grid; gap: 20px; }
+.intro-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 8px 24px; }
+.intro-head h2 { font-size: clamp(28px, 4vw, 40px); font-weight: 800; }
+.intro-head p { color: var(--muted); max-width: 52ch; font-size: 15px; }
+.stages { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0; border: 2px solid var(--ink); background: var(--panel); }
+.stage-item { padding: 16px; display: grid; gap: 8px; align-content: start; border-right: 1px solid var(--rule); }
+.stage-item:last-child { border-right: 0; }
+.stage-item h3 { font-size: 24px; font-weight: 800; }
+.stage-item p { font-size: 14px; color: var(--muted); }
+.stage-item .who { font-size: 13px; color: var(--ink); border-top: 1px dashed var(--rule); padding-top: 8px; }
+.stage-item .who b { font: 600 10px/1.6 var(--f-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); display: block; }
+
+/* ================================================================
+   7. THE BUSBAR LAYOUT (sections hang off a vertical line)
+   ================================================================ */
+.bus { position: relative; border-left: 3px solid var(--ink); margin-left: 7px; padding-left: 30px; display: grid; gap: 72px; padding-block: 56px; }
+.node { position: relative; display: grid; gap: 8px; margin-bottom: 24px; }
+.node::before {
+  content: ""; position: absolute; left: -41px; top: 4px; width: 16px; height: 16px;
+  background: var(--volt); border: 3px solid var(--ink);
+}
+.node h2 { font-size: clamp(36px, 5vw, 56px); font-weight: 800; }
+.node p { color: var(--muted); max-width: 60ch; }
+
+/* ================================================================
+   8. CYCLE MAP (one row per theme)
+   ================================================================ */
+.themes { display: grid; gap: 16px; }
+.theme {
+  display: grid; grid-template-columns: minmax(0, 250px) minmax(0, 1fr) minmax(0, 260px); gap: 20px 28px;
+  border: 2px solid var(--ink); background: var(--panel); padding: 20px;
+}
+.theme-name { display: grid; gap: 12px; align-content: start; }
+.theme-name h3 { font-size: 28px; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+.track { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px; }
+.track span { height: 10px; border: 1px solid var(--ink); }
+.track span.past { background: var(--ink); }
+.track span.now { background: var(--volt); border-width: 2px; }
+.theme-body { display: grid; gap: 10px; align-content: start; }
+.theme-body p { font-size: 15px; }
+.theme-body .watch { color: var(--muted); }
+.theme-body .watch b { color: var(--ink); font-weight: 600; }
+.evidence { display: grid; gap: 8px; align-content: start; border-left: 1px dashed var(--rule); padding-left: 20px; }
+.evidence ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.evidence a { font-size: 14px; text-decoration: none; display: grid; gap: 2px; }
+.evidence a:hover span:last-child { text-decoration: underline; text-decoration-color: var(--volt); text-decoration-thickness: 2px; }
+.evidence .none { font-size: 14px; color: var(--muted); }
+
+/* ================================================================
+   9. FEATURED SLIDER
+   ================================================================ */
+.feature { display: grid; grid-template-columns: 220px minmax(0, 1fr); border: 2px solid var(--ink); background: var(--panel); }
+.feature-plate { background: var(--volt); color: var(--on-volt); padding: 20px; display: flex; flex-direction: column; justify-content: space-between; gap: 16px; border-right: 2px solid var(--ink); }
+.feature-plate .big { font: 900 96px/.8 var(--f-display); }
+.feature-body { padding: 28px; display: grid; gap: 14px; align-content: start; min-width: 0; }
+.feature-body h3 { font-size: clamp(30px, 4vw, 46px); }
+.feature-body h3 a { text-decoration: none; }
+.feature-body h3 a:hover { text-decoration: underline; text-decoration-color: var(--volt); text-decoration-thickness: 3px; }
+.feature-body p { max-width: 60ch; }
+.slider-ctrl { display: flex; align-items: center; gap: 12px; margin-top: 14px; }
+.slider-ctrl button { width: 40px; height: 40px; border: 2px solid var(--ink); background: var(--panel); color: var(--ink); font-size: 14px; cursor: pointer; }
+.slider-ctrl button:hover { background: var(--volt); color: var(--on-volt); }
+
+/* ================================================================
+   10. STORY CARDS
+   ================================================================ */
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+.card {
+  display: flex; flex-direction: column; gap: 10px; padding: 18px;
+  background: var(--panel); border: 2px solid var(--ink); text-decoration: none;
+  transition: transform .15s ease, box-shadow .15s ease; min-width: 0;
+}
+.card:hover { transform: translate(-3px,-3px); box-shadow: 6px 6px 0 var(--volt); }
+.card .meta { display: flex; justify-content: space-between; gap: 8px; align-items: center; color: var(--muted); }
+.card h3 { font-size: 27px; font-weight: 800; }
+.card p { font-size: 15px; color: var(--muted); }
+.card .foot { margin-top: auto; padding-top: 12px; border-top: 1px dashed var(--rule); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 12px; color: var(--muted); }
+.card .foot b { color: var(--ink); font-weight: 600; }
+.more { margin-top: 20px; }
+.board { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+.planned { border: 2px dashed var(--muted); padding: 16px; display: grid; gap: 8px; align-content: start; }
+.planned h3 { font-size: 24px; font-weight: 800; color: var(--muted); }
+.planned p { font-size: 14px; color: var(--muted); }
+
+/* ================================================================
+   11. LCOE CALCULATOR
+   ================================================================ */
+.calc { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); border: 2px solid var(--ink); background: var(--panel); }
+.calc-in { padding: 24px; display: grid; gap: 18px; border-right: 2px solid var(--ink); }
+.presets { display: flex; flex-wrap: wrap; gap: 8px; }
+.presets button { font: 600 10px/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; padding: 9px 10px; border: 1px solid var(--ink); background: transparent; color: var(--ink); cursor: pointer; }
+.presets button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.field { display: grid; gap: 6px; }
+.field label { display: flex; justify-content: space-between; gap: 8px; font-size: 14px; }
+.field output { font: 600 13px var(--f-mono); font-variant-numeric: tabular-nums; }
+input[type="range"] { width: 100%; accent-color: var(--volt); }
+.calc-out { padding: 24px; display: grid; gap: 16px; align-content: start; }
+.lcoe { font: 900 clamp(56px, 8vw, 88px)/.9 var(--f-display); font-variant-numeric: tabular-nums; }
+.lcoe small { font-size: .32em; font-weight: 600; color: var(--muted); }
+.split { display: flex; height: 18px; border: 2px solid var(--ink); }
+.split span:first-child { background: var(--volt); }
+.split span:last-child { background: var(--rule); }
+.split-key { display: flex; justify-content: space-between; gap: 8px; color: var(--muted); }
+.readout { display: grid; gap: 6px; border-top: 1px dashed var(--rule); padding-top: 14px; }
+.readout div { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; }
+.readout b { font: 600 13px var(--f-mono); font-variant-numeric: tabular-nums; }
+.note { font-size: 13px; color: var(--muted); }
+
+/* ================================================================
+   12. SUBSCRIBE, ABOUT, FOOTER
+   ================================================================ */
+.subscribe { background: var(--ink); color: var(--paper); padding: 32px; display: grid; gap: 16px; }
+.subscribe h2 { font-size: clamp(34px, 5vw, 52px); }
+.subscribe form { display: flex; flex-wrap: wrap; gap: 10px; }
+.subscribe input { flex: 1 1 240px; min-width: 0; padding: 14px; font: 15px var(--f-body); border: 2px solid var(--paper); background: var(--paper); color: var(--ink); }
+.subscribe .btn { border-color: var(--paper); }
+.subscribe .msg { color: var(--volt); font-size: 14px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.about { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 32px; align-items: start; }
+.about-text { display: grid; gap: 14px; max-width: 60ch; }
+.plate { border: 2px solid var(--ink); background: var(--panel); padding: 18px; position: relative; }
+.plate::before, .plate::after { content: ""; position: absolute; top: 8px; width: 7px; height: 7px; border-radius: 50%; background: var(--ink); }
+.plate::before { left: 8px; } .plate::after { right: 8px; }
+.plate h3 { font-size: 20px; text-align: center; padding-bottom: 10px; border-bottom: 2px solid var(--ink); margin-bottom: 8px; }
+.plate dl { margin: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px 16px; }
+.plate dt { font: 600 10px/1.8 var(--f-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.plate dd { margin: 0; font-size: 14px; }
+
+footer { border-top: 2px solid var(--ink); margin-top: 24px; }
+footer .wrap { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; padding-block: 32px; }
+footer ul { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 6px; }
+footer a { text-decoration: none; font-size: 14px; }
+footer a:hover { text-decoration: underline; }
+footer .logo { font-size: 22px; }
+
+/* ================================================================
+   13. STORY READER (opens when you click a story)
+   ================================================================ */
+.reader {
+  position: fixed; inset: 0; z-index: 50; background: var(--paper); overflow-y: auto;
+  padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.reader-bar { position: sticky; top: 0; background: var(--paper); border-bottom: 2px solid var(--ink); }
+.reader-bar .wrap { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-block: 10px; }
+.reader article { max-width: 68ch; margin: 0 auto; padding-block: 48px 72px; display: grid; gap: 20px; }
+.reader h1 { font-size: clamp(40px, 6vw, 68px); font-weight: 900; }
+.reader .tags { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+.reader .standfirst { font-size: 20px; color: var(--muted); }
+.reader .body { display: grid; gap: 18px; font-size: 18px; line-height: 1.7; }
+.reader .body h2 { font-size: 28px; margin-top: 12px; }
+.reader .read { border: 2px solid var(--ink); background: var(--panel); padding: 18px 20px; display: grid; gap: 10px; justify-items: start; }
+.reader .read p { font-size: 17px; }
+.reader .src { color: var(--muted); }
+.reader .src a { color: var(--volt-ink); }
+.reader .end { border-top: 2px solid var(--ink); padding-top: 20px; display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center; }
+
+/* ================================================================
+   14. PHONE AND TABLET LAYOUT
+   ================================================================ */
+@media (max-width: 980px) {
+  .stages { grid-template-columns: minmax(0, 1fr); }
+  .stage-item { border-right: 0; border-bottom: 1px solid var(--rule); grid-template-columns: 72px minmax(0, 1fr); column-gap: 16px; }
+  .stage-item:last-child { border-bottom: 0; }
+  .stage-item > * { grid-column: 2; }
+  .stage-item > .code { grid-column: 1; grid-row: 1 / span 3; justify-self: start; align-self: start; }
+  .theme { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .evidence { grid-column: 1 / -1; border-left: 0; padding-left: 0; border-top: 1px dashed var(--rule); padding-top: 14px; }
+}
+@media (max-width: 860px) {
+  .hero, .about, .calc { grid-template-columns: minmax(0, 1fr); }
+  .calc-in { border-right: 0; border-bottom: 2px solid var(--ink); }
+}
+@media (max-width: 640px) {
+  .theme { grid-template-columns: minmax(0, 1fr); }
+  .feature { grid-template-columns: minmax(0, 1fr); }
+  .feature-plate { border-right: 0; border-bottom: 2px solid var(--ink); flex-direction: row; align-items: end; }
+  .feature-plate .big { font-size: 64px; }
+  .stage-item { grid-template-columns: minmax(0, 1fr); }
+  .stage-item > *, .stage-item > .code { grid-column: 1; grid-row: auto; }
+  .bus { padding-left: 22px; }
+  .node::before { left: -33px; }
+  .nav { margin-left: 0; width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track, .flow { animation: none; }
+  .btn, .card { transition: none; }
+}
+</style>
+</head>
+<body>
+<!-- ================================================================
+     PAGE MARKUP
+     Most content (stories, themes, sections, slider, cycle wave) is
+     filled in by the JavaScript at the bottom, from the THEMES and
+     POSTS lists.
+     ================================================================ -->
+
+<div class="ticker" aria-hidden="true"><div class="ticker-track" id="ticker"></div></div>
+
+<header class="top">
+  <div class="wrap">
+    <a class="logo" href="#top" aria-label="Baseload home">
+      <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true">
+        <rect x="1" y="1" width="28" height="28" fill="var(--volt)" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M6 15 q4.5 -8 9 0 t9 0" fill="none" stroke="var(--on-volt)" stroke-width="2.5"/>
+      </svg>
+      <span>Baseload</span>
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a href="#cycle">Cycle map</a>
+      <span id="nav-sections" style="display:contents"></span>
+      <a href="#about">About</a>
+      <a class="btn primary" href="#subscribe">Subscribe ▶</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <div class="wrap">
+
+    <!-- HERO -->
+    <section class="hero">
+      <div>
+        <p class="eyebrow status"><i></i> <span id="hero-sections">Cycle watch</span></p>
+        <h1>Finding the <em>next investment cycle</em></h1>
+        <p class="lead">A weekly briefing on sustainable finance, energy, infrastructure and technology. Each story is summarised in plain English and placed on the investment cycle, from first signal to mature asset, to show where capital is likely to go next.</p>
+        <div class="actions">
+          <a class="btn primary" href="#cycle">See the cycle map ▶</a>
+          <a class="btn" href="#latest">This week's signals</a>
+        </div>
+      </div>
+
+      <figure class="sld">
+        <svg id="wave" viewBox="0 0 360 262" role="img" aria-label="The investment cycle drawn as a wave, with each tracked theme placed at its current stage."></svg>
+        <figcaption>
+          <ul class="legend" id="legend"></ul>
+        </figcaption>
+      </figure>
+    </section>
+
+    <!-- INTRO: the five stages -->
+    <section class="intro" aria-labelledby="stages-h">
+      <div class="intro-head">
+        <h2 id="stages-h">The five stages</h2>
+        <p>Every theme on this site moves through the same cycle. The next cycle forms where themes cross from stage 01 to stage 03.</p>
+      </div>
+      <div class="stages" id="stages"></div>
+    </section>
+
+    <!-- EVERYTHING BELOW HANGS OFF THE BUSBAR -->
+    <div class="bus">
+
+      <section id="cycle" aria-labelledby="cycle-h">
+        <header class="node">
+          <span class="eyebrow">Cycle map · Updated weekly</span>
+          <h2 id="cycle-h">Where each theme sits</h2>
+          <p>The themes this briefing tracks, the stage each one has reached, and what would move it on. Every story is filed as evidence under one theme.</p>
+        </header>
+        <div class="themes" id="themes"></div>
+      </section>
+
+      <section id="latest" aria-labelledby="latest-h">
+        <header class="node">
+          <span class="eyebrow">This week · Strongest signals</span>
+          <h2 id="latest-h">On the wire</h2>
+        </header>
+        <div id="feature"></div>
+        <div class="slider-ctrl">
+          <button type="button" id="prev" aria-label="Previous featured story">◀</button>
+          <span class="mono" id="slide-count" aria-live="polite"></span>
+          <button type="button" id="next" aria-label="Next featured story">▶</button>
+        </div>
+      </section>
+
+      <!-- The three topic sections are built by JavaScript here -->
+      <div id="sections" style="display:grid;gap:72px"></div>
+
+      <section id="drawing-board" aria-labelledby="board-h">
+        <header class="node">
+          <span class="eyebrow">Coming later</span>
+          <h2 id="board-h">On the drawing board</h2>
+          <p>Sectors this briefing plans to cover next. Each one goes live when there is time to follow it properly.</p>
+        </header>
+        <div class="board" id="board"></div>
+      </section>
+
+      <section id="bonus" aria-labelledby="bonus-h">
+        <header class="node">
+          <span class="eyebrow">Bonus · Try it yourself</span>
+          <h2 id="bonus-h">What a maturing cycle is worth</h2>
+          <p>Cost of capital falls as a theme matures. Early-stage assets carry more risk, so investors demand higher returns; mature assets attract cheaper money. Levelised cost of electricity (LCOE) shows the effect: it is the average price a solar or wind farm must earn per megawatt-hour to repay its build cost, running costs and investors' required return. Move the WACC slider down to see how much a maturing market lowers that price.</p>
+        </header>
+        <div class="calc">
+          <div class="calc-in">
+            <div class="presets" id="presets" aria-label="Example projects"></div>
+            <div class="field"><label for="capex">Build cost (£ per kW) <output id="capex-o"></output></label><input type="range" id="capex" min="300" max="2000" step="10"></div>
+            <div class="field"><label for="cf">Capacity factor (%) <output id="cf-o"></output></label><input type="range" id="cf" min="5" max="60" step="1"></div>
+            <div class="field"><label for="opex">Running cost (£ per kW per year) <output id="opex-o"></output></label><input type="range" id="opex" min="5" max="60" step="1"></div>
+            <div class="field"><label for="wacc">Cost of capital, WACC (%) <output id="wacc-o"></output></label><input type="range" id="wacc" min="2" max="14" step="0.5"></div>
+            <div class="field"><label for="life">Project life (years) <output id="life-o"></output></label><input type="range" id="life" min="15" max="40" step="1"></div>
+          </div>
+          <div class="calc-out" aria-live="polite">
+            <span class="eyebrow">Levelised cost</span>
+            <div class="lcoe"><span id="lcoe"></span> <small>£ / MWh</small></div>
+            <div class="split" aria-hidden="true"><span id="split-cap"></span><span id="split-op"></span></div>
+            <div class="split-key mono"><span id="key-cap"></span><span id="key-op"></span></div>
+            <div class="readout">
+              <div><span>Output per kW each year</span><b id="r-out"></b></div>
+              <div><span>Capital recovery factor</span><b id="r-crf"></b></div>
+              <div><span>If WACC falls by 2 points</span><b id="r-sens"></b></div>
+            </div>
+            <p class="note">Simple model in real terms: no tax, panel degradation, inflation or financing fees. The example projects use illustrative inputs, not market data.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="subscribe" class="subscribe" aria-labelledby="sub-h">
+        <span class="mono" style="color:var(--volt)">Stay connected</span>
+        <h2 id="sub-h">One cycle briefing every Sunday</h2>
+        <p>The week's strongest signals across sustainable finance, energy, infrastructure and technology, and where each theme now sits in the cycle.</p>
+        <form id="sub-form">
+          <label for="email" class="sr-only">Email address</label>
+          <input type="email" id="email" required placeholder="you@example.com" autocomplete="email">
+          <button class="btn primary" type="submit">Connect ▶</button>
+        </form>
+        <p class="msg" id="sub-msg" hidden></p>
+      </section>
+
+      <section id="about" aria-labelledby="about-h">
+        <header class="node">
+          <span class="eyebrow">Operator</span>
+          <h2 id="about-h">About me</h2>
+        </header>
+        <div class="about">
+          <div class="about-text">
+            <p>I'm Liam, an environmental engineer turned sustainable finance graduate, based in London and originally from Vietnam. Sustainable finance is my home field: it decides which projects get funded, and at what cost.</p>
+            <p>Baseload asks one question each week: where is the next investment cycle forming? I summarise public news and reports on sustainable finance, energy, infrastructure and technology, and place each story on the cycle, from first signal to mature asset. I pay special attention to emerging markets and ASEAN, where many of the next cycles are still at the signal stage.</p>
+            <p>Summaries are my own reading of other people's reporting, and every story links to its source for the full detail. Stage calls are my own judgement. Nothing here is investment advice.</p>
+          </div>
+          <div class="plate" aria-label="Profile summary">
+            <h3>Rating plate</h3>
+            <dl>
+              <dt>Based</dt><dd>London, UK</dd>
+              <dt>Origin</dt><dd>Vietnam</dd>
+              <dt>Training</dt><dd>Environmental engineering</dd>
+              <dt>Study</dt><dd>MSc Sustainable Management &amp; Finance, Bayes Business School</dd>
+              <dt>Credentials</dt><dd>CFA Level I · CFA Certificate in ESG Investing</dd>
+              <dt>Focus</dt><dd>Energy transition, infrastructure, ASEAN</dd>
+            </dl>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <a class="logo" href="#top"><span>Baseload</span></a>
+      <p style="color:var(--muted);font-size:14px;margin-top:8px;max-width:32ch">A weekly briefing on where the next investment cycle is forming.</p>
+    </div>
+    <div>
+      <span class="eyebrow">Site map</span>
+      <ul id="sitemap"></ul>
+    </div>
+    <div>
+      <span class="eyebrow">System</span>
+      <ul>
+        <li class="mono">Est. 2026 · Build v0.3</li>
+        <li class="mono">© <span id="year"></span> Baseload</li>
+        <li id="linkedin-li" hidden><a id="linkedin" href="#" target="_blank" rel="noopener">LinkedIn ▶</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<!-- STORY READER: hidden until a story is opened -->
+<div class="reader" id="reader" hidden role="dialog" aria-modal="true" aria-labelledby="reader-title">
+  <div class="reader-bar"><div class="wrap">
+    <span class="mono" id="reader-crumb"></span>
+    <button class="btn" type="button" id="reader-close">Close ✕</button>
+  </div></div>
+  <div class="wrap"><article id="reader-article"></article></div>
+</div>
+
+<script>
+/* ================================================================
+   A. SETTINGS — edit these first
+   ================================================================ */
+const SITE = {
+  name: "Baseload",
+  linkedin: "",   // paste your LinkedIn profile URL here to show the link
+  newsletterNote: "Thanks. Sign-ups are not live yet: this form will connect to a newsletter service such as Substack."
+};
+
+/* SECTIONS — the sectors this briefing covers.
+   status "live":    shown on the site, in the menu, and drafted every Sunday.
+   status "planned": listed under "On the drawing board" until you are ready.
+   To start covering a planned sector, change its status to "live".
+   To add a new idea, copy one line and give it a short unique id. */
+const SECTIONS = [
+  { id: "sustainable-finance", name: "Sustainable finance", label: "Capital & rules", status: "live",
+    blurb: "Green bonds, blended finance, taxonomies and disclosure: the rules and instruments that decide where capital can go." },
+  { id: "energy",         name: "Energy",         label: "Grid notes",       status: "live",
+    blurb: "Power markets, renewables, storage and the contracts that pay for them." },
+  { id: "infrastructure", name: "Infrastructure", label: "Asset book",       status: "live",
+    blurb: "Grids, transport and utilities: long-lived assets with steady cash flows." },
+  { id: "technology",     name: "Technology",     label: "Compute & cables", status: "live",
+    blurb: "Data centres, networks and the technology changing how assets earn." },
+  { id: "climate-tech",   name: "Climate tech venture", status: "planned",
+    blurb: "Early-stage companies and the venture funds backing them." },
+  { id: "impact",         name: "Impact investing",     status: "planned",
+    blurb: "Funds that target measurable social and environmental results alongside returns." },
+  { id: "private-markets", name: "Private equity in emerging markets", status: "planned",
+    blurb: "Buyouts and growth deals in Southeast Asia and other emerging markets." }
+];
+const LIVE = SECTIONS.filter(s => s.status === "live");
+const PLANNED = SECTIONS.filter(s => s.status === "planned");
+
+/* The five stages of the investment cycle. Edit the wording if you like,
+   but keep five stages in this order. */
+const STAGES = [
+  { n: 1, name: "Signal",        short: "SIGNAL",
+    text: "A policy, price or technology shift makes a new asset look possible. Little money has moved yet.",
+    who:  "Governments, development banks, grants" },
+  { n: 2, name: "Early capital", short: "EARLY",
+    text: "First platforms form and early projects reach financing. Risk is high, and so are target returns.",
+    who:  "Venture and development capital, DFIs" },
+  { n: 3, name: "Build-out",     short: "BUILD",
+    text: "Capital scales up fast. Large funds close, supply chains stretch and equipment runs short.",
+    who:  "Infrastructure funds, project finance banks" },
+  { n: 4, name: "Crowded",       short: "CROWDED",
+    text: "Too much money chases the same assets. Prices and returns fall, and contracts replace market risk.",
+    who:  "Late entrants, consolidators" },
+  { n: 5, name: "Mature",        short: "MATURE",
+    text: "The asset class is well understood. Steady cash flows, lower returns, long holding periods.",
+    who:  "Pension funds, insurers, core funds" }
+];
+
+/* ================================================================
+   B. THEMES — the cycle map.
+   Each theme sits at one stage (1 to 5). Move a theme by changing
+   its stage number. Every story below is filed under one theme.
+   ================================================================ */
+const THEMES = [
+  { id: "asean", name: "ASEAN power", stage: 1,
+    thesis: "Fast demand growth and cheap solar and wind make the case. Weak buyer credit and shifting rules still hold most capital back.",
+    watch:  "Direct power purchase agreements (DPPAs) signing at scale, tariff reform, and a stronger balance sheet at EVN." },
+  { id: "em-finance", name: "Emerging-market climate finance", stage: 2,
+    thesis: "Development banks are building structures that take the first losses so private money can follow into emerging markets. Capital is still scarce and expensive.",
+    watch:  "Private tranches of blended funds filling on time, and national green taxonomies in markets such as Vietnam." },
+  { id: "grids", name: "Grids and transmission", stage: 2,
+    thesis: "Generation is no longer the main bottleneck; moving power is. Private capital is starting to build and own transmission platforms.",
+    watch:  "Regulators opening more transmission to private owners, and the first large grid-focused funds closing." },
+  { id: "compute", name: "Power for compute", stage: 3,
+    thesis: "Data centres need power faster than grids can supply it. Capital is flowing into new generation, grid equipment and on-site power.",
+    watch:  "Shorter equipment lead times or a slowdown in AI spending, either of which would mark the move to crowded." },
+  { id: "eugb", name: "EU green bonds", stage: 3,
+    thesis: "The EU's voluntary gold-standard green bond is scaling fast from a small base, led by issuers that fund Taxonomy-aligned assets.",
+    watch:  "Evidence that the label lowers borrowing costs, and large sovereign and utility issuers adopting it." },
+  { id: "storage", name: "Battery storage", stage: 4,
+    thesis: "Merchant battery income has fallen as capacity floods in. New money now wants contracted income or batteries paired with solar.",
+    watch:  "Long-term contracts for storage (tolling, cap-and-floor) becoming standard, which would start the move to mature." },
+  { id: "core", name: "Core infrastructure", stage: 5,
+    thesis: "Airports, utilities and regulated networks change hands between long-term owners. Returns come from steady cash flow.",
+    watch:  "Prices on stake sales, as a read on what pension funds will pay for core assets." }
+];
+
+/* Each story says how it moves its theme. */
+const SIGNALS = {
+  forward:  { label: "▲ Moves it forward" },
+  confirms: { label: "■ Confirms the stage" },
+  back:     { label: "▼ Holds it back" }
+};
+
+/* ================================================================
+   C. STORIES — this list is your blog.
+   Each item summarises one public article in your own words.
+   To add a story, copy one block, change the text, and save.
+   - section:  the id of a live section, e.g. "sustainable-finance"
+   - theme:    the id of a theme above, e.g. "compute"
+   - signal:   "forward", "confirms" or "back"
+   - date:     date of the original story, "YYYY-MM-DD"
+   - featured: true puts it in the Strongest signals slider
+   - body:     the key facts, as a list of short paragraphs
+   - cycleRead: your view on what the story says about the cycle
+   - source:   who published the original, and the link
+   Rules: write in your own words, keep it short, never copy
+   paragraphs or images, and always link the original.
+   ================================================================ */
+const POSTS = [
+  {
+    slug: "world-bank-imf-bangkok-climate-sidelined",
+    section: "sustainable-finance", theme: "em-finance", signal: "back",
+    date: "2026-10-22", minutes: 3, featured: true,
+    title: "Climate slips down the agenda at the World Bank and IMF meetings",
+    summary: "The annual meetings in Bangkok focused on jobs, private capital and small businesses, and campaigners say the energy transition was pushed aside.",
+    body: [
+      "The World Bank and IMF annual meetings in Bangkok gave climate little attention. World Bank President Ajay Banga told AFP the focus was jobs, mobilising private capital, and micro and small businesses. Eight governments announced partnerships on reforms, infrastructure and investment.",
+      "The shift follows pressure from the United States, the largest shareholder in both institutions. US Treasury Secretary Scott Bessent has criticised the IMF for \"mission creep\" and urged the World Bank to drop its climate-finance target. In June the Bank dropped its target of putting 45% of financing into climate, while keeping its wider climate action plan.",
+      "Climate Home News reported that the Bank plans to back gas projects in some developing countries. Banga also set a goal to grow the Bank's critical minerals business five-fold within five years, naming 20 possible partner countries.",
+      "Campaigners quoted in the piece say only 2.4% of development bank clean energy finance reached low-income countries, and that 92% was lent rather than granted. Green Central Banking is a specialist outlet, and the critical views here come mainly from climate campaign groups."
+    ],
+    cycleRead: "Emerging-market climate finance depends on development banks taking the first loss so private money can follow. If the largest of them shifts its weight to gas, jobs and minerals, there is less first-loss capital for clean energy, and the theme stays at early capital for longer. Watch whether European DFIs and blended funds such as the EU's green bond fund fill the gap.",
+    source: { name: "Green Central Banking", url: "https://greencentralbanking.com/2026/10/22/world-bank-imf-sideline-climate-at-bangkok-annual-meeting" }
+  },
+  {
+    slug: "vietnam-pm-power-supply-2027-2030-order",
+    section: "energy", theme: "asean", signal: "confirms",
+    date: "2026-10-22", minutes: 3, featured: true,
+    title: "Vietnam orders a rooftop solar and battery push to avoid power shortages",
+    summary: "The Prime Minister told ministries and EVN to speed up rooftop solar, build battery storage from 2027 and write storage rules by December, saying shortages must not happen.",
+    body: [
+      "Dispatch No. 10790, issued on 22 October, sets out urgent measures to secure power supply for 2027 to 2030. The Ministry of Industry and Trade (MOIT) must propose rooftop solar targets for each province, especially in the north, by 30 October, and guide local support policies for household systems by December.",
+      "State utility EVN must study and invest in battery storage at substations, with systems running in 2027. MOIT, working with the finance and justice ministries, must draft mechanisms for energy storage by December 2026, including rooftop solar paired with batteries in northern industrial parks.",
+      "The order also targets electricity savings of at least 3% a year, at least 10% in the hot months of April to July, a 3,000 MW cut in peak demand and grid losses below 6%. Two coal plants, Na Duong 2 and Quang Trach I, must start commercial operation in 2026.",
+      "MOIT must report project delays and financing problems by 30 October, and may propose state budget funding for urgent projects. No private investment figures are given."
+    ],
+    cycleRead: "A clear signal-stage document: the state sets targets and deadlines, and the money is still mostly public or undefined. The storage rulebook due in December matters most for investors, because without rules on how batteries earn income there is nothing to finance. The theme moves to early capital when private developers can sign DPPAs or storage contracts with a buyer banks trust.",
+    source: { name: "VietnamPlus", url: "https://en.vietnamplus.vn/pm-orders-urgent-measures-to-ensure-power-supply-for-20272030-post354184.vnp" }
+  },
+  {
+    slug: "ofgem-hornsea-3-ofto-tender",
+    section: "infrastructure", theme: "grids", signal: "forward",
+    date: "2026-10-22", minutes: 3,
+    title: "Ofgem puts £3.5bn of Hornsea 3 grid links up for private bidders",
+    summary: "The UK regulator has opened its 14th offshore transmission tender, inviting investors to own and run the cables and substations for a 2.9 GW wind farm.",
+    body: [
+      "Ofgem's tender covers the offshore transmission link for Hornsea 3, a 2.9 GW wind farm more than 100 km off the Norfolk coast. The assets, valued at about £3.5 billion, include offshore and onshore cables and substations. The wind farm is due for completion at the end of 2027.",
+      "Under the Offshore Transmission Owner (OFTO) regime, investors compete for the right to own, finance, operate and maintain transmission assets once they are built. The winner receives a long-term revenue stream linked to inflation.",
+      "Since the regime began in 2009, more than £10 billion has been invested in transmission links for 28 offshore wind farms. Ofgem says competition keeps costs down for consumers."
+    ],
+    cycleRead: "In Britain, owning built offshore transmission is already a mature, contracted asset: low risk and inflation-linked income that suits long-term investors. The model shows where grids elsewhere could go if regulators let private owners in. For the wider theme, the hard part is still financing new onshore lines before they are built, where planning and construction risk sit.",
+    source: { name: "Power Technology", url: "https://www.power-technology.com/news/ofgem-tender-hornsea-3-transmission/" }
+  },
+  {
+    slug: "ifm-buys-majority-of-associated-british-ports",
+    section: "infrastructure", theme: "core", signal: "confirms",
+    date: "2026-10-21", minutes: 3, featured: true,
+    title: "IFM buys control of Associated British Ports from two Canadian pension funds",
+    summary: "An IFM fund will buy 63.9% of the UK's largest port group from CPP Investments and OMERS, in a deal reported to value it at about £10bn.",
+    body: [
+      "A fund managed by IFM Investors, which is owned by Australian pension funds and the UK's Nest pension scheme, will buy CPP Investments' 33.9% stake and OMERS' 30% stake in Associated British Ports (ABP). Financial terms were not disclosed; Bloomberg reported a valuation of about £10 billion.",
+      "ABP runs 19 ports, including Southampton, Immingham and Hull, which handle about a quarter of the UK's seaborne trade. It also supports more than half of the country's offshore wind capacity.",
+      "OMERS has owned its stake since 2006 and CPP Investments since 2015. The deal needs shareholder and regulatory approvals, including a national security review, and is expected to close in the first half of 2027."
+    ],
+    cycleRead: "A textbook mature-stage trade: pension money selling to pension money after holds of 11 to 20 years. Unlike last week's Perth Airport sale, this one comes with a reported price, which gives a useful marker for what core buyers will pay for UK port assets. The link to offshore wind gives ABP some growth on top of steady trade income.",
+    source: { name: "gCaptain", url: "https://gcaptain.com/australian-fund-to-acquire-majority-stake-in-uks-largest-port-operator-in-13-4-billion-deal/" }
+  },
+  {
+    slug: "nextera-federal-gas-hubs-16-5gw",
+    section: "technology", theme: "compute", signal: "confirms",
+    date: "2026-10-21", minutes: 3, featured: true,
+    title: "NextEra signs 16.5 GW of gas hubs paid for with government money",
+    summary: "The US power group will develop, build and run three federally backed energy hubs for fees, without putting in its own capital.",
+    body: [
+      "In its third-quarter results on 21 October, NextEra said it has signed definitive agreements for three federal energy hub projects, two in Texas and one in Pennsylvania, totalling about 16.5 GW. It has secured $5.7 billion of initial funding so far this year.",
+      "NextEra expects to earn fees for developing, building and operating the hubs, without investing its own capital. It has about 30 more possible hubs under discussion and expects that to reach 40 by the end of 2026.",
+      "Separately, NextEra plans to build and own up to 2 GW of gas generation and up to 2.6 GW of battery storage for a data centre campus at the Department of Energy's Paducah site in Kentucky. It added 3.7 GW of renewables and storage to its backlog in the quarter, taking the total to about 36.7 GW."
+    ],
+    cycleRead: "Build-out has reached the point where governments fund the power plants and utilities act as paid builders. That keeps construction and market risk away from NextEra's balance sheet and puts it on sovereign and project-level capital. The risk of overbuilding sits with those funders if AI demand slows, which would be the first sign of a crowded stage.",
+    source: { name: "NextEra Energy (SEC filing)", url: "https://www.sec.gov/Archives/edgar/data/0000753308/000075330826000077/neeq32026exhibit99.htm" }
+  },
+  {
+    slug: "tata-power-2-8gw-india-data-centres",
+    section: "technology", theme: "compute", signal: "forward",
+    date: "2026-10-21", minutes: 2,
+    title: "Tata Power lines up 2.8 GW of power for India's data centres",
+    summary: "India's Tata Power is working with 18 data centre operators on generation, grid and green power projects, as official estimates point to 26 GW of AI data centre demand by 2032.",
+    body: [
+      "Tata Power plans more than 2.8 GW of power projects for data centres: about 430 MW of new load on its distribution network, 1,236 MW of transmission-linked opportunities and 1,150 MW of green energy capacity in active talks. It has 29 workstreams with 18 operators, none named.",
+      "It is also spending about ₹15,000 crore (around $1.6 billion) to upgrade Mumbai's grid, including a 400 kV transmission ring. India's Central Electricity Authority estimates AI data centre demand at about 26.3 GW by 2031-32."
+    ],
+    cycleRead: "The compute build-out is spreading from the US into large emerging markets, led by integrated utilities that can offer land, grid connection and green power together. In India the bottleneck is grid capacity in cities like Mumbai, so capital flows to transmission as much as generation. This is early evidence for an Indian leg of the theme rather than a stage change.",
+    source: { name: "DCD", url: "https://www.datacenterdynamics.com/en/news/tata-power-eyes-28gw-of-generation-transmission-and-distribution-for-indian-data-center-sector/" }
+  },
+  {
+    slug: "ignitis-inaugural-european-green-bond",
+    section: "sustainable-finance", theme: "eugb", signal: "confirms",
+    date: "2026-10-20", minutes: 2,
+    title: "Lithuania's Ignitis sells its first European Green Bond, 3.3 times covered",
+    summary: "The Baltic utility raised €300m under the EU Green Bond Standard to refinance a 2027 bond, drawing more than €1bn of orders.",
+    body: [
+      "Ignitis Group priced a €300 million five-year European Green Bond (EuGB) on 20 October, with a 4.5% coupon, 115 basis points over mid-swaps. More than 80 investors placed over €1 billion of orders.",
+      "Net proceeds will refinance existing debt, including a tender offer for its €300 million 2% notes due July 2027. Gross proceeds are earmarked for capital and operating spending that meets the EU Taxonomy under the regulation's gradual approach. The bond is expected to be rated Baa1 by Moody's and BBB+ by S&P.",
+      "The announcement does not claim any pricing benefit from the EuGB label."
+    ],
+    cycleRead: "Another utility adopting the standard fits the build-out stage: issuers are accepting stricter rules because investor demand is there. The open question is still price. Until issuers can show a lower spread for the label, it stays a marketing choice, and the move to crowded or mature depends on that evidence.",
+    source: { name: "Ignitis Group (GlobeNewswire)", url: "https://www.globenewswire.com/news-release/2026/10/20/3384726/0/en/ignitis-group-prices-its-inaugural-eur-300-million-5-year-eugb-bonds.html" }
+  },
+  {
+    slug: "akaysha-au1-75bn-bess-refinancing",
+    section: "energy", theme: "storage", signal: "confirms",
+    date: "2026-10-20", minutes: 3,
+    title: "Eleven banks lend Akaysha A$1.75bn to refinance Australian batteries",
+    summary: "The BlackRock-backed developer has moved four battery projects onto one portfolio loan, with tenors of up to ten years, to fund a 6 GW pipeline.",
+    body: [
+      "Akaysha Energy secured an A$1.75 billion (US$1.22 billion) portfolio facility from 11 banks, including ANZ, Commonwealth Bank, BNP Paribas, MUFG and ING. It has three loans of five, seven and ten years plus liquidity facilities. Pricing was not disclosed.",
+      "The loan refinances four batteries in New South Wales, Queensland and Victoria, including the 415 MW/1,660 MWh Orana project, and creates a financing platform for a pipeline of about 6 GW/25 GWh in Australia's main grid.",
+      "At Orana, 200 MW is contracted to EnergyAustralia under a 12-year virtual tolling agreement; the rest earns merchant income from the wholesale market. Contract terms for the other three batteries were not given."
+    ],
+    cycleRead: "Banks lending for ten years against a portfolio is how a crowded asset class starts to look mature: lenders spread risk across several sites and accept lower margins. But a large share of income here is still merchant, so equity carries the price risk. The move to mature needs more of these assets on long tolling contracts.",
+    source: { name: "Energy-Storage.news", url: "https://www.energy-storage.news/akaysha-energy-secures-au1-75-billion-portfolio-financing-for-australian-bess-expansion/" }
+  },
+  {
+    slug: "eu-green-bond-standard-issuance-2026",
+    section: "sustainable-finance", theme: "eugb", signal: "forward",
+    date: "2026-10-20", minutes: 3, featured: true,
+    title: "EU green bond issuance nearly doubles under the new standard",
+    summary: "European Green Bonds issued under the EU's voluntary gold standard reached €39 billion in 2026 to 7 October, almost twice the 2025 total.",
+    body: [
+      "New European Commission figures show about €60 billion of European Green Bonds issued since the EU Green Bond Standard began applying in December 2024: €21 billion in 2025 and €39 billion from January to 7 October 2026. The standard is voluntary and covers bonds that fund activities meeting the EU Taxonomy, the EU's list of activities it counts as sustainable.",
+      "Across the EU, more than €1.2 trillion has gone into sustainable activities since 2021. In 2025, over €320 billion went into Taxonomy-aligned activities, with energy, mainly electricity companies, taking the largest share.",
+      "The Commission says it is also working to simplify the framework so it is easier to use."
+    ],
+    cycleRead: "A strict standard moving into build-out: more issuers are accepting tougher rules and reporting, which points to real investor demand for the label. Electricity companies leading Taxonomy-aligned investment ties this theme to grid and generation spending. The next step depends on whether the label lowers borrowing costs; if it does, large sovereign and utility issuers will follow.",
+    source: { name: "European Commission", url: "https://finance.ec.europa.eu/news/commission-data-shows-continued-growth-sustainable-investments-across-eu-2026-10-20_en" }
+  },
+  {
+    slug: "vifc-hcmc-green-transition-finance-hub",
+    section: "sustainable-finance", theme: "em-finance", signal: "confirms",
+    date: "2026-08-07", minutes: 3,
+    title: "Ho Chi Minh City wants to be Southeast Asia's transition finance hub",
+    summary: "Vietnam's new international financial centre aims to turn climate projects into assets foreign investors can buy, as green lending grows but stays small.",
+    body: [
+      "At the Vietnam Green Finance Summit in August, the Vietnam International Financial Centre in Ho Chi Minh City (VIFC-HCMC) set a goal of becoming Southeast Asia's green and transition finance hub for emerging markets by 2030. Its plan is to package climate projects into measurable, tradable assets that can attract cross-border money.",
+      "Green credit in Vietnam reached nearly VND 780 trillion at the end of 2025, up 14.6% on the year, but made up only 4.2% of all lending. Commercial banks hold about 88% of it. Cumulative green bond issuance passed $1.5 billion over 2020 to 2025.",
+      "The World Bank estimates Vietnam needs about $368 billion of extra investment by 2040 for climate-resilient growth. Clean energy projects in emerging markets face capital costs at least twice those in advanced economies and China. The IFC called for a national green taxonomy and new financing tools."
+    ],
+    cycleRead: "Vietnam's green finance market is bank-led and still small, which places it at the early capital stage. The gap is in capital markets: a national taxonomy and bonds foreign investors trust would lower the cost of capital that holds back the ASEAN power theme. Watch for a published taxonomy and the first large green bond sold to foreign investors.",
+    source: { name: "Việt Nam News", url: "https://vietnamnews.vn/economy/1797032/vifc-hcmc-aims-to-become-regional-hub-for-green-and-transition-finance.html" }
+  },
+  {
+    slug: "ggbi-blended-green-bond-fund-amundi",
+    section: "sustainable-finance", theme: "em-finance", signal: "forward",
+    date: "2026-04-27", minutes: 3,
+    title: "EU backs a €3bn blended fund for first-time green bonds in emerging markets",
+    summary: "Amundi will run the Global Green Bond Initiative Fund, where development banks take the first losses so pension funds and insurers can invest alongside them.",
+    body: [
+      "The Global Green Bond Initiative (GGBI) Fund is the flagship of the EU's Global Gateway strategy, managed by Amundi. Development finance institutions led by the European Investment Bank, including EBRD, KfW, FMO, Proparco, CDP and AECID, provide about €1 billion.",
+      "That €1 billion takes the first losses, backed by EU guarantees. On top of it, the fund aims to raise up to €2 billion from private investors through notes paid from the coupons on its bond portfolio.",
+      "The fund buys newly issued green bonds, prefers first-time issuers such as governments, cities and companies, and must put at least 20% into the least developed countries. It also offers technical help to issuers. The EU hopes the initiative will draw in up to €20 billion of private capital for sustainable infrastructure."
+    ],
+    cycleRead: "Blended finance is how a theme moves from signal to early capital in markets private investors see as too risky. Public money takes the first loss, which lowers the risk for pension funds and brings the cost of capital within reach of first-time issuers. The test is whether the €2 billion private tranche fills; if it does, expect more funds built on the same model.",
+    source: { name: "ESG Today", url: "https://www.esgtoday.com/amundi-to-manage-new-e3-billion-eu-backed-green-bond-blended-finance-fund/" }
+  },
+  {
+    slug: "blackstone-energy-transition-fund-v",
+    section: "energy", theme: "grids", signal: "forward",
+    date: "2026-10-19", minutes: 3, featured: true,
+    title: "Blackstone closes an $8.7bn energy transition fund",
+    summary: "Blackstone's fifth energy transition fund reached its hard cap, about 50% larger than the one before it, and is already building transmission platforms.",
+    body: [
+      "Blackstone Energy Transition Partners V closed at $8.7 billion, its maximum size, after more investors asked to join than there was room for. The fund began investing in June.",
+      "It has made six investments so far. Three are platform companies that build and run power generation and transmission lines (Kindle, Fisterra and Viridon). The other three are efficiency businesses: liquid cooling for data centres, metering and control equipment for gas and water utilities, and inspection services for energy assets.",
+      "The strategy does not own or extract oil and gas reserves. Blackstone reports a 34% net IRR for the strategy since 1997, measured at 30 June."
+    ],
+    cycleRead: "Transmission is moving from early capital towards build-out. A fund this size building platforms that develop and run power lines shows private capital stepping into grids at scale. The data-centre cooling business in the same fund shows how closely this theme now overlaps with power for compute.",
+    source: { name: "Investing.com", url: "https://ng.investing.com/news/stock-market-news/blackstone-closes-87-billion-energy-transition-fund-93CH-2743361" }
+  },
+  {
+    slug: "microsoft-nisource-indiana-power-deal",
+    section: "technology", theme: "compute", signal: "confirms",
+    date: "2026-10-19", minutes: 3, featured: true,
+    title: "Microsoft signs a 20-year power deal in Indiana, and pays for the new plants",
+    summary: "Utility NiSource will add about 1.1 GW of supply and 600 MW of batteries for a planned Microsoft data centre, under a rate class that makes large users fund their own infrastructure.",
+    body: [
+      "The 20-year agreement starts in 2028. NiSource will supply power through its generation subsidiary and build the transmission and generation needed. Its portfolio grows by about 1.1 GW, plus 600 MW of battery storage under a tolling agreement, to be built by an affiliate of AGP Group.",
+      "The data centre campus sits in a new large-load rate class. Customers in that class must pay for the generation and grid infrastructure built to serve them. NiSource says this protects its existing customers from higher bills. The deal likely serves Microsoft's data centre under construction in La Porte, though this has not been confirmed."
+    ],
+    cycleRead: "A clear build-out marker: buyers now pay for new power plants up front to get capacity sooner. The large-load tariff gives the utility a creditworthy buyer for new assets and limits the political risk of rising household bills. Expect other utilities to copy the model.",
+    source: { name: "DCD", url: "https://www.datacenterdynamics.com/en/news/microsoft-signs-20-year-power-deal-with-indiana-utility-nisource-for-planned-data-center-in-the-state/" }
+  },
+  {
+    slug: "ls-electric-us-data-centre-switchgear",
+    section: "technology", theme: "compute", signal: "confirms",
+    date: "2026-10-19", minutes: 2,
+    title: "LS Electric wins a $125m switchgear order from US big tech",
+    summary: "The Korean equipment maker will supply high-voltage switchgear for North American data centres under a two-year agreement.",
+    body: [
+      "LS Electric announced a $125.23 million order from an unnamed US technology company. It covers 38 kV switchgear, the equipment that distributes incoming high-voltage power around a data centre and protects it during faults.",
+      "The order is a long-term agreement running through 2027 and 2028. The announced value covers 2027 deliveries only, with 2028 volumes still to be agreed. LS Electric is also discussing supplying transformers and other distribution equipment, made at its US sites in Utah and Texas."
+    ],
+    cycleRead: "Equipment shortages are a classic build-out marker. Buyers locking in switchgear two years ahead shows supply is setting the pace. The move to crowded would show up as shorter lead times and falling equipment prices.",
+    source: { name: "Seoul Economic Daily", url: "https://en.sedaily.com/finance/2026/10/19/ls-electric-wins-125-million-us-data-center-power-deal" }
+  },
+  {
+    slug: "macquarie-tif-exits-perth-airport",
+    section: "infrastructure", theme: "core", signal: "confirms",
+    date: "2026-10-16", minutes: 2,
+    title: "Macquarie fund sells its Perth Airport stake after 25 years",
+    summary: "The Infrastructure Fund and Australian Retirement Trust sold a combined 9.14% of Perth Airport to fellow shareholder AustralianSuper.",
+    body: [
+      "The Infrastructure Fund (TIF), managed by Macquarie Asset Management, sold its 7.19% stake. Australian Retirement Trust sold 1.95%. The buyer was AustralianSuper, which already owned part of the airport. The sale completed on 16 October. No price was disclosed.",
+      "TIF first invested in 2001. Over that time, yearly passengers grew from about 7 million in FY06 to more than 18 million in FY26."
+    ],
+    cycleRead: "The end of a cycle looks like this: a 25-year hold sold to a pension fund already on the shareholder register. Core assets change hands between long-term owners, and returns come from steady cash flow. Without a price, the sale gives no read on what core buyers are paying.",
+    source: { name: "Macquarie", url: "https://www.macquarie.com/ie/en/about/news/2026/the-infrastructure-fund-and-australian-retirement-trust-announce-successful-completion-of-the-sale-of-combined-interest-in-perth-airport.html" }
+  },
+  {
+    slug: "ieefa-vietnam-renewables-vs-lng",
+    section: "energy", theme: "asean", signal: "forward",
+    date: "2026-10-15", minutes: 4, featured: true,
+    title: "Solar and wind beat LNG on cost and speed in Vietnam, says IEEFA",
+    summary: "A new report finds Vietnam's planned LNG power plants would cost far more per kWh than solar or onshore wind, and take years longer to build.",
+    body: [
+      "Vietnam's revised power development plan (PDP8) targets 22.5 GW of LNG-fired power by 2030. IEEFA, a think tank that generally favours clean energy, estimates that running all of it would cost $15.5 to 23.6 billion a year in imported fuel.",
+      "Asian spot LNG prices averaged $18.74/MMBtu up to August 2026, against just under $12 before the Middle East conflict. On that basis, IEEFA puts LNG power at VND 3,780 to 4,860 per kWh. That is above the government's LNG price ceiling of VND 3,327, which is itself above the average retail price of VND 2,204.",
+      "Utility-scale solar comes in at VND 1,328 to 1,625 per kWh and onshore wind at VND 1,026 to 1,412. Solar can start generating about six months after construction begins, and wind in about a year. New LNG plants face four to five years of waiting for equipment before construction starts.",
+      "The report recommends shifting near-term investment to solar and wind, reviewing the LNG target, speeding up storage and transmission, and expanding auctions and direct power purchase agreements (DPPAs)."
+    ],
+    cycleRead: "The economics already favour solar and wind; the missing piece is a buyer investors trust. LNG power priced above the regulated tariff adds to the losses at EVN, the state utility (about $1.7 billion by the end of 2024), which keeps the cost of capital high. The theme reaches early capital when DPPAs and tariff reform give projects a creditworthy buyer.",
+    source: { name: "SolarQuarter", url: "https://solarquarter.com/2026/10/15/solar-and-wind-could-meet-vietnams-rising-power-demand-faster-and-at-lower-cost-than-lng-ieefa-report-finds/" }
+  },
+  {
+    slug: "asean-energy-transition-investment-roadmap",
+    section: "infrastructure", theme: "asean", signal: "confirms",
+    date: "2026-10-14", minutes: 3, featured: true,
+    title: "New ASEAN roadmap puts net zero at about £520bn a year",
+    summary: "A regional roadmap launched in Manila sets out what Southeast Asia would need to invest each year to 2050 to reach net zero.",
+    body: [
+      "The ASEAN Energy Transition and Investment Roadmap was launched on 14 October at the ASEAN Energy Business Forum in Manila. It was developed by Sustainable Energy for All with the ASEAN Centre for Energy and member states, with UK funding.",
+      "Under its net-zero pathway, the region would need average investment of roughly £520 billion a year to 2050, with power and transport taking the largest shares. Fossil fuel supply in 2050 would be about 57% lower than under business as usual, and renewables could provide around 44% of primary energy.",
+      "The roadmap puts electrification at the centre and highlights cross-border power trading and grid interconnection as ways to share renewable resources and improve energy security. It estimates about 8.6 million more jobs than business as usual by 2050."
+    ],
+    cycleRead: "A signal-stage document: it measures what the region needs to spend, and no money is committed yet. Its weight on grids and cross-border interconnectors points to where the first large cheques are likely to go once rules and buyers are in place.",
+    source: { name: "SEforALL", url: "https://www.seforall.org/news/asean-energy-transition-and-investment-roadmap-launched-at-aebf-26-to-accelerate-a-clean" }
+  },
+  {
+    slug: "aurora-europe-battery-saturation",
+    section: "energy", theme: "storage", signal: "confirms",
+    date: "2026-05-14", minutes: 3,
+    title: "Too many batteries: Europe's storage revenues set to fall",
+    summary: "Aurora Energy Research expects battery revenues across Europe to fall by about 20% by 2040 as the market fills up, and sees pairing batteries with solar or wind as the main defence.",
+    body: [
+      "Aurora's European co-location report, released in May, projects that market saturation will cut battery revenues by around a fifth by 2040, as more batteries compete to provide the same grid services.",
+      "Placing batteries alongside solar or wind farms (co-location) can offset part of the fall. The battery stores power that would otherwise be wasted when the grid is full, and sells it later at a better price. Europe had 6.3 GW of co-located renewable capacity in 2025, mostly solar paired with storage.",
+      "Germany, Great Britain and Bulgaria rank as the most attractive of the 20 markets studied. More than 1,600 GW of renewables and storage is waiting for a grid connection across Europe, including about 550 GW in Great Britain."
+    ],
+    cycleRead: "Storage shows the crowded stage clearly: so much capacity has arrived that each battery earns less. The next phase is about contracts and pairing with solar, which lowers both risk and returns. That is how a crowded theme starts to mature.",
+    source: { name: "Batteries International", url: "https://www.batteriesinternational.com/news/market-saturation-set-to-hit-europes-battery-revenues-says-report/" }
+  }
+];
+
+/* ================================================================
+   D. HELPERS
+   ================================================================ */
+const $ = (id) => document.getElementById(id);
+const sectionOf = (id) => SECTIONS.find(s => s.id === id);
+const themeOf = (id) => THEMES.find(t => t.id === id);
+const stageOf = (n) => STAGES[n - 1];
+const byNewest = (a, b) => b.date.localeCompare(a.date);
+const pad = (n) => String(n).padStart(2, "0");
+const themesInOrder = [...THEMES].sort((a, b) => a.stage - b.stage);
+const themeNumber = (id) => themesInOrder.findIndex(t => t.id === id) + 1;
+
+function formatDate(iso) {
+  return new Date(iso + "T12:00:00")
+    .toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
+    .toUpperCase();
+}
+function stageTag(theme) {
+  const s = stageOf(theme.stage);
+  return `<span class="stage">${pad(s.n)} · ${s.name}</span>`;
+}
+function signalTag(p) {
+  return `<span class="sig ${p.signal}">${SIGNALS[p.signal].label}</span>`;
+}
+
+/* ================================================================
+   E. BUILD THE PAGE
+   ================================================================ */
+function renderTicker() {
+  const latest = [...POSTS].sort(byNewest)[0];
+  const items = ["<b>▲ Latest:</b> " + latest.title]
+    .concat(themesInOrder.map(t => "<b>" + t.name + ":</b> " + pad(t.stage) + " " + stageOf(t.stage).name))
+    .concat(["<b>New briefing</b> every Sunday"]);
+  const once = items.map(t => "<span>" + t + " ◆</span>").join("");
+  $("ticker").innerHTML = once + once; // twice, so the loop is seamless
+}
+
+// The cycle wave in the hero. Drawn from STAGES and THEMES, so it updates itself.
+function renderWave() {
+  const left = 20, width = 64, base = 228;
+  const xs = STAGES.map((_, i) => left + width * i + width / 2);   // centre of each stage
+  const ys = [196, 168, 104, 62, 118];                              // capital flowing in at each stage
+  const pts = [[left, 212]].concat(xs.map((x, i) => [x, ys[i]])).concat([[left + width * 5, 124]]);
+
+  // Smooth line through the points (Catmull-Rom curve)
+  let d = `M${pts[0][0]},${pts[0][1]}`;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[i - 1] || pts[i], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2] || p2;
+    const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+    const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+    d += ` C${c1[0].toFixed(1)},${c1[1].toFixed(1)} ${c2[0].toFixed(1)},${c2[1].toFixed(1)} ${p2[0]},${p2[1]}`;
+  }
+  const area = d + ` L${left + width * 5},${base} L${left},${base} Z`;
+
+  let svg = `<text class="lbl" x="${left}" y="16">CAPITAL IN ↑</text>`;
+  svg += `<text class="lbl" x="${left + width * 5}" y="16" text-anchor="end">FIG. 1</text>`;
+  for (let i = 1; i < 5; i++) svg += `<line class="band" x1="${left + width * i}" y1="28" x2="${left + width * i}" y2="${base}"/>`;
+  svg += `<path class="wave-area" d="${area}"/><path class="wave" d="${d}"/><path class="flow" d="${d}"/>`;
+  svg += `<line class="axis" x1="${left}" y1="${base}" x2="${left + width * 5}" y2="${base}"/>`;
+  STAGES.forEach((s, i) => {
+    svg += `<text class="lbl" x="${xs[i]}" y="${base + 15}" text-anchor="middle">${pad(s.n)}</text>`;
+    svg += `<text class="lbl" x="${xs[i]}" y="${base + 28}" text-anchor="middle">${s.short}</text>`;
+  });
+  // Theme dots, stacked upwards when several share a stage
+  const used = {};
+  themesInOrder.forEach(t => {
+    const k = used[t.stage] = (used[t.stage] || 0) + 1;
+    const x = xs[t.stage - 1], y = ys[t.stage - 1] - 22 * k + 4;
+    svg += `<line class="axis" x1="${x}" y1="${y + 10}" x2="${x}" y2="${ys[t.stage - 1]}" style="stroke-width:1"/>`;
+    svg += `<circle class="dot" cx="${x}" cy="${y}" r="10"/><text class="dot-t" x="${x}" y="${y + 3.5}" text-anchor="middle">${themeNumber(t.id)}</text>`;
+  });
+  $("wave").innerHTML = svg;
+
+  $("legend").innerHTML = themesInOrder.map(t =>
+    `<li><span class="num">${themeNumber(t.id)}</span><a href="#cycle" style="text-decoration:none">${t.name}</a></li>`).join("");
+}
+
+function renderStages() {
+  $("stages").innerHTML = STAGES.map(s => `
+    <div class="stage-item">
+      <span class="code">${pad(s.n)}</span>
+      <h3>${s.name}</h3>
+      <p>${s.text}</p>
+      <p class="who"><b>Typical capital</b>${s.who}</p>
+    </div>`).join("");
+}
+
+function renderThemes() {
+  $("themes").innerHTML = themesInOrder.map(t => {
+    const posts = POSTS.filter(p => p.theme === t.id).sort(byNewest);
+    const track = STAGES.map(s =>
+      `<span class="${s.n < t.stage ? "past" : s.n === t.stage ? "now" : ""}"></span>`).join("");
+    const list = posts.length
+      ? `<ul>${posts.map(p => `<li><a href="#${p.slug}" data-slug="${p.slug}">${signalTag(p)}<span>${p.title}</span></a></li>`).join("")}</ul>`
+      : `<p class="none">No stories filed yet.</p>`;
+    return `
+      <article class="theme" id="theme-${t.id}">
+        <div class="theme-name">
+          <h3><span class="num">${themeNumber(t.id)}</span>${t.name}</h3>
+          <div class="track" role="img" aria-label="Stage ${t.stage} of 5: ${stageOf(t.stage).name}">${track}</div>
+          <div>${stageTag(t)}</div>
+        </div>
+        <div class="theme-body">
+          <p>${t.thesis}</p>
+          <p class="watch"><b>Watch for:</b> ${t.watch}</p>
+        </div>
+        <div class="evidence">
+          <span class="eyebrow">Evidence · ${posts.length} ${posts.length === 1 ? "story" : "stories"}</span>
+          ${list}
+        </div>
+      </article>`;
+  }).join("");
+}
+
+function cardHTML(p) {
+  const t = themeOf(p.theme);
+  return `
+    <a class="card" href="#${p.slug}" data-slug="${p.slug}">
+      <div class="meta mono">${stageTag(t)}<span>${formatDate(p.date)}</span></div>
+      <span class="eyebrow">${t.name}</span>
+      <h3>${p.title}</h3>
+      <p>${p.summary}</p>
+      <div class="foot mono">${signalTag(p)}<span>Via <b>${p.source.name}</b></span></div>
+    </a>`;
+}
+
+const SHOW_FIRST = 3; // stories shown per section before "Show all"
+
+function renderNav() {
+  $("nav-sections").innerHTML = LIVE.map(s => `<a href="#${s.id}">${s.name}</a>`).join("");
+  $("hero-sections").textContent = ["Cycle watch"].concat(LIVE.map(s => s.name)).join(" · ");
+  $("sitemap").innerHTML = [`<li><a href="#cycle">00 · Cycle map</a></li>`]
+    .concat(LIVE.map((s, i) => `<li><a href="#${s.id}">${pad(i + 1)} · ${s.name}</a></li>`))
+    .concat([`<li><a href="#about">${pad(LIVE.length + 1)} · About</a></li>`]).join("");
+}
+
+function renderBoard() {
+  if (!PLANNED.length) { $("drawing-board").hidden = true; return; }
+  $("board").innerHTML = PLANNED.map(s => `
+    <div class="planned">
+      <span class="eyebrow">Planned</span>
+      <h3>${s.name}</h3>
+      <p>${s.blurb}</p>
+    </div>`).join("");
+}
+
+function renderSections() {
+  $("sections").innerHTML = LIVE.map((s, i) => {
+    const posts = POSTS.filter(p => p.section === s.id).sort(byNewest);
+    const extra = posts.length > SHOW_FIRST
+      ? `<button class="btn more" type="button" data-more="${s.id}">Show all ${posts.length} ▼</button>` : "";
+    return `
+      <section id="${s.id}" aria-labelledby="${s.id}-h">
+        <header class="node">
+          <span class="eyebrow">Bus ${pad(i + 1)} · ${s.name}</span>
+          <h2 id="${s.id}-h">${s.label}</h2>
+          <p>${s.blurb}</p>
+        </header>
+        <div class="cards" id="${s.id}-cards">${posts.slice(0, SHOW_FIRST).map(cardHTML).join("")}</div>
+        ${extra}
+      </section>`;
+  }).join("");
+}
+
+// Featured slider
+const FEATURED_MAX = 6; // how many featured stories the slider shows, newest first
+const featured = POSTS.filter(p => p.featured).sort(byNewest).slice(0, FEATURED_MAX);
+let slide = 0;
+
+function renderFeature() {
+  if (!featured.length) { $("latest").hidden = true; return; }
+  const p = featured[slide];
+  const t = themeOf(p.theme);
+  const s = stageOf(t.stage);
+  $("feature").innerHTML = `
+    <article class="feature">
+      <div class="feature-plate">
+        <span class="mono">Stage · ${s.name}</span>
+        <span class="big">${pad(s.n)}</span>
+      </div>
+      <div class="feature-body">
+        <span class="eyebrow">${t.name} · ${formatDate(p.date)} · Via ${p.source.name}</span>
+        <h3><a href="#${p.slug}" data-slug="${p.slug}">${p.title}</a></h3>
+        <p>${p.summary}</p>
+        <div>${signalTag(p)}</div>
+        <div><a class="btn primary" href="#${p.slug}" data-slug="${p.slug}">Read the summary ▶</a></div>
+      </div>
+    </article>`;
+  $("slide-count").textContent = pad(slide + 1) + " / " + pad(featured.length);
+}
+
+$("prev").addEventListener("click", () => { slide = (slide - 1 + featured.length) % featured.length; renderFeature(); });
+$("next").addEventListener("click", () => { slide = (slide + 1) % featured.length; renderFeature(); });
+
+/* ================================================================
+   F. STORY READER
+   ================================================================ */
+let lastFocus = null;
+
+function openPost(slug) {
+  const p = POSTS.find(x => x.slug === slug);
+  if (!p) return;
+  const t = themeOf(p.theme);
+  const ordered = [...POSTS].sort(byNewest);
+  const next = ordered[(ordered.indexOf(p) + 1) % ordered.length];
+  $("reader-crumb").textContent = sectionOf(p.section).name + " · " + t.name;
+  $("reader-article").innerHTML = `
+    <span class="eyebrow">${formatDate(p.date)} · Via ${p.source.name} · ${p.minutes} min read</span>
+    <h1 id="reader-title">${p.title}</h1>
+    <div class="tags">${stageTag(t)}<span class="mono">${t.name}</span>${signalTag(p)}</div>
+    <p class="standfirst">${p.summary}</p>
+    <div class="body">${p.body.map(b => b.startsWith("<h2") ? b : "<p>" + b + "</p>").join("")}</div>
+    <aside class="read"><span class="code">Cycle read</span><p>${p.cycleRead}</p></aside>
+    <p class="src mono">Source: ${p.source.name} · <a href="${p.source.url}" target="_blank" rel="noopener">Read the original ▶</a></p>
+    <div class="end">
+      <span class="mono">Next on the wire</span>
+      <a class="btn" href="#${next.slug}" data-slug="${next.slug}">${next.title} ▶</a>
+    </div>`;
+  lastFocus = document.activeElement;
+  $("reader").hidden = false;
+  $("reader").scrollTop = 0;
+  document.body.style.overflow = "hidden";
+  $("reader-close").focus();
+  try { history.replaceState(null, "", "#" + slug); } catch (e) {}
+}
+
+function closePost() {
+  $("reader").hidden = true;
+  document.body.style.overflow = "";
+  try { history.replaceState(null, "", location.pathname); } catch (e) {}
+  if (lastFocus) lastFocus.focus();
+}
+
+$("reader-close").addEventListener("click", closePost);
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("reader").hidden) closePost(); });
+
+// One click handler for every story link and "Show all" button on the page
+document.addEventListener("click", e => {
+  const link = e.target.closest("[data-slug]");
+  if (link) { e.preventDefault(); openPost(link.dataset.slug); return; }
+  const more = e.target.closest("[data-more]");
+  if (more) {
+    const id = more.dataset.more;
+    $(id + "-cards").innerHTML = POSTS.filter(p => p.section === id).sort(byNewest).map(cardHTML).join("");
+    more.remove();
+  }
+});
+
+/* ================================================================
+   G. LCOE CALCULATOR
+   LCOE = (build cost × capital recovery factor + yearly running cost)
+          ÷ yearly output
+   Capital recovery factor = r(1+r)^n / ((1+r)^n − 1)
+   ================================================================ */
+const PRESETS = [
+  { name: "UK solar",               capex: 600,  cf: 11, opex: 12, wacc: 6,  life: 30 },
+  { name: "UK onshore wind",        capex: 1300, cf: 28, opex: 30, wacc: 6,  life: 25 },
+  { name: "Southern Vietnam solar", capex: 550,  cf: 17, opex: 9,  wacc: 10, life: 25 }
+];
+const FIELDS = ["capex", "cf", "opex", "wacc", "life"];
+
+function crf(r, n) { return r === 0 ? 1 / n : r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1); }
+
+function lcoe(v, waccOverride) {
+  const r = (waccOverride ?? v.wacc) / 100;
+  const capital = v.capex * crf(r, v.life);   // £ per kW per year
+  const mwhPerKw = 8.76 * v.cf / 100;          // 8,760 hours × capacity factor ÷ 1,000
+  return { total: (capital + v.opex) / mwhPerKw, capital, mwhPerKw, crf: crf(r, v.life) };
+}
+
+function readInputs() {
+  const v = {};
+  FIELDS.forEach(f => v[f] = parseFloat($(f).value));
+  return v;
+}
+
+function updateCalc() {
+  const v = readInputs();
+  const res = lcoe(v);
+  const down = lcoe(v, Math.max(0, v.wacc - 2)).total;
+  const capShare = res.capital / (res.capital + v.opex) * 100;
+
+  $("capex-o").textContent = "£" + v.capex.toLocaleString("en-GB");
+  $("cf-o").textContent = v.cf + "%";
+  $("opex-o").textContent = "£" + v.opex;
+  $("wacc-o").textContent = v.wacc.toFixed(1) + "%";
+  $("life-o").textContent = v.life + " yrs";
+
+  $("lcoe").textContent = res.total.toFixed(1);
+  $("split-cap").style.width = capShare + "%";
+  $("split-op").style.width = (100 - capShare) + "%";
+  $("key-cap").textContent = "Capital " + Math.round(capShare) + "%";
+  $("key-op").textContent = "Running " + Math.round(100 - capShare) + "%";
+  $("r-out").textContent = Math.round(res.mwhPerKw * 1000).toLocaleString("en-GB") + " kWh";
+  $("r-crf").textContent = (res.crf * 100).toFixed(2) + "%";
+  $("r-sens").textContent = "£" + down.toFixed(1) + " (" + ((down / res.total - 1) * 100).toFixed(1) + "%)";
+
+  // Highlight a preset only while the inputs still match it
+  document.querySelectorAll("#presets button").forEach((b, i) => {
+    const p = PRESETS[i];
+    b.setAttribute("aria-pressed", FIELDS.every(f => p[f] === v[f]) ? "true" : "false");
+  });
+}
+
+function applyPreset(p) { FIELDS.forEach(f => $(f).value = p[f]); updateCalc(); }
+
+$("presets").innerHTML = PRESETS.map((p, i) => `<button type="button" data-preset="${i}">${p.name}</button>`).join("");
+$("presets").addEventListener("click", e => {
+  const b = e.target.closest("[data-preset]");
+  if (b) applyPreset(PRESETS[+b.dataset.preset]);
+});
+FIELDS.forEach(f => $(f).addEventListener("input", updateCalc));
+
+/* ================================================================
+   H. SUBSCRIBE FORM
+   To collect real emails, replace this with your newsletter
+   service's embed code (Substack, Buttondown, Mailchimp...).
+   ================================================================ */
+$("sub-form").addEventListener("submit", e => {
+  e.preventDefault();
+  $("sub-msg").textContent = SITE.newsletterNote;
+  $("sub-msg").hidden = false;
+  e.target.reset();
+});
+
+/* ================================================================
+   I. START
+   ================================================================ */
+renderNav();
+renderBoard();
+renderTicker();
+renderWave();
+renderStages();
+renderThemes();
+renderFeature();
+renderSections();
+applyPreset(PRESETS[2]);
+$("year").textContent = new Date().getFullYear();
+if (SITE.linkedin) { $("linkedin").href = SITE.linkedin; $("linkedin-li").hidden = false; }
+
+// Open a story directly if the address ends in #story-slug
+const start = location.hash.slice(1);
+if (POSTS.some(p => p.slug === start)) openPost(start);
+</script>
+</body>
+</html>
