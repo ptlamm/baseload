@@ -29,20 +29,25 @@ const live = new Set(SECTIONS.filter(s => s.status === "live").map(s => s.id));
 const allSections = new Set(SECTIONS.map(s => s.id));
 const themes = new Set(THEMES.map(t => t.id));
 const slugs = new Set();
-THEMES.forEach(t => { if (!(t.stage >= 1 && t.stage <= STAGES.length)) problems.push(`Theme "${t.id}" has stage ${t.stage}; it must be 1 to ${STAGES.length}.`); });
+SECTIONS.forEach(s => { if (!["live", "planned", "archived"].includes(s.status)) problems.push(`Section "${s.id}" has status "${s.status}"; use live, planned or archived.`); });
+THEMES.forEach(t => {
+  if (!(t.stage >= 1 && t.stage <= STAGES.length)) problems.push(`Theme "${t.id}" has stage ${t.stage}; it must be 1 to ${STAGES.length}.`);
+  (t.photos || []).forEach(ph => { if (!/^photo-[0-9]+-[0-9a-f]+$/.test(ph)) problems.push(`Theme "${t.id}" has a photo "${ph}" that does not look like an Unsplash photo id (photo-123...-abc...).`); });
+});
 POSTS.forEach((p, i) => {
   const name = p.slug || `story #${i + 1}`;
   if (!p.slug || !/^[a-z0-9-]+$/.test(p.slug)) problems.push(`${name}: slug must use lowercase letters, numbers and hyphens.`);
   if (slugs.has(p.slug)) problems.push(`${name}: slug is used twice.`);
   slugs.add(p.slug);
   if (!allSections.has(p.section)) problems.push(`${name}: section "${p.section}" does not exist.`);
-  else if (!live.has(p.section)) console.log(`Note: ${name} is in planned section "${p.section}", so it stays hidden.`);
+  else if (!live.has(p.section)) console.log(`Note: ${name} is in a section that is not live ("${p.section}"), so it stays hidden.`);
   if (!themes.has(p.theme)) problems.push(`${name}: theme "${p.theme}" does not exist.`);
   if (!SIGNALS[p.signal]) problems.push(`${name}: signal must be forward, confirms or back.`);
   if (!/^\d{4}-\d{2}-\d{2}$/.test(p.date || "")) problems.push(`${name}: date must look like 2026-10-25.`);
   ["title", "summary", "cycleRead"].forEach(k => { if (!p[k]) problems.push(`${name}: missing ${k}.`); });
   if (!Array.isArray(p.body) || !p.body.length) problems.push(`${name}: body must be a list of paragraphs.`);
   if (!p.source || !/^https?:\/\//.test(p.source.url || "")) problems.push(`${name}: source needs a name and a full link.`);
+  if (p.image !== undefined && typeof p.image !== "string") problems.push(`${name}: image must be a file path or link in quotes.`);
 });
 
 if (problems.length) fail(problems.join("\n"));

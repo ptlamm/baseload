@@ -27,6 +27,7 @@ Commit the change on GitHub, and the live site updates in about a minute.
 All sectors live in one list, `SECTIONS`. Each has a `status`:
 - `"live"`: shown on the site and in the menu, and included in the Sunday drafts.
 - `"planned"`: shown in "On the drawing board" as a sector coming later.
+- `"archived"`: hidden from the site and from the Sunday drafts. Its stories stay in the file, and setting it back to `"live"` brings them back. A theme whose stories are all archived also hides from the cycle map until it has a live story again.
 
 To start covering a planned sector: change `"planned"` to `"live"`. It gets its own block on the home page (three newest stories), a footer link and Sunday drafts automatically.
 
@@ -36,8 +37,18 @@ To pause a sector: set it back to `"planned"`. Its stories stay in the file but 
 
 The order of the list is the order on the page. Start with the sector you know best.
 
-### Thumbnails
-Every story gets a thumbnail drawn from its theme's `icon` (sun, globe, pylon, server, bond, battery, crane or chart) on graph paper. The yellow line rises when the story moves its theme forward, stays flat when it confirms the stage, and falls when it holds the theme back. Never use pictures copied from the source article; use your own charts or photos through `image`.
+### Thumbnails (photos)
+Each theme has a `photos` list of three free Unsplash photos. Its stories use them in turn, so neighbouring cards rarely repeat. The site loads them straight from Unsplash, and the footer and story pages credit Unsplash.
+
+To change or add a theme photo:
+1. Find a photo on **unsplash.com**. Use free photos only; skip any marked **Unsplash+**.
+2. Open the photo, right-click it and choose **Copy image address**.
+3. The address looks like `https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?...`. Copy the part from `photo-` up to the `?`.
+4. Paste it into the theme's `photos` list in quotes, separated by commas.
+
+To give one story its own picture, add `image: "images/file.png"` (a file you upload to the repository) or a full image link to that story. Never use pictures copied from news articles.
+
+A theme with no photos falls back to a drawn thumbnail made from its `icon` (sun, globe, pylon, server, bond, battery, crane or chart).
 
 ## 4. Move a theme along the cycle
 The site's question is: where is the next investment cycle forming? Every theme in `B. THEMES` sits at one of five stages:
@@ -52,7 +63,7 @@ The site's question is: where is the next investment cycle forming? Every theme 
 
 To move a theme, change its `stage` number. The wave in the hero, the cycle map and every card update by themselves. Review the stages once a month, not every week.
 
-To add a theme, copy one block and give it a short `id`, a `name`, a `stage`, an `icon`, a one-line `thesis` and a `watch` line (what would move it to the next stage). Five to seven themes is enough.
+To add a theme, copy one block and give it a short `id`, a `name`, a `stage`, `photos`, an `icon`, a one-line `thesis` and a `watch` line (what would move it to the next stage). Five to seven themes is enough.
 
 ## 5. Add a story
 In `C. STORIES`, copy one `{ ... },` block, paste it at the top of the list and change:

@@ -402,8 +402,10 @@ section[id], details[id] { scroll-margin-top: 90px; }
 .feature { grid-template-columns: minmax(0, 340px) minmax(0, 1fr); }
 .feature-thumb { border-right: 2px solid var(--ink); }
 .feature-thumb .thumb { height: 100%; aspect-ratio: auto; min-height: 200px; }
-.feature-thumb svg { height: 100%; }
+.feature-thumb svg, .feature-thumb img { height: 100%; }
 .reader .thumb { border: 2px solid var(--ink); }
+.reader .credit { font-size: 12px; color: var(--muted); margin-top: -12px; }
+.reader .credit a { color: inherit; }
 
 @media (max-width: 640px) {
   .feature { grid-template-columns: minmax(0, 1fr); }
@@ -624,7 +626,8 @@ section[id], details[id] { scroll-margin-top: 90px; }
     <div>
       <span class="eyebrow">System</span>
       <ul>
-        <li class="mono">Est. 2026 · Build v0.6</li>
+        <li class="mono">Est. 2026 · Build v0.7</li>
+        <li class="mono">Photos: <a href="https://unsplash.com" target="_blank" rel="noopener">Unsplash</a></li>
         <li class="mono">© <span id="year"></span> Baseload</li>
         <li id="linkedin-li" hidden><a id="linkedin" href="#" target="_blank" rel="noopener">LinkedIn ▶</a></li>
       </ul>
@@ -654,6 +657,8 @@ const SITE = {
 /* SECTIONS — the sectors this briefing covers.
    status "live":    shown on the site, in the menu, and drafted every Sunday.
    status "planned": listed under "On the drawing board" until you are ready.
+   status "archived": hidden from the site and the Sunday drafts. Its stories
+                      stay in this file; set it back to "live" to bring them back.
    To start covering a planned sector, change its status to "live".
    To add a new idea, copy one line and give it a short unique id. */
 const SECTIONS = [
@@ -663,7 +668,7 @@ const SECTIONS = [
     blurb: "Power markets, renewables, storage and the contracts that pay for them." },
   { id: "infrastructure", name: "Infrastructure", label: "Asset book",       status: "live",
     blurb: "Grids, transport and utilities: long-lived assets with steady cash flows." },
-  { id: "technology",     name: "Technology",     label: "Compute & cables", status: "live",
+  { id: "technology",     name: "Technology",     label: "Compute & cables", status: "archived",
     blurb: "Data centres, networks and the technology changing how assets earn." },
   { id: "climate-tech",   name: "Climate tech venture", status: "planned",
     blurb: "Early-stage companies and the venture funds backing them." },
@@ -699,29 +704,39 @@ const STAGES = [
    B. THEMES — the cycle map.
    Each theme sits at one stage (1 to 5). Move a theme by changing
    its stage number. Every story below is filed under one theme.
-   icon: the picture on its stories' thumbnails. Choose from
-   sun, globe, pylon, server, bond, battery, crane, chart.
+   photos: free Unsplash photos used as thumbnails for this theme's
+   stories, in turn. Each is the "photo-..." part of an Unsplash image
+   address (see the README). Use free photos only, never Unsplash+.
+   icon: the drawn thumbnail used when a theme has no photos. Choose
+   from sun, globe, pylon, server, bond, battery, crane, chart.
    ================================================================ */
 const THEMES = [
   { id: "asean", name: "ASEAN power", stage: 1, icon: "sun",
+    photos: ["photo-1591269469224-0479a5f956c6", "photo-1780445392628-d6f5b9e5609b", "photo-1680355065203-43ad84bb6e69"],
     thesis: "Fast demand growth and cheap solar and wind make the case. Weak buyer credit and shifting rules still hold most capital back.",
     watch:  "Direct power purchase agreements (DPPAs) signing at scale, tariff reform, and a stronger balance sheet at EVN." },
   { id: "em-finance", name: "Emerging-market climate finance", stage: 2, icon: "globe",
+    photos: ["photo-1602646994030-464f98de5e5c", "photo-1668444835599-6e4bece2893e", "photo-1768364635790-229648251482"],
     thesis: "Development banks are building structures that take the first losses so private money can follow into emerging markets. Capital is still scarce and expensive.",
     watch:  "Private tranches of blended funds filling on time, and national green taxonomies in markets such as Vietnam." },
   { id: "grids", name: "Grids and transmission", stage: 2, icon: "pylon",
+    photos: ["photo-1473341304170-971dccb5ac1e", "photo-1777734794648-2bd10e93f0b2", "photo-1509390559807-3144e7d29097"],
     thesis: "Generation is no longer the main bottleneck; moving power is. Private capital is starting to build and own transmission platforms.",
     watch:  "Regulators opening more transmission to private owners, and the first large grid-focused funds closing." },
   { id: "compute", name: "Power for compute", stage: 3, icon: "server",
+    photos: ["photo-1584169417032-d34e8d805e8b", "photo-1564457461758-8ff96e439e83", "photo-1784652852605-6945598f2af3"],
     thesis: "Data centres need power faster than grids can supply it. Capital is flowing into new generation, grid equipment and on-site power.",
     watch:  "Shorter equipment lead times or a slowdown in AI spending, either of which would mark the move to crowded." },
   { id: "eugb", name: "EU green bonds", stage: 3, icon: "bond",
+    photos: ["photo-1771749372003-193cddcc3c6b", "photo-1759169306825-d1d4b832ae3a", "photo-1608817576203-3c27ed168bd2"],
     thesis: "The EU's voluntary gold-standard green bond is scaling fast from a small base, led by issuers that fund Taxonomy-aligned assets.",
     watch:  "Evidence that the label lowers borrowing costs, and large sovereign and utility issuers adopting it." },
   { id: "storage", name: "Battery storage", stage: 4, icon: "battery",
+    photos: ["photo-1775519520494-d12d91797a01", "photo-1509390144018-eeaf65052242", "photo-1780444745115-a58369e913ee"],
     thesis: "Merchant battery income has fallen as capacity floods in. New money now wants contracted income or batteries paired with solar.",
     watch:  "Long-term contracts for storage (tolling, cap-and-floor) becoming standard, which would start the move to mature." },
   { id: "core", name: "Core infrastructure", stage: 5, icon: "crane",
+    photos: ["photo-1590496793907-4d66e2994b4d", "photo-1683971336619-d445cbec0276", "photo-1562892302-97faedd66f1c"],
     thesis: "Airports, utilities and regulated networks change hands between long-term owners. Returns come from steady cash flow.",
     watch:  "Prices on stake sales, as a read on what pension funds will pay for core assets." }
 ];
@@ -1013,7 +1028,10 @@ const themeOf = (id) => THEMES.find(t => t.id === id);
 const stageOf = (n) => STAGES[n - 1];
 const byNewest = (a, b) => b.date.localeCompare(a.date);
 const pad = (n) => String(n).padStart(2, "0");
-const themesInOrder = [...THEMES].sort((a, b) => a.stage - b.stage);
+const isLive = (p) => LIVE.some(s => s.id === p.section);
+const LIVE_POSTS = POSTS.filter(isLive);
+// A theme shows on the cycle map once it has at least one live story.
+const themesInOrder = THEMES.filter(t => LIVE_POSTS.some(p => p.theme === t.id)).sort((a, b) => a.stage - b.stage);
 const themeNumber = (id) => themesInOrder.findIndex(t => t.id === id) + 1;
 
 function formatDate(iso) {
@@ -1033,7 +1051,7 @@ function signalTag(p) {
    E. BUILD THE PAGE
    ================================================================ */
 function renderTicker() {
-  const latest = [...POSTS].sort(byNewest)[0];
+  const latest = [...LIVE_POSTS].sort(byNewest)[0];
   const items = ["<b>▲ Latest:</b> " + latest.title]
     .concat(themesInOrder.map(t => "<b>" + t.name + ":</b> " + pad(t.stage) + " " + stageOf(t.stage).name))
     .concat(["<b>New briefing</b> every Sunday"]);
@@ -1089,14 +1107,14 @@ function renderStages() {
       <span class="n">${pad(s.n)}</span><span class="nm">${s.name}</span>
     </button>`).join("");
   const s = stageOf(stageSel);
-  const here = THEMES.filter(t => t.stage === s.n).map(t => t.name);
+  const here = themesInOrder.filter(t => t.stage === s.n).map(t => t.name);
   $("stage-detail").innerHTML = `<p>${s.text}</p>
     <p class="who">Typical capital: ${s.who}${here.length ? " · Themes here now: " + here.join(", ") : ""}</p>`;
 }
 
 function renderThemes() {
   $("themes").innerHTML = themesInOrder.map(t => {
-    const posts = POSTS.filter(p => p.theme === t.id).sort(byNewest);
+    const posts = LIVE_POSTS.filter(p => p.theme === t.id).sort(byNewest);
     const track = STAGES.map(s =>
       `<span class="${s.n < t.stage ? "past" : s.n === t.stage ? "now" : ""}"></span>`).join("");
     const list = posts.length
@@ -1150,9 +1168,20 @@ function seeded(text) { // the same story always gets the same picture
   return () => { h ^= h << 13; h ^= h >>> 17; h ^= h << 5; return ((h >>> 0) % 10000) / 10000; };
 }
 
+// Photos rotate through a theme's list in story order, so neighbours rarely repeat.
+function photoFor(p) {
+  const t = themeOf(p.theme);
+  if (!t.photos || !t.photos.length) return null;
+  const order = POSTS.filter(q => q.theme === t.id).sort((a, b) => a.date.localeCompare(b.date) || a.slug.localeCompare(b.slug));
+  return t.photos[order.indexOf(p) % t.photos.length];
+}
+const unsplash = (id, w) => `https://images.unsplash.com/${id}?w=${w}&h=${Math.round(w * 9 / 16)}&fit=crop&q=70&auto=format`;
+
 function thumbHTML(p) {
   const t = themeOf(p.theme);
   if (p.image) return `<span class="thumb"><img src="${p.image}" alt="" loading="lazy"></span>`;
+  const ph = photoFor(p);
+  if (ph) return `<span class="thumb"><img src="${unsplash(ph, 640)}" srcset="${unsplash(ph, 400)} 400w, ${unsplash(ph, 640)} 640w, ${unsplash(ph, 1200)} 1200w" sizes="(max-width: 640px) 100vw, 400px" alt="" loading="lazy" decoding="async"></span>`;
   const rand = seeded(p.slug);
   const drift = p.signal === "forward" ? -9 : p.signal === "back" ? 9 : 0;   // up, flat or down
   let y = p.signal === "forward" ? 130 : p.signal === "back" ? 60 : 96;
@@ -1217,7 +1246,7 @@ function renderTopics() {
 
 // Featured slider
 const FEATURED_MAX = 6; // how many featured stories the slider shows, newest first
-const featured = POSTS.filter(p => p.featured).sort(byNewest).slice(0, FEATURED_MAX);
+const featured = LIVE_POSTS.filter(p => p.featured).sort(byNewest).slice(0, FEATURED_MAX);
 let slide = 0;
 
 function renderFeature() {
@@ -1251,11 +1280,12 @@ function openPost(slug) {
   const p = POSTS.find(x => x.slug === slug);
   if (!p) return;
   const t = themeOf(p.theme);
-  const ordered = [...POSTS].sort(byNewest);
-  const next = ordered[(ordered.indexOf(p) + 1) % ordered.length];
+  const ordered = [...LIVE_POSTS].sort(byNewest);
+  const next = ordered[(Math.max(0, ordered.indexOf(p)) + 1) % ordered.length];
   $("reader-crumb").textContent = sectionOf(p.section).name + " · " + t.name;
   $("reader-article").innerHTML = `
     ${thumbHTML(p)}
+    ${!p.image && photoFor(p) ? `<span class="credit">Photo: <a href="https://unsplash.com" target="_blank" rel="noopener">Unsplash</a></span>` : ""}
     <span class="eyebrow">${formatDate(p.date)} · Via ${p.source.name} · ${p.minutes} min read</span>
     <h1 id="reader-title">${p.title}</h1>
     <div class="tags">${stageTag(t)}<span class="mono">${t.name}</span>${signalTag(p)}</div>
