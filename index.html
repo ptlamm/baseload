@@ -124,10 +124,17 @@ p { margin: 0; }
    5. HERO AND THE CYCLE WAVE
    ================================================================ */
 .hero { display: grid; grid-template-columns: 1.15fr 1fr; gap: 40px; align-items: center; padding-block: 56px 40px; }
-.hero h1 { font-size: clamp(48px, 7.4vw, 96px); font-weight: 900; letter-spacing: .005em; margin-block: 14px 20px; }
+.hero h1 { font-size: clamp(44px, 6.6vw, 84px); font-weight: 900; letter-spacing: .005em; margin-block: 14px 20px; }
 .hero h1 em { font-style: normal; color: var(--volt-ink); }
 .hero .lead { font-size: 18px; max-width: 46ch; color: var(--muted); }
-.hero .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+.hero .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+.welcome-card { display: flex; gap: 14px; align-items: flex-start; margin-top: 22px; padding: 14px 16px; max-width: 54ch; background: var(--panel); border-left: 4px solid var(--volt); }
+.avatar { flex: none; width: 48px; height: 48px; border-radius: 50%; overflow: hidden; display: grid; place-items: center; background: var(--ink); color: var(--paper); font: 900 22px/1 var(--f-display); }
+.avatar img { width: 100%; height: 100%; object-fit: cover; }
+.welcome-card p { font-size: 14px; color: var(--muted); }
+.welcome-card .who { font-size: 15px; color: var(--ink); margin-bottom: 2px; }
+.welcome-card a { display: inline-block; margin-top: 6px; font: 600 11px var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--volt-ink); text-decoration: none; }
+.welcome-card a:hover { text-decoration: underline; }
 .status { display: inline-flex; align-items: center; gap: 8px; }
 .status i { width: 8px; height: 8px; border-radius: 50%; background: var(--live); box-shadow: 0 0 0 3px color-mix(in srgb, var(--live) 25%, transparent); }
 
@@ -530,9 +537,17 @@ section[id], details[id] { scroll-margin-top: 90px; }
     <!-- HERO -->
     <section class="hero">
       <div>
-        <p class="eyebrow status"><i></i> Weekly briefing · Every Sunday</p>
+        <p class="eyebrow status"><i></i> Welcome to Baseload · New every Sunday</p>
         <h1>Finding the <em>next investment cycle</em></h1>
-        <p class="lead">Each week's deals and reports, placed on the investment cycle to show where capital goes next.</p>
+        <p class="lead">Hi, I'm Liam. Every Sunday I pick the week's most telling deals and reports in sustainable finance, energy and infrastructure, explain them in plain English, and place each one on the investment cycle. The aim is to show where capital is likely to go next.</p>
+        <div class="welcome-card">
+          <span class="avatar" id="avatar" aria-hidden="true">L</span>
+          <div>
+            <p class="who"><b>Liam</b> · London</p>
+            <p>Environmental engineer turned sustainable finance graduate. MSc Sustainable Management &amp; Finance (Bayes Business School), CFA Level I. Focused on emerging markets and ASEAN.</p>
+            <a href="#about">More about me ▶</a>
+          </div>
+        </div>
         <div class="actions">
           <a class="btn primary" href="#latest">Read this week ▶</a>
           <a class="btn" href="#cycle">See the cycle map</a>
@@ -726,6 +741,7 @@ section[id], details[id] { scroll-margin-top: 90px; }
 const SITE = {
   name: "Baseload",
   linkedin: "",   // paste your LinkedIn profile URL here to show the link
+  photo: "",      // optional: your photo for the welcome card, e.g. "images/liam.jpg" (upload it first)
   newsletterNote: "Thanks. Sign-ups are not live yet: this form will connect to a newsletter service such as Substack."
 };
 
@@ -1611,6 +1627,7 @@ renderTagIndex();
 stripeBands();
 applyPreset(PRESETS[2]);
 $("year").textContent = new Date().getFullYear();
+if (SITE.photo) $("avatar").innerHTML = `<img src="${SITE.photo}" alt="">`;
 if (SITE.linkedin) { $("linkedin").href = SITE.linkedin; $("linkedin-li").hidden = false; }
 
 handleHash();

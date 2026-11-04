@@ -14,7 +14,7 @@ Open `index.html` on GitHub and click the pencil icon, or use a code editor such
 | Find this | What it controls |
 |---|---|
 | `1. DESIGN TOKENS` | Colours and fonts for the whole site |
-| `A. SETTINGS` | Site name, LinkedIn link, newsletter message |
+| `A. SETTINGS` | Site name, LinkedIn link, your photo for the welcome card, newsletter message |
 | `const SECTIONS` | The sectors you cover: live or planned |
 | `const STAGES` | The five cycle stages and their wording |
 | `B. THEMES` | The cycle map: each theme and its stage |
