@@ -18,10 +18,10 @@ try { new vm.Script(code); } catch (e) { fail("The page script has a syntax erro
 const cut = code.indexOf("D. HELPERS");
 if (cut < 0) fail("Could not find the 'D. HELPERS' marker in the script.");
 const dataCode = code.slice(0, code.lastIndexOf("/*", cut)) +
-  "\n;({ SECTIONS, THEMES, STAGES, SIGNALS, POSTS });";
+  "\n;({ SECTIONS, THEMES, STAGES, SIGNALS, POSTS, TAGS: typeof TAGS === \"undefined\" ? null : TAGS });";
 let data;
 try { data = vm.runInNewContext(dataCode, {}); } catch (e) { fail("Could not read the story lists: " + e.message); }
-const { SECTIONS, THEMES, STAGES, SIGNALS, POSTS } = data;
+const { SECTIONS, THEMES, STAGES, SIGNALS, POSTS, TAGS } = data;
 
 // 3. Check every story.
 const problems = [];
@@ -47,6 +47,12 @@ POSTS.forEach((p, i) => {
   ["title", "summary", "cycleRead"].forEach(k => { if (!p[k]) problems.push(`${name}: missing ${k}.`); });
   if (!Array.isArray(p.body) || !p.body.length) problems.push(`${name}: body must be a list of paragraphs.`);
   if (!p.source || !/^https?:\/\//.test(p.source.url || "")) problems.push(`${name}: source needs a name and a full link.`);
+  if (TAGS) {
+    const t = p.tags || {};
+    if (!TAGS.region.includes(t.region)) problems.push(`${name}: tags.region "${t.region}" is not in the TAGS region list.`);
+    if (!TAGS.deal.includes(t.deal)) problems.push(`${name}: tags.deal "${t.deal}" is not in the TAGS deal list.`);
+    if (!(TAGS.asset[p.section] || []).includes(t.asset)) problems.push(`${name}: tags.asset "${t.asset}" is not in the asset list for section "${p.section}".`);
+  }
   if (p.image !== undefined && typeof p.image !== "string") problems.push(`${name}: image must be a file path or link in quotes.`);
 });
 

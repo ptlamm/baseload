@@ -50,6 +50,15 @@ To give one story its own picture, add `image: "images/file.png"` (a file you up
 
 A theme with no photos falls back to a drawn thumbnail made from its `icon` (sun, globe, pylon, server, bond, battery, crane or chart).
 
+### Tags
+Every story has three tags: a **region**, a **deal type** and an **asset**. They show as small chips on cards and story pages; clicking one lists every story with that tag in the "Browse by tag" section. The lists live in `TAGS` near the top of the stories:
+
+- **Region:** UK, Europe, US, Vietnam, ASEAN, India, Australia, Other emerging markets, Global
+- **Deal type:** Fund raise, Stake sale / M&A, Debt & project finance, Bond issue, Contract / PPA, Tender / auction, Policy & regulation, Report & data
+- **Asset:** a separate list for each section
+
+To add a tag, add it to the right list in `TAGS`. Use exactly the same spelling in stories; the story check stops the build if a tag is not on the lists. Tags with no live stories stay hidden on the site.
+
 ## 4. Move a theme along the cycle
 The site's question is: where is the next investment cycle forming? Every theme in `B. THEMES` sits at one of five stages:
 
@@ -70,6 +79,7 @@ In `C. STORIES`, copy one `{ ... },` block, paste it at the top of the list and 
 - `slug`: short web name, lowercase with hyphens, must be unique
 - `section`: the `id` of a live sector, such as `"sustainable-finance"` or `"energy"`
 - `theme`: the `id` of one theme, such as `"compute"`
+- `tags`: exactly three, from the `TAGS` lists: `{ region: "Vietnam", deal: "Policy & regulation", asset: "Solar" }`. The asset must come from the story's own section list.
 - `signal`: `"forward"` (moves the theme towards the next stage), `"confirms"` (fits its current stage) or `"back"` (holds it back)
 - `date`: the date of the original story
 - `minutes`: reading time
