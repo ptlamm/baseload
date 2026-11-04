@@ -273,6 +273,20 @@ input[type="range"] { width: 100%; accent-color: var(--volt); }
 .subscribe .msg { color: var(--volt); font-size: 14px; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
+.welcome { display: grid; gap: 14px; max-width: 760px; }
+.welcome .hello { font: 700 21px/1.3 var(--f-body); }
+.welcome > p { max-width: 62ch; }
+.guide { margin: 8px 0 4px; display: grid; grid-template-columns: 190px minmax(0, 1fr); border-top: 1px solid color-mix(in srgb, var(--ink) 14%, transparent); }
+.guide dt, .guide dd { margin: 0; padding: 12px 0; border-bottom: 1px solid color-mix(in srgb, var(--ink) 14%, transparent); }
+.guide dt a { font: 600 12px/1.6 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; text-decoration: none; }
+.guide dt a:hover { color: var(--volt-ink); }
+.guide dd { color: var(--muted); font-size: 15px; }
+.welcome .fine { font-size: 13px; color: var(--muted); }
+@media (max-width: 640px) {
+  .guide { grid-template-columns: minmax(0, 1fr); }
+  .guide dt { padding-bottom: 2px; border-bottom: 0; }
+  .guide dd { padding-top: 0; }
+}
 .about { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 32px; align-items: start; }
 .about-text { display: grid; gap: 14px; max-width: 60ch; }
 .plate { border: 2px solid var(--ink); background: var(--panel); padding: 18px; position: relative; }
@@ -663,25 +677,15 @@ section[id], details[id] { scroll-margin-top: 90px; }
   <div class="band"><div class="wrap">
       <section id="about" aria-labelledby="about-h">
         <header class="node">
-          <span class="eyebrow">Operator</span>
-          <h2 id="about-h">About me</h2>
+          <span class="eyebrow">About</span>
+          <h2 id="about-h">Welcome to my page</h2>
         </header>
-        <div class="about">
-          <div class="about-text">
-            <p>I'm Liam, an environmental engineer turned sustainable finance graduate, based in London and originally from Vietnam.</p>
-            <p>Each week, Baseload places public news on the investment cycle to show where capital goes next, with a focus on emerging markets and ASEAN. Summaries are my reading of other people's reporting, and every story links to its source. Nothing here is investment advice.</p>
-          </div>
-          <div class="plate" aria-label="Profile summary">
-            <h3>Rating plate</h3>
-            <dl>
-              <dt>Based</dt><dd>London, UK</dd>
-              <dt>Origin</dt><dd>Vietnam</dd>
-              <dt>Training</dt><dd>Environmental engineering</dd>
-              <dt>Study</dt><dd>MSc Sustainable Management &amp; Finance, Bayes Business School</dd>
-              <dt>Credentials</dt><dd>CFA Level I · CFA Certificate in ESG Investing</dd>
-              <dt>Focus</dt><dd>Energy transition, infrastructure, ASEAN</dd>
-            </dl>
-          </div>
+        <div class="welcome">
+          <p class="hello">Hi, I'm Liam, and this is my personal blog.</p>
+          <p>I'm an environmental engineer turned sustainable finance graduate, based in London and originally from Vietnam. Every Sunday I place the week's deals and reports on the investment cycle to show where capital goes next.</p>
+          <dl class="guide" id="guide"></dl>
+          <p class="fine">MSc Sustainable Management &amp; Finance, Bayes Business School · CFA Level I · CFA Certificate in ESG Investing</p>
+          <p class="fine">Summaries are my own reading of public reporting, with a link to every source. Nothing here is investment advice.</p>
         </div>
       </section>
   </div></div>
@@ -1629,6 +1633,13 @@ function renderTopics() {
   }).join("");
 }
 
+// About: one line per live section, so the intro always matches the site
+function renderGuide() {
+  const rows = LIVE.map(s => [s.id, s.name, s.blurb])
+    .concat([["cycle", "Cycle map", "Where each theme sits, from first signal to mature asset, and what would move it on."]]);
+  $("guide").innerHTML = rows.map(([id, name, text]) => `<dt><a href="#${id}">${name}</a></dt><dd>${text}</dd>`).join("");
+}
+
 // Alternate band backgrounds so each section stands apart
 function stripeBands() {
   document.querySelectorAll("main .band:not(.band-hero):not(.ink):not([hidden])")
@@ -1834,6 +1845,7 @@ renderThemes();
 renderFeature();
 renderTopics();
 renderTagIndex();
+renderGuide();
 stripeBands();
 applyPreset(PRESETS[2]);
 $("year").textContent = new Date().getFullYear();
