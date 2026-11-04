@@ -50,6 +50,9 @@ To give one story its own picture, add `image: "images/file.png"` (a file you up
 
 A theme with no photos falls back to a drawn thumbnail made from its `icon` (sun, globe, pylon, server, bond, battery, crane or chart).
 
+### Deal tracker
+Every deal story (fund raises, stake sales, loans, bonds, contracts and tenders) carries a `deal` block. The site lists them in the **Deal tracker** table, newest first, with a total of the deals that have a US dollar figure. Visitors can download the table as a CSV file. The story page shows the same facts in a "Deal facts" box. The story check stops the build if a deal story is missing its `deal` block or a field is wrong.
+
 ### Tags
 Every story has three tags: a **region**, a **deal type** and an **asset**. They show as small chips on cards and story pages; clicking one lists every story with that tag in the "Browse by tag" section. The lists live in `TAGS` near the top of the stories:
 
@@ -80,6 +83,7 @@ In `C. STORIES`, copy one `{ ... },` block, paste it at the top of the list and 
 - `section`: the `id` of a live sector, such as `"sustainable-finance"` or `"energy"`
 - `theme`: the `id` of one theme, such as `"compute"`
 - `tags`: exactly three, from the `TAGS` lists: `{ region: "Vietnam", deal: "Policy & regulation", asset: "Solar" }`. The asset must come from the story's own section list.
+- `deal` (deal stories only; not for "Policy & regulation" or "Report & data"): `{ amount: "$105m", usdMillions: 105, status: "Closed", country: "Vietnam", investors: ["HSBC"], recipient: "EVNNPC" }`. Write `amount` as reported, in its own currency. Add `usdMillions` only when the source gives a US$ figure. `status` is Closed, Agreed, Open or Cancelled. Use `investors: []` when they are not named.
 - `signal`: `"forward"` (moves the theme towards the next stage), `"confirms"` (fits its current stage) or `"back"` (holds it back)
 - `date`: the date of the original story
 - `minutes`: reading time
