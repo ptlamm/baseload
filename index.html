@@ -124,17 +124,10 @@ p { margin: 0; }
    5. HERO AND THE CYCLE WAVE
    ================================================================ */
 .hero { display: grid; grid-template-columns: 1.15fr 1fr; gap: 40px; align-items: center; padding-block: 56px 40px; }
-.hero h1 { font-size: clamp(44px, 6.6vw, 84px); font-weight: 900; letter-spacing: .005em; margin-block: 14px 20px; }
+.hero h1 { font-size: clamp(48px, 7.4vw, 96px); font-weight: 900; letter-spacing: .005em; margin-block: 14px 20px; }
 .hero h1 em { font-style: normal; color: var(--volt-ink); }
 .hero .lead { font-size: 18px; max-width: 46ch; color: var(--muted); }
-.hero .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
-.welcome-card { display: flex; gap: 14px; align-items: flex-start; margin-top: 22px; padding: 14px 16px; max-width: 54ch; background: var(--panel); border-left: 4px solid var(--volt); }
-.avatar { flex: none; width: 48px; height: 48px; border-radius: 50%; overflow: hidden; display: grid; place-items: center; background: var(--ink); color: var(--paper); font: 900 22px/1 var(--f-display); }
-.avatar img { width: 100%; height: 100%; object-fit: cover; }
-.welcome-card p { font-size: 14px; color: var(--muted); }
-.welcome-card .who { font-size: 15px; color: var(--ink); margin-bottom: 2px; }
-.welcome-card a { display: inline-block; margin-top: 6px; font: 600 11px var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--volt-ink); text-decoration: none; }
-.welcome-card a:hover { text-decoration: underline; }
+.hero .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
 .status { display: inline-flex; align-items: center; gap: 8px; }
 .status i { width: 8px; height: 8px; border-radius: 50%; background: var(--live); box-shadow: 0 0 0 3px color-mix(in srgb, var(--live) 25%, transparent); }
 
@@ -280,6 +273,20 @@ input[type="range"] { width: 100%; accent-color: var(--volt); }
 .subscribe .msg { color: var(--volt); font-size: 14px; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
+.welcome { display: grid; gap: 14px; max-width: 760px; }
+.welcome .hello { font: 700 21px/1.3 var(--f-body); }
+.welcome > p { max-width: 62ch; }
+.guide { margin: 8px 0 4px; display: grid; grid-template-columns: 190px minmax(0, 1fr); border-top: 1px solid color-mix(in srgb, var(--ink) 14%, transparent); }
+.guide dt, .guide dd { margin: 0; padding: 12px 0; border-bottom: 1px solid color-mix(in srgb, var(--ink) 14%, transparent); }
+.guide dt a { font: 600 12px/1.6 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; text-decoration: none; }
+.guide dt a:hover { color: var(--volt-ink); }
+.guide dd { color: var(--muted); font-size: 15px; }
+.welcome .fine { font-size: 13px; color: var(--muted); }
+@media (max-width: 640px) {
+  .guide { grid-template-columns: minmax(0, 1fr); }
+  .guide dt { padding-bottom: 2px; border-bottom: 0; }
+  .guide dd { padding-top: 0; }
+}
 .about { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 32px; align-items: start; }
 .about-text { display: grid; gap: 14px; max-width: 60ch; }
 .plate { border: 2px solid var(--ink); background: var(--panel); padding: 18px; position: relative; }
@@ -537,17 +544,9 @@ section[id], details[id] { scroll-margin-top: 90px; }
     <!-- HERO -->
     <section class="hero">
       <div>
-        <p class="eyebrow status"><i></i> Welcome to Baseload · New every Sunday</p>
+        <p class="eyebrow status"><i></i> Weekly briefing · Every Sunday</p>
         <h1>Finding the <em>next investment cycle</em></h1>
-        <p class="lead">Hi, I'm Liam. Every Sunday I pick the week's most telling deals and reports in sustainable finance, energy and infrastructure, explain them in plain English, and place each one on the investment cycle. The aim is to show where capital is likely to go next.</p>
-        <div class="welcome-card">
-          <span class="avatar" id="avatar" aria-hidden="true">L</span>
-          <div>
-            <p class="who"><b>Liam</b> · London</p>
-            <p>Environmental engineer turned sustainable finance graduate. MSc Sustainable Management &amp; Finance (Bayes Business School), CFA Level I. Focused on emerging markets and ASEAN.</p>
-            <a href="#about">More about me ▶</a>
-          </div>
-        </div>
+        <p class="lead">Each week's deals and reports, placed on the investment cycle to show where capital goes next.</p>
         <div class="actions">
           <a class="btn primary" href="#latest">Read this week ▶</a>
           <a class="btn" href="#cycle">See the cycle map</a>
@@ -678,25 +677,15 @@ section[id], details[id] { scroll-margin-top: 90px; }
   <div class="band"><div class="wrap">
       <section id="about" aria-labelledby="about-h">
         <header class="node">
-          <span class="eyebrow">Operator</span>
-          <h2 id="about-h">About me</h2>
+          <span class="eyebrow">About</span>
+          <h2 id="about-h">Welcome to my page</h2>
         </header>
-        <div class="about">
-          <div class="about-text">
-            <p>I'm Liam, an environmental engineer turned sustainable finance graduate, based in London and originally from Vietnam.</p>
-            <p>Each week, Baseload places public news on the investment cycle to show where capital goes next, with a focus on emerging markets and ASEAN. Summaries are my reading of other people's reporting, and every story links to its source. Nothing here is investment advice.</p>
-          </div>
-          <div class="plate" aria-label="Profile summary">
-            <h3>Rating plate</h3>
-            <dl>
-              <dt>Based</dt><dd>London, UK</dd>
-              <dt>Origin</dt><dd>Vietnam</dd>
-              <dt>Training</dt><dd>Environmental engineering</dd>
-              <dt>Study</dt><dd>MSc Sustainable Management &amp; Finance, Bayes Business School</dd>
-              <dt>Credentials</dt><dd>CFA Level I · CFA Certificate in ESG Investing</dd>
-              <dt>Focus</dt><dd>Energy transition, infrastructure, ASEAN</dd>
-            </dl>
-          </div>
+        <div class="welcome">
+          <p class="hello">Hi, I'm Liam, and this is my personal blog.</p>
+          <p>I'm an environmental engineer turned sustainable finance graduate, based in London and originally from Vietnam. Every Sunday I place the week's deals and reports on the investment cycle to show where capital goes next.</p>
+          <dl class="guide" id="guide"></dl>
+          <p class="fine">MSc Sustainable Management &amp; Finance, Bayes Business School · CFA Level I · CFA Certificate in ESG Investing</p>
+          <p class="fine">Summaries are my own reading of public reporting, with a link to every source. Nothing here is investment advice.</p>
         </div>
       </section>
   </div></div>
@@ -741,7 +730,6 @@ section[id], details[id] { scroll-margin-top: 90px; }
 const SITE = {
   name: "Baseload",
   linkedin: "",   // paste your LinkedIn profile URL here to show the link
-  photo: "",      // optional: your photo for the welcome card, e.g. "images/liam.jpg" (upload it first)
   newsletterNote: "Thanks. Sign-ups are not live yet: this form will connect to a newsletter service such as Substack."
 };
 
@@ -1419,6 +1407,13 @@ function renderTopics() {
   }).join("");
 }
 
+// About: one line per live section, so the intro always matches the site
+function renderGuide() {
+  const rows = LIVE.map(s => [s.id, s.name, s.blurb])
+    .concat([["cycle", "Cycle map", "Where each theme sits, from first signal to mature asset, and what would move it on."]]);
+  $("guide").innerHTML = rows.map(([id, name, text]) => `<dt><a href="#${id}">${name}</a></dt><dd>${text}</dd>`).join("");
+}
+
 // Alternate band backgrounds so each section stands apart
 function stripeBands() {
   document.querySelectorAll("main .band:not(.band-hero):not(.ink):not([hidden])")
@@ -1624,10 +1619,10 @@ renderThemes();
 renderFeature();
 renderTopics();
 renderTagIndex();
+renderGuide();
 stripeBands();
 applyPreset(PRESETS[2]);
 $("year").textContent = new Date().getFullYear();
-if (SITE.photo) $("avatar").innerHTML = `<img src="${SITE.photo}" alt="">`;
 if (SITE.linkedin) { $("linkedin").href = SITE.linkedin; $("linkedin-li").hidden = false; }
 
 handleHash();
