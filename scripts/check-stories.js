@@ -18,10 +18,10 @@ try { new vm.Script(code); } catch (e) { fail("The page script has a syntax erro
 const cut = code.indexOf("D. HELPERS");
 if (cut < 0) fail("Could not find the 'D. HELPERS' marker in the script.");
 const dataCode = code.slice(0, code.lastIndexOf("/*", cut)) +
-  "\n;({ SECTIONS, THEMES, STAGES, SIGNALS, POSTS, TAGS: typeof TAGS === \"undefined\" ? null : TAGS });";
+  "\n;({ SECTIONS, THEMES, STAGES, SIGNALS, POSTS, TAGS: typeof TAGS === \"undefined\" ? null : TAGS, NOT_DEALS: typeof NOT_DEALS === \"undefined\" ? null : NOT_DEALS, DEAL_STATUS: typeof DEAL_STATUS === \"undefined\" ? null : DEAL_STATUS });";
 let data;
 try { data = vm.runInNewContext(dataCode, {}); } catch (e) { fail("Could not read the story lists: " + e.message); }
-const { SECTIONS, THEMES, STAGES, SIGNALS, POSTS, TAGS } = data;
+const { SECTIONS, THEMES, STAGES, SIGNALS, POSTS, TAGS, NOT_DEALS, DEAL_STATUS } = data;
 
 // 3. Check every story.
 const problems = [];
@@ -52,6 +52,18 @@ POSTS.forEach((p, i) => {
     if (!TAGS.region.includes(t.region)) problems.push(`${name}: tags.region "${t.region}" is not in the TAGS region list.`);
     if (!TAGS.deal.includes(t.deal)) problems.push(`${name}: tags.deal "${t.deal}" is not in the TAGS deal list.`);
     if (!(TAGS.asset[p.section] || []).includes(t.asset)) problems.push(`${name}: tags.asset "${t.asset}" is not in the asset list for section "${p.section}".`);
+  }
+  if (NOT_DEALS && DEAL_STATUS && p.tags && p.tags.deal && !NOT_DEALS.includes(p.tags.deal)) {
+    const d = p.deal;
+    if (!d) problems.push(`${name}: deal stories ("${p.tags.deal}") need a deal block with amount, status, country, investors and recipient.`);
+    else {
+      if (typeof d.amount !== "string" || !d.amount) problems.push(`${name}: deal.amount must be text, e.g. "$105m" or "Not disclosed".`);
+      if (d.usdMillions !== undefined && typeof d.usdMillions !== "number") problems.push(`${name}: deal.usdMillions must be a number without quotes, e.g. 105.`);
+      if (!DEAL_STATUS.includes(d.status)) problems.push(`${name}: deal.status must be one of ${DEAL_STATUS.join(", ")}.`);
+      if (typeof d.country !== "string" || !d.country) problems.push(`${name}: deal.country is missing.`);
+      if (!Array.isArray(d.investors)) problems.push(`${name}: deal.investors must be a list in square brackets, e.g. ["HSBC"] or [].`);
+      if (typeof d.recipient !== "string" || !d.recipient) problems.push(`${name}: deal.recipient is missing.`);
+    }
   }
   if (p.image !== undefined && typeof p.image !== "string") problems.push(`${name}: image must be a file path or link in quotes.`);
 });
