@@ -50,8 +50,32 @@ To give one story its own picture, add `image: "images/file.png"` (a file you up
 
 A theme with no photos falls back to a drawn thumbnail made from its `icon` (sun, globe, pylon, server, bond, battery, crane or chart).
 
-### Deal tracker
-Every deal story (fund raises, stake sales, loans, bonds, contracts and tenders) carries a `deal` block. The site lists them in the **Deal tracker** table, newest first, with a total of the deals that have a US dollar figure. Visitors can download the table as a CSV file. The story page shows the same facts in a "Deal facts" box. The story check stops the build if a deal story is missing its `deal` block or a field is wrong.
+### Deal tracker (`deals.csv`)
+The deals live in their own file, **`deals.csv`**, one row per deal. The site reads it every time the page opens and shows the **Deal tracker** table, newest first, with a total of the deals that have a US dollar figure. The **Download CSV** button hands visitors this same file.
+
+A deal can have a full story, or just a row:
+- **With a story:** put the story's `slug` in the `story` column. The table links to the story, and the story page shows a "Deal facts" box.
+- **Without a story:** leave `story` empty. The table links straight to the original source, marked ↗.
+
+To edit it, open `deals.csv` on GitHub and click the pencil (GitHub shows it as a table), or download it, edit it in Excel and save it as CSV. The columns:
+
+| Column | What goes in it |
+|---|---|
+| `id` | Short unique name, lowercase with hyphens. For a deal with a story, use the story's slug. |
+| `date` | Date of the original report, `2026-10-25` |
+| `deal` | A one-line headline in your own words |
+| `section`, `theme` | The ids of a section and a theme, as in `index.html` |
+| `region`, `deal_type`, `asset` | Tags from the `TAGS` lists. Policy and report items do not go in this file. |
+| `country` | Country of the deal or asset, or "Global" / "Emerging markets" |
+| `amount` | As reported, in its own currency: `$105m`, `€300m`, `Not disclosed` |
+| `usd_millions` | A plain number such as `105`, only when the source gives a US$ figure; otherwise empty |
+| `status` | Closed, Agreed, Open or Cancelled |
+| `investors` | Who puts the money in, separated by semicolons: `HSBC; ADB`. Empty if not named. |
+| `recipient` | Who receives the money |
+| `source_name`, `source_url` | The publisher and the link to the original |
+| `story` | The slug of the Baseload story about it, or empty |
+
+A cell with a comma in it needs "double quotes" around it (Excel does this for you). The story check stops the build if a row has a wrong value, if the same deal appears twice, or if a deal story has no row.
 
 ### Tags
 Every story has three tags: a **region**, a **deal type** and an **asset**. They show as small chips on cards and story pages; clicking one lists every story with that tag in the "Browse by tag" section. The lists live in `TAGS` near the top of the stories:
@@ -83,7 +107,7 @@ In `C. STORIES`, copy one `{ ... },` block, paste it at the top of the list and 
 - `section`: the `id` of a live sector, such as `"sustainable-finance"` or `"energy"`
 - `theme`: the `id` of one theme, such as `"compute"`
 - `tags`: exactly three, from the `TAGS` lists: `{ region: "Vietnam", deal: "Policy & regulation", asset: "Solar" }`. The asset must come from the story's own section list.
-- `deal` (deal stories only; not for "Policy & regulation" or "Report & data"): `{ amount: "$105m", usdMillions: 105, status: "Closed", country: "Vietnam", investors: ["HSBC"], recipient: "EVNNPC" }`. Write `amount` as reported, in its own currency. Add `usdMillions` only when the source gives a US$ figure. `status` is Closed, Agreed, Open or Cancelled. Use `investors: []` when they are not named.
+- For deal stories (not "Policy & regulation" or "Report & data"), also add a row to `deals.csv` with this story's slug in the `story` column.
 - `signal`: `"forward"` (moves the theme towards the next stage), `"confirms"` (fits its current stage) or `"back"` (holds it back)
 - `date`: the date of the original story
 - `minutes`: reading time

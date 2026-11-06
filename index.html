@@ -491,6 +491,7 @@ section[id], details[id] { scroll-margin-top: 90px; }
 .deal-table td.deal a:hover { text-decoration: underline; text-decoration-color: var(--volt); text-decoration-thickness: 2px; }
 .deal-table td.parties { color: var(--muted); min-width: 220px; }
 .deal-table .usd { display: block; color: var(--muted); font-size: 11px; }
+.deal-key { margin: 10px 0 0; }
 .status { display: inline-block; font: 600 10px/1 var(--f-mono); letter-spacing: .06em; text-transform: uppercase; padding: 4px 6px; border: 1px solid currentColor; white-space: nowrap; }
 .status.Closed { color: var(--live); }
 .status.Agreed { color: var(--ink); }
@@ -622,7 +623,7 @@ section[id], details[id] { scroll-margin-top: 90px; }
             <h2 id="deals-h">Deal tracker</h2>
             <p id="deal-summary"></p>
           </header>
-          <button class="btn" type="button" id="deal-csv">Download CSV</button>
+          <a class="btn" href="deals.csv" download="baseload-deals.csv" id="deal-csv">Download CSV</a>
         </div>
         <div class="deal-table-wrap">
           <table class="deal-table">
@@ -630,6 +631,7 @@ section[id], details[id] { scroll-margin-top: 90px; }
             <tbody id="deal-rows"></tbody>
           </table>
         </div>
+        <p class="note deal-key">Deals with a Baseload story open it. Deals marked ↗ link to the original source.</p>
         <button class="btn more" type="button" id="deal-more" hidden>Show all deals ▼</button>
       </section>
   </div></div>
@@ -750,7 +752,7 @@ section[id], details[id] { scroll-margin-top: 90px; }
     <div>
       <span class="eyebrow">System</span>
       <ul>
-        <li class="mono">Est. 2026 · Build v0.10</li>
+        <li class="mono">Est. 2026 · Build v0.11</li>
         <li class="mono">Photos: <a href="https://unsplash.com" target="_blank" rel="noopener">Unsplash</a></li>
         <li class="mono">© <span id="year"></span> Baseload</li>
         <li id="linkedin-li" hidden><a id="linkedin" href="#" target="_blank" rel="noopener">LinkedIn ▶</a></li>
@@ -890,8 +892,9 @@ const TAGS = {
   }
 };
 
-/* Deal tracker: stories whose deal type is not in NOT_DEALS carry a
-   "deal" block, and appear in the deal tracker table. */
+/* Deal tracker: the deals live in their own file, deals.csv, one row
+   per deal (see README). Stories whose deal type is not in NOT_DEALS
+   need a row there with the story's slug in the "story" column. */
 const NOT_DEALS = ["Policy & regulation", "Report & data"];
 const DEAL_STATUS = ["Closed", "Agreed", "Open", "Cancelled"];
 
@@ -901,13 +904,8 @@ const DEAL_STATUS = ["Closed", "Agreed", "Open", "Cancelled"];
    To add a story, copy one block, change the text, and save.
    - section:  the id of a live section, e.g. "sustainable-finance"
    - tags:     { region: "...", deal: "...", asset: "..." } from the TAGS lists
-   - deal:     for deal stories only (not policy or report stories):
-               { amount: "$105m",        as reported, in its own currency
-                 usdMillions: 105,       only if the source gives a US$ figure
-                 status: "Closed",       Closed, Agreed, Open or Cancelled
-                 country: "Vietnam",
-                 investors: ["..."],     who puts the money in ([] if not named)
-                 recipient: "..." }      who receives it
+   - deal facts (amount, status, investors...) go in deals.csv, in a
+               row whose "story" column is this story's slug
    - theme:    the id of a theme above, e.g. "compute"
    - signal:   "forward", "confirms" or "back"
    - date:     date of the original story, "YYYY-MM-DD"
@@ -942,7 +940,6 @@ const POSTS = [
 {
   slug: "isq-infrastructure-credit-fund-ii-3bn",
   tags: { region: "Global", deal: "Fund raise", asset: "Grids & transmission" },
-  deal: { amount: "$3bn", usdMillions: 3000, status: "Closed", country: "North America & Europe", investors: [], recipient: "I Squared Capital (ISQ Global Infrastructure Credit Fund II)" },
   section: "infrastructure",
   theme: "core",
   signal: "confirms",
@@ -1036,7 +1033,6 @@ const POSTS = [
 {
   slug: "maharlika-drops-synergy-grid-stake",
   tags: { region: "ASEAN", deal: "Stake sale / M&A", asset: "Grids & transmission" },
-  deal: { amount: "P19.7bn", status: "Cancelled", country: "Philippines", investors: ["Maharlika Investment Corporation"], recipient: "Synergy Grid and Development Philippines (SGP)" },
   section: "infrastructure",
   theme: "grids",
   signal: "back",
@@ -1056,7 +1052,6 @@ const POSTS = [
 {
   slug: "tpg-10-4bn-climate-funds-global-south",
   tags: { region: "Other emerging markets", deal: "Fund raise", asset: "ESG fund flows" },
-  deal: { amount: "$10.4bn", usdMillions: 10400, status: "Closed", country: "Global", investors: ["ALTÉRRA (initial $500m to the Global South Initiative)"], recipient: "TPG (Rise Climate II and Global South Initiative)" },
   section: "sustainable-finance",
   theme: "em-finance",
   signal: "forward",
@@ -1077,7 +1072,6 @@ const POSTS = [
 {
   slug: "ge-vernova-buys-trench-9bn",
   tags: { region: "Global", deal: "Stake sale / M&A", asset: "Grids & transmission" },
-  deal: { amount: "$9bn", usdMillions: 9000, status: "Agreed", country: "Germany", investors: ["GE Vernova"], recipient: "Triton Partners (selling Trench Group)" },
   section: "infrastructure",
   theme: "grids",
   signal: "forward",
@@ -1098,7 +1092,6 @@ const POSTS = [
 {
   slug: "hsbc-evnnpc-105m-green-loan-substation-batteries",
   tags: { region: "Vietnam", deal: "Debt & project finance", asset: "Green & transition bonds" },
-  deal: { amount: "$105m", usdMillions: 105, status: "Closed", country: "Vietnam", investors: ["HSBC (lead arranger)", "15 lenders from China, South Korea, Taiwan and Thailand"], recipient: "EVN Northern Power Corporation (EVNNPC)" },
   section: "sustainable-finance",
   theme: "asean",
   signal: "forward",
@@ -1187,7 +1180,6 @@ const POSTS = [
   {
     slug: "ofgem-hornsea-3-ofto-tender",
     tags: { region: "UK", deal: "Tender / auction", asset: "Grids & transmission" },
-    deal: { amount: "£3.5bn (asset value)", status: "Open", country: "UK", investors: ["To be chosen by tender"], recipient: "Hornsea 3 offshore transmission assets" },
     section: "infrastructure", theme: "grids", signal: "forward",
     date: "2026-10-22", minutes: 3,
     title: "Ofgem puts £3.5bn of Hornsea 3 grid links up for private bidders",
@@ -1203,7 +1195,6 @@ const POSTS = [
   {
     slug: "ifm-buys-majority-of-associated-british-ports",
     tags: { region: "UK", deal: "Stake sale / M&A", asset: "Ports" },
-    deal: { amount: "c.£10bn valuation (reported)", status: "Agreed", country: "UK", investors: ["IFM Investors"], recipient: "CPP Investments and OMERS (selling 63.9% of Associated British Ports)" },
     section: "infrastructure", theme: "core", signal: "confirms",
     date: "2026-10-21", minutes: 3, featured: true,
     title: "IFM buys control of Associated British Ports from two Canadian pension funds",
@@ -1219,7 +1210,6 @@ const POSTS = [
   {
     slug: "nextera-federal-gas-hubs-16-5gw",
     tags: { region: "US", deal: "Contract / PPA", asset: "Data centres" },
-    deal: { amount: "$5.7bn initial funding", usdMillions: 5700, status: "Agreed", country: "US", investors: ["US federal government"], recipient: "NextEra Energy" },
     section: "technology", theme: "compute", signal: "confirms",
     date: "2026-10-21", minutes: 3, featured: true,
     title: "NextEra signs 16.5 GW of gas hubs paid for with government money",
@@ -1249,7 +1239,6 @@ const POSTS = [
   {
     slug: "ignitis-inaugural-european-green-bond",
     tags: { region: "Europe", deal: "Bond issue", asset: "Green & transition bonds" },
-    deal: { amount: "€300m", status: "Closed", country: "Lithuania", investors: ["80+ bond investors"], recipient: "Ignitis Group" },
     section: "sustainable-finance", theme: "eugb", signal: "confirms",
     date: "2026-10-20", minutes: 2,
     title: "Lithuania's Ignitis sells its first European Green Bond, 3.3 times covered",
@@ -1265,7 +1254,6 @@ const POSTS = [
   {
     slug: "akaysha-au1-75bn-bess-refinancing",
     tags: { region: "Australia", deal: "Debt & project finance", asset: "Battery storage" },
-    deal: { amount: "A$1.75bn", usdMillions: 1220, status: "Closed", country: "Australia", investors: ["ANZ", "Commonwealth Bank", "BNP Paribas", "MUFG", "ING", "6 other banks"], recipient: "Akaysha Energy" },
     section: "energy", theme: "storage", signal: "confirms",
     date: "2026-10-20", minutes: 3,
     title: "Eleven banks lend Akaysha A$1.75bn to refinance Australian batteries",
@@ -1311,7 +1299,6 @@ const POSTS = [
   {
     slug: "ggbi-blended-green-bond-fund-amundi",
     tags: { region: "Other emerging markets", deal: "Fund raise", asset: "Blended finance" },
-    deal: { amount: "€3bn target", status: "Open", country: "Emerging markets", investors: ["EIB", "EBRD", "KfW", "FMO", "Proparco", "CDP", "AECID"], recipient: "Amundi (Global Green Bond Initiative Fund)" },
     section: "sustainable-finance", theme: "em-finance", signal: "forward",
     date: "2026-04-27", minutes: 3,
     title: "EU backs a €3bn blended fund for first-time green bonds in emerging markets",
@@ -1327,7 +1314,6 @@ const POSTS = [
   {
     slug: "blackstone-energy-transition-fund-v",
     tags: { region: "Global", deal: "Fund raise", asset: "Power markets" },
-    deal: { amount: "$8.7bn", usdMillions: 8700, status: "Closed", country: "Global", investors: [], recipient: "Blackstone (Energy Transition Partners V)" },
     section: "energy", theme: "grids", signal: "forward",
     date: "2026-10-19", minutes: 3, featured: true,
     title: "Blackstone closes an $8.7bn energy transition fund",
@@ -1343,7 +1329,6 @@ const POSTS = [
   {
     slug: "microsoft-nisource-indiana-power-deal",
     tags: { region: "US", deal: "Contract / PPA", asset: "Data centres" },
-    deal: { amount: "Not disclosed", status: "Agreed", country: "US", investors: ["Microsoft"], recipient: "NiSource" },
     section: "technology", theme: "compute", signal: "confirms",
     date: "2026-10-19", minutes: 3, featured: true,
     title: "Microsoft signs a 20-year power deal in Indiana, and pays for the new plants",
@@ -1358,7 +1343,6 @@ const POSTS = [
   {
     slug: "ls-electric-us-data-centre-switchgear",
     tags: { region: "US", deal: "Contract / PPA", asset: "Grid equipment" },
-    deal: { amount: "$125m", usdMillions: 125, status: "Agreed", country: "US", investors: ["Unnamed US technology company"], recipient: "LS Electric" },
     section: "technology", theme: "compute", signal: "confirms",
     date: "2026-10-19", minutes: 2,
     title: "LS Electric wins a $125m switchgear order from US big tech",
@@ -1373,7 +1357,6 @@ const POSTS = [
   {
     slug: "macquarie-tif-exits-perth-airport",
     tags: { region: "Australia", deal: "Stake sale / M&A", asset: "Airports" },
-    deal: { amount: "Not disclosed", status: "Closed", country: "Australia", investors: ["AustralianSuper"], recipient: "The Infrastructure Fund (Macquarie) and Australian Retirement Trust (selling 9.14%)" },
     section: "infrastructure", theme: "core", signal: "confirms",
     date: "2026-10-16", minutes: 2,
     title: "Macquarie fund sells its Perth Airport stake after 25 years",
@@ -1713,58 +1696,107 @@ function renderGuide() {
 }
 
 // ---- Deal tracker -----------------------------------------------
+// The deals live in deals.csv, next to this page. The page reads the
+// file when it opens, so editing the file updates the table.
 const DEAL_ROWS_FIRST = 8;
-const dealStories = () => LIVE_POSTS.filter(p => p.deal && p.tags && !NOT_DEALS.includes(p.tags.deal)).sort(byNewest);
+let DEALS = null; // filled from deals.csv
+
+const esc = (v) => String(v ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const listOr = (arr, empty) => (arr && arr.length ? arr.join(", ") : empty);
 const usdNote = (d) => (typeof d.usdMillions === "number" && !d.amount.startsWith("$") ? `≈ US$${d.usdMillions.toLocaleString("en-GB")}m` : "");
 
+// Reads CSV text (commas, quoted cells, "" for a quote mark) into rows of cells
+function parseCSV(text) {
+  const rows = []; let row = [], cell = "", quoted = false;
+  text = text.replace(/^﻿/, "");
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (quoted) {
+      if (c === '"' && text[i + 1] === '"') { cell += '"'; i++; }
+      else if (c === '"') quoted = false;
+      else cell += c;
+    } else if (c === '"') quoted = true;
+    else if (c === ",") { row.push(cell); cell = ""; }
+    else if (c === "\n" || c === "\r") {
+      if (c === "\r" && text[i + 1] === "\n") i++;
+      row.push(cell); cell = "";
+      if (row.some(v => v.trim() !== "")) rows.push(row);
+      row = [];
+    } else cell += c;
+  }
+  row.push(cell);
+  if (row.some(v => v.trim() !== "")) rows.push(row);
+  return rows;
+}
+
+function toDeals(rows) {
+  const head = rows[0].map(h => h.trim());
+  return rows.slice(1).map(r => {
+    const o = {}; head.forEach((h, i) => o[h] = (r[i] ?? "").trim());
+    return {
+      id: o.id, date: o.date, deal: o.deal, section: o.section, theme: o.theme,
+      region: o.region, type: o.deal_type, asset: o.asset, country: o.country,
+      amount: o.amount, usdMillions: o.usd_millions === "" ? undefined : Number(o.usd_millions),
+      status: o.status, investors: o.investors ? o.investors.split(";").map(x => x.trim()).filter(Boolean) : [],
+      recipient: o.recipient, source: { name: o.source_name, url: o.source_url }, story: o.story
+    };
+  });
+}
+
+const liveDeals = () => (DEALS || []).filter(d => LIVE.some(s => s.id === d.section))
+  .sort((a, b) => b.date.localeCompare(a.date));
+const storyOf = (d) => d.story ? LIVE_POSTS.find(p => p.slug === d.story) : null;
+
 function renderDeals(all) {
-  const list = dealStories();
-  const usd = list.filter(p => typeof p.deal.usdMillions === "number" && p.deal.status !== "Cancelled");
-  const total = usd.reduce((a, p) => a + p.deal.usdMillions, 0);
+  if (!DEALS) return;
+  const list = liveDeals();
+  const usd = list.filter(d => typeof d.usdMillions === "number" && d.status !== "Cancelled");
+  const total = usd.reduce((a, d) => a + d.usdMillions, 0);
   $("deal-summary").textContent = `${list.length} deals tracked. US$${(total / 1000).toFixed(1)}bn across the ${usd.length} with a US dollar figure (cancelled deals excluded).`;
-  $("deal-rows").innerHTML = list.slice(0, all ? list.length : DEAL_ROWS_FIRST).map(p => {
-    const d = p.deal, note = usdNote(d);
+  $("deal-rows").innerHTML = list.slice(0, all ? list.length : DEAL_ROWS_FIRST).map(d => {
+    const note = usdNote(d), story = storyOf(d);
+    const name = story
+      ? `<a href="#${story.slug}" data-slug="${story.slug}">${esc(d.deal)}</a>`
+      : `<a href="${esc(d.source.url)}" target="_blank" rel="noopener">${esc(d.deal)} ↗</a>`;
     return `<tr>
-      <td class="date">${formatDate(p.date)}</td>
-      <td class="deal"><a href="#${p.slug}" data-slug="${p.slug}">${p.title}</a></td>
-      <td>${d.country}</td>
-      <td>${p.tags.deal}</td>
-      <td class="amt">${d.amount}${note ? `<span class="usd">${note}</span>` : ""}</td>
-      <td class="parties">${listOr(d.investors, "Not named")} → ${d.recipient}</td>
-      <td><span class="status ${d.status}">${d.status}</span></td>
+      <td class="date">${formatDate(d.date)}</td>
+      <td class="deal">${name}</td>
+      <td>${esc(d.country)}</td>
+      <td>${esc(d.type)}</td>
+      <td class="amt">${esc(d.amount)}${note ? `<span class="usd">${note}</span>` : ""}</td>
+      <td class="parties">${esc(listOr(d.investors, "Not named"))} → ${esc(d.recipient)}</td>
+      <td><span class="status ${esc(d.status)}">${esc(d.status)}</span></td>
     </tr>`;
   }).join("");
   $("deal-more").hidden = all || list.length <= DEAL_ROWS_FIRST;
   $("deal-more").textContent = `Show all ${list.length} deals ▼`;
 }
 
-function downloadDealsCSV() {
-  const cell = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
-  const head = ["date", "title", "section", "theme", "stage", "region", "deal_type", "asset", "country", "amount", "usd_millions", "status", "investors", "recipient", "source", "source_url"];
-  const rows = dealStories().map(p => {
-    const d = p.deal, t = themeOf(p.theme);
-    return [p.date, p.title, sectionOf(p.section).name, t.name, stageOf(t.stage).name, p.tags.region, p.tags.deal, p.tags.asset,
-      d.country, d.amount, d.usdMillions ?? "", d.status, (d.investors || []).join("; "), d.recipient, p.source.name, p.source.url].map(cell).join(",");
-  });
-  const blob = new Blob(["\ufeff" + [head.join(",")].concat(rows).join("\n")], { type: "text/csv;charset=utf-8" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = `baseload-deals-${new Date().toISOString().slice(0, 10)}.csv`;
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-}
-
-function dealFactsHTML(p) {
-  if (!p.deal || !p.tags || NOT_DEALS.includes(p.tags.deal)) return "";
-  const d = p.deal, note = usdNote(d);
-  return `<aside class="deal-facts" aria-label="Deal facts"><span class="code">Deal facts</span><dl>
-    <dt>Amount</dt><dd>${d.amount}${note ? ` (${note})` : ""}</dd>
-    <dt>Status</dt><dd><span class="status ${d.status}">${d.status}</span></dd>
-    <dt>Country</dt><dd>${d.country}</dd>
-    <dt>Investors</dt><dd>${listOr(d.investors, "Not named")}</dd>
-    <dt>Recipient</dt><dd>${d.recipient}</dd>
+function dealFactsInner(slug) {
+  return (DEALS || []).filter(d => d.story === slug).map(d => {
+    const note = usdNote(d);
+    return `<aside class="deal-facts" aria-label="Deal facts"><span class="code">Deal facts</span><dl>
+    <dt>Amount</dt><dd>${esc(d.amount)}${note ? ` (${note})` : ""}</dd>
+    <dt>Status</dt><dd><span class="status ${esc(d.status)}">${esc(d.status)}</span></dd>
+    <dt>Country</dt><dd>${esc(d.country)}</dd>
+    <dt>Investors</dt><dd>${esc(listOr(d.investors, "Not named"))}</dd>
+    <dt>Recipient</dt><dd>${esc(d.recipient)}</dd>
   </dl></aside>`;
+  }).join("");
+}
+// The story page holds a slot that fills in once deals.csv has loaded
+const dealFactsHTML = (p) => `<div id="reader-deal" data-slug="${p.slug}">${dealFactsInner(p.slug)}</div>`;
+
+function loadDeals() {
+  fetch("deals.csv", { cache: "no-cache" })
+    .then(r => { if (!r.ok) throw new Error(r.status); return r.text(); })
+    .then(text => {
+      DEALS = toDeals(parseCSV(text));
+      renderDeals(false);
+      const slot = $("reader-deal");
+      if (slot && !$("reader").hidden) slot.innerHTML = dealFactsInner(slot.dataset.slug);
+    })
+    .catch(() => { $("deal-summary").textContent = "The deal list could not load just now. Try again later, or use Download CSV."; });
 }
 
 // Alternate band backgrounds so each section stands apart
@@ -1862,7 +1894,6 @@ document.addEventListener("click", e => {
   }
   if (e.target.closest("[data-tag-clear]")) { clearTag(); return; }
   if (e.target.closest("#deal-more")) { renderDeals(true); return; }
-  if (e.target.closest("#deal-csv")) { downloadDealsCSV(); return; }
   const link = e.target.closest("[data-slug]");
   if (link) { e.preventDefault(); openPost(link.dataset.slug); return; }
   const more = e.target.closest("[data-more]");
@@ -1974,7 +2005,7 @@ renderStages();
 renderThemes();
 renderFeature();
 renderTopics();
-renderDeals(false);
+loadDeals();
 renderTagIndex();
 renderGuide();
 stripeBands();
