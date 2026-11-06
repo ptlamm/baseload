@@ -1,7 +1,8 @@
 // Checks index.html before it goes live.
 // Run it yourself with:  node scripts/check-stories.js
-// It stops with an error if the page script is broken or a story points
-// to a theme, section or signal that does not exist.
+// It stops with an error if the page script is broken, a story points
+// to a theme, section or signal that does not exist, or a row in
+// deals.csv is wrong.
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
@@ -53,22 +54,94 @@ POSTS.forEach((p, i) => {
     if (!TAGS.deal.includes(t.deal)) problems.push(`${name}: tags.deal "${t.deal}" is not in the TAGS deal list.`);
     if (!(TAGS.asset[p.section] || []).includes(t.asset)) problems.push(`${name}: tags.asset "${t.asset}" is not in the asset list for section "${p.section}".`);
   }
-  if (NOT_DEALS && DEAL_STATUS && p.tags && p.tags.deal && !NOT_DEALS.includes(p.tags.deal)) {
-    const d = p.deal;
-    if (!d) problems.push(`${name}: deal stories ("${p.tags.deal}") need a deal block with amount, status, country, investors and recipient.`);
-    else {
-      if (typeof d.amount !== "string" || !d.amount) problems.push(`${name}: deal.amount must be text, e.g. "$105m" or "Not disclosed".`);
-      if (d.usdMillions !== undefined && typeof d.usdMillions !== "number") problems.push(`${name}: deal.usdMillions must be a number without quotes, e.g. 105.`);
-      if (!DEAL_STATUS.includes(d.status)) problems.push(`${name}: deal.status must be one of ${DEAL_STATUS.join(", ")}.`);
-      if (typeof d.country !== "string" || !d.country) problems.push(`${name}: deal.country is missing.`);
-      if (!Array.isArray(d.investors)) problems.push(`${name}: deal.investors must be a list in square brackets, e.g. ["HSBC"] or [].`);
-      if (typeof d.recipient !== "string" || !d.recipient) problems.push(`${name}: deal.recipient is missing.`);
-    }
-  }
+  if (p.deal) problems.push(`${name}: deal facts now go in deals.csv, not in the story. Move them to a row with story "${p.slug}".`);
   if (p.image !== undefined && typeof p.image !== "string") problems.push(`${name}: image must be a file path or link in quotes.`);
 });
 
+// 4. Check deals.csv, the deal tracker's own file.
+const dealFile = path.join(__dirname, "..", "deals.csv");
+let dealCount = 0;
+if (!fs.existsSync(dealFile)) problems.push("deals.csv is missing. The deal tracker reads its rows from that file.");
+else {
+  const rows = parseCSV(fs.readFileSync(dealFile, "utf8"));
+  const COLS = ["id", "date", "deal", "section", "theme", "region", "deal_type", "asset", "country", "amount",
+                "usd_millions", "status", "investors", "recipient", "source_name", "source_url", "story"];
+  const head = (rows[0] || []).map(h => h.trim());
+  const missing = COLS.filter(c => !head.includes(c));
+  if (missing.length) problems.push(`deals.csv: the first row must name the columns; missing: ${missing.join(", ")}.`);
+  else {
+    const ids = new Set(), seen = new Map(), linked = new Set();
+    const posts = new Map(POSTS.map(p => [p.slug, p]));
+    rows.slice(1).forEach((r, i) => {
+      const line = i + 2;
+      const o = {}; head.forEach((h, k) => o[h] = (r[k] ?? "").trim());
+      const name = `deals.csv line ${line}${o.id ? ` (${o.id})` : ""}`;
+      dealCount++;
+      if (r.length !== head.length) problems.push(`${name}: has ${r.length} cells but there are ${head.length} columns. A cell with a comma in it needs "double quotes" around it.`);
+      if (!/^[a-z0-9-]+$/.test(o.id)) problems.push(`${name}: id must use lowercase letters, numbers and hyphens.`);
+      if (ids.has(o.id)) problems.push(`${name}: id is used twice.`);
+      ids.add(o.id);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(o.date)) problems.push(`${name}: date must look like 2026-10-25.`);
+      if (!o.deal) problems.push(`${name}: deal (the short headline) is empty.`);
+      if (!allSections.has(o.section)) problems.push(`${name}: section "${o.section}" does not exist.`);
+      if (!themes.has(o.theme)) problems.push(`${name}: theme "${o.theme}" does not exist.`);
+      if (TAGS) {
+        if (!TAGS.region.includes(o.region)) problems.push(`${name}: region "${o.region}" is not in the TAGS region list.`);
+        if (!TAGS.deal.includes(o.deal_type)) problems.push(`${name}: deal_type "${o.deal_type}" is not in the TAGS deal list.`);
+        if (!(TAGS.asset[o.section] || []).includes(o.asset)) problems.push(`${name}: asset "${o.asset}" is not in the asset list for section "${o.section}".`);
+      }
+      if (NOT_DEALS && NOT_DEALS.includes(o.deal_type)) problems.push(`${name}: "${o.deal_type}" is not a deal type; policy and report items do not go in deals.csv.`);
+      if (!o.country) problems.push(`${name}: country is empty.`);
+      if (!o.amount) problems.push(`${name}: amount is empty; write "Not disclosed" if the source gives none.`);
+      if (o.usd_millions !== "" && !(/^\d+(\.\d+)?$/.test(o.usd_millions))) problems.push(`${name}: usd_millions must be a plain number such as 105 (no $, m or commas), or empty.`);
+      if (DEAL_STATUS && !DEAL_STATUS.includes(o.status)) problems.push(`${name}: status must be one of ${DEAL_STATUS.join(", ")}.`);
+      if (!o.recipient) problems.push(`${name}: recipient is empty.`);
+      if (!o.source_name || !/^https?:\/\//.test(o.source_url)) problems.push(`${name}: needs source_name and a full source_url.`);
+      const key = (o.source_url + "|" + o.amount).toLowerCase();
+      if (seen.has(key)) problems.push(`${name}: looks like a repeat of line ${seen.get(key)} (same source and amount).`);
+      seen.set(key, line);
+      if (o.story) {
+        const p = posts.get(o.story);
+        if (!p) problems.push(`${name}: story "${o.story}" is not a story slug in index.html.`);
+        else {
+          linked.add(o.story);
+          if (p.section !== o.section) problems.push(`${name}: section "${o.section}" differs from its story's section "${p.section}".`);
+          if (p.tags && p.tags.deal !== o.deal_type) problems.push(`${name}: deal_type "${o.deal_type}" differs from its story's deal tag "${p.tags.deal}".`);
+        }
+      }
+    });
+    if (NOT_DEALS) POSTS.forEach(p => {
+      if (p.tags && p.tags.deal && !NOT_DEALS.includes(p.tags.deal) && !linked.has(p.slug))
+        problems.push(`${p.slug}: deal stories ("${p.tags.deal}") need a row in deals.csv with story "${p.slug}".`);
+    });
+  }
+}
+
 if (problems.length) fail(problems.join("\n"));
-console.log(`OK: ${POSTS.length} stories, ${THEMES.length} themes, ${live.size} live sections.`);
+console.log(`OK: ${POSTS.length} stories, ${dealCount} deals, ${THEMES.length} themes, ${live.size} live sections.`);
+
+// Reads CSV text (commas, quoted cells, "" for a quote mark) into rows of cells
+function parseCSV(text) {
+  const rows = []; let row = [], cell = "", quoted = false;
+  text = text.replace(/^\ufeff/, "");
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (quoted) {
+      if (c === '"' && text[i + 1] === '"') { cell += '"'; i++; }
+      else if (c === '"') quoted = false;
+      else cell += c;
+    } else if (c === '"') quoted = true;
+    else if (c === ",") { row.push(cell); cell = ""; }
+    else if (c === "\n" || c === "\r") {
+      if (c === "\r" && text[i + 1] === "\n") i++;
+      row.push(cell); cell = "";
+      if (row.some(v => v.trim() !== "")) rows.push(row);
+      row = [];
+    } else cell += c;
+  }
+  row.push(cell);
+  if (row.some(v => v.trim() !== "")) rows.push(row);
+  return rows;
+}
 
 function fail(msg) { console.error("Story check failed:\n" + msg); process.exit(1); }
