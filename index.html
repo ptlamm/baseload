@@ -444,7 +444,7 @@ section[id], details[id] { scroll-margin-top: 90px; }
 .band > .wrap { padding-block: 64px 72px; }
 .band-hero { border-top: 0; }
 .band-hero > .wrap { padding-block: 0 8px; }
-.band-hero .intro { border-bottom: 0; }
+.band-hero .intro { border-bottom: 0; border-top: 0; padding-top: 40px; }
 .band.ink { background: var(--ink); color: var(--paper); }
 .band.ink > .wrap { padding-block: 56px; }
 .band.ink .subscribe { padding: 0; background: transparent; }
@@ -570,26 +570,6 @@ section[id], details[id] { scroll-margin-top: 90px; }
 
 <main id="top">
   <div class="band band-hero"><div class="wrap">
-    <!-- HERO -->
-    <section class="hero">
-      <div>
-        <p class="eyebrow status"><i></i> Weekly briefing · Every Sunday</p>
-        <h1>Finding the <em>next investment cycle</em></h1>
-        <p class="lead">Each week's deals and reports, placed on the investment cycle to show where capital goes next.</p>
-        <div class="actions">
-          <a class="btn primary" href="#latest">Read this week ▶</a>
-          <a class="btn" href="#cycle">See the cycle map</a>
-        </div>
-      </div>
-
-      <figure class="sld">
-        <svg id="wave" viewBox="0 0 360 262" role="img" aria-label="The investment cycle drawn as a wave, with each tracked theme placed at its current stage."></svg>
-        <figcaption>
-          <ul class="legend" id="legend"></ul>
-        </figcaption>
-      </figure>
-    </section>
-
     <!-- INTRO: the five stages -->
     <section class="intro" aria-labelledby="stages-h">
       <div class="intro-head">
@@ -1461,6 +1441,7 @@ function renderTicker() {
 
 // The cycle wave in the hero. Drawn from STAGES and THEMES, so it updates itself.
 function renderWave() {
+  if (!$("wave")) return; // the hero chart was removed from the page
   const left = 20, width = 64, base = 228;
   const xs = STAGES.map((_, i) => left + width * i + width / 2);   // centre of each stage
   const ys = [196, 168, 104, 62, 118];                              // capital flowing in at each stage
