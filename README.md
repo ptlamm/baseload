@@ -1,4 +1,4 @@
-# Baseload — your blog
+# Transilience — your blog
 
 One file, `index.html`, holds the whole site: design (CSS), content (the `THEMES` and `POSTS` lists) and behaviour (JavaScript).
 
@@ -73,7 +73,7 @@ To edit it, open `deals.csv` on GitHub and click the pencil (GitHub shows it as 
 | `investors` | Who puts the money in, separated by semicolons: `HSBC; ADB`. Empty if not named. |
 | `recipient` | Who receives the money |
 | `source_name`, `source_url` | The publisher and the link to the original |
-| `story` | The slug of the Baseload story about it, or empty |
+| `story` | The slug of the Transilience story about it, or empty |
 
 A cell with a comma in it needs "double quotes" around it (Excel does this for you). The story check stops the build if a row has a wrong value, if the same deal appears twice, or if a deal story has no row.
 
