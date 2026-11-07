@@ -128,7 +128,7 @@ In `C. STORIES`, copy one `{ ... },` block, paste it at the top of the list and 
 7. **Prefer the original source.** A company press release or the report itself beats a news site repeating it. Avoid paywalled links where you can.
 
 ## 6. How the site updates
-The live site is **infrabrief.netlify.app**. It is built from this GitHub repository (`ptlamm/baseload`). Netlify publishes whatever is on the `main` branch.
+The live site is **transilienceresearch.com** (the older address infrabrief.netlify.app still works). It is built from this GitHub repository (`ptlamm/baseload`). Netlify publishes whatever is on the `main` branch.
 
 ### Every Sunday (automatic)
 1. The scheduled task drafts the week's stories and opens a **pull request** in this repository, titled "Weekly briefing: <date>".
