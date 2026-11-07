@@ -444,7 +444,13 @@ section[id], details[id] { scroll-margin-top: 90px; }
 .band > .wrap { padding-block: 64px 72px; }
 .band-hero { border-top: 0; }
 .band-hero > .wrap { padding-block: 0 8px; }
-.band-hero .intro { border-bottom: 0; border-top: 0; padding-top: 40px; }
+.band-hero .intro { border-bottom: 0; }
+.transitions { list-style: none; margin: 0; padding: 0; background: var(--panel); border: 2px solid var(--ink); }
+.transitions li { display: grid; grid-template-columns: 56px 1fr; gap: 4px 16px; padding: 22px 24px; border-bottom: 1px solid var(--rule); align-items: baseline; }
+.transitions li:last-child { border-bottom: 0; }
+.transitions .n { font: 400 12px/1 var(--f-mono); color: var(--muted); }
+.transitions strong { font: 800 32px/1 var(--f-display); text-transform: uppercase; }
+.transitions .d { grid-column: 2; font-size: 15px; color: var(--muted); }
 .band.ink { background: var(--ink); color: var(--paper); }
 .band.ink > .wrap { padding-block: 56px; }
 .band.ink .subscribe { padding: 0; background: transparent; }
@@ -570,6 +576,25 @@ section[id], details[id] { scroll-margin-top: 90px; }
 
 <main id="top">
   <div class="band band-hero"><div class="wrap">
+    <!-- HERO -->
+    <section class="hero">
+      <div>
+        <p class="eyebrow status"><i></i> Weekly briefing · Every Sunday</p>
+        <h1>Three transitions are <em>moving capital</em></h1>
+        <p class="lead">Climate change, AI and a shifting world order are redrawing where money flows. Each Sunday, the week's deals are placed on the investment cycle.</p>
+        <div class="actions">
+          <a class="btn primary" href="#latest">Read this week ▶</a>
+          <a class="btn" href="#cycle">See the cycle map</a>
+        </div>
+      </div>
+
+      <ol class="transitions" aria-label="The three transitions">
+        <li><span class="n">01</span><strong>Climate &amp; energy</strong><span class="d">Power, grids and storage replacing fossil fuels</span></li>
+        <li><span class="n">02</span><strong>AI &amp; compute</strong><span class="d">Data centres and the power they need</span></li>
+        <li><span class="n">03</span><strong>Politics</strong><span class="d">Elections, sanctions and alliances changing where money can go</span></li>
+      </ol>
+    </section>
+
     <!-- INTRO: the five stages -->
     <section class="intro" aria-labelledby="stages-h">
       <div class="intro-head">
