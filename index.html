@@ -8,7 +8,10 @@
 <meta name="description" content="A weekly briefing on where the next investment cycle is forming in energy, infrastructure and technology.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Martian+Mono:wght@400;600&family=Public+Sans:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="icon" href="brand/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="brand/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="brand/png/apple-touch-icon.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Manrope:wght@500&family=Martian+Mono:wght@400;600&family=Public+Sans:ital,wght@0,400;0,600;1,400&display=swap">
 
 <style>
 /* ================================================================
@@ -31,6 +34,7 @@
   --live:    #2E7D57;   /* "moves it forward" green   */
   --hold:    #B23A2E;   /* "holds it back" red        */
   --band:    #DFE5DC;   /* alternate section band     */
+  --logo-accent: #B87500; /* amber half of the logo   */
 
   --f-display: "Big Shoulders Display", "Arial Narrow", Impact, sans-serif;
   --f-body:    "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -41,14 +45,14 @@
   :root:not([data-theme="light"]) {
     --paper:#0F1724; --panel:#162234; --ink:#E7EBE3; --muted:#9BA7B8;
     --rule:#26364B; --volt:#F2B705; --volt-ink:#F2B705; --on-volt:#13233B;
-    --live:#4CC38A; --hold:#F07A6B; --band:#132033;
+    --live:#4CC38A; --hold:#F07A6B; --band:#132033; --logo-accent:#F2B705;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --paper:#0F1724; --panel:#162234; --ink:#E7EBE3; --muted:#9BA7B8;
   --rule:#26364B; --volt:#F2B705; --volt-ink:#F2B705; --on-volt:#13233B;
-  --live:#4CC38A; --hold:#F07A6B; --band:#132033;
+  --live:#4CC38A; --hold:#F07A6B; --band:#132033; --logo-accent:#F2B705;
   color-scheme: dark;
 }
 
@@ -113,7 +117,7 @@ p { margin: 0; }
   background: var(--paper); border-bottom: 2px solid var(--ink);
 }
 .top .wrap { display: flex; align-items: center; gap: 12px 24px; padding-block: 12px; flex-wrap: wrap; }
-.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; font: 900 28px/1 var(--f-display); letter-spacing: .04em; text-transform: uppercase; }
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; font: 500 26px/1 "Manrope", var(--f-body); letter-spacing: .005em; color: var(--ink); }
 .logo svg { flex: none; }
 .nav { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-left: auto; align-items: center; }
 .nav a { font: 600 11px/1 var(--f-mono); letter-spacing: .1em; text-transform: uppercase; text-decoration: none; padding-block: 8px; border-bottom: 2px solid transparent; }
@@ -548,11 +552,8 @@ section[id], details[id] { scroll-margin-top: 90px; }
 <header class="top">
   <div class="wrap">
     <a class="logo" href="#top" aria-label="Transilience home">
-      <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true">
-        <rect x="1" y="1" width="28" height="28" fill="var(--volt)" stroke="var(--ink)" stroke-width="2"/>
-        <path d="M6 15 q4.5 -8 9 0 t9 0" fill="none" stroke="var(--on-volt)" stroke-width="2.5"/>
-      </svg>
-      <span>Transilience</span>
+      <svg width="37.2" height="28" viewBox="2.2 4.4 25 18.8" aria-hidden="true"><defs><mask id="lm-h" maskUnits="userSpaceOnUse" x="0" y="0" width="30" height="30"><rect width="30" height="30" fill="#fff"/><circle cx="21" cy="8.3" r="3.15" fill="#000"/></mask></defs><g transform="rotate(-24 15 15)"><path d="M15 10.4 A13.50 5.2 0 0 0 15 20.8 A10.50 5.2 0 0 1 15 10.4 Z" fill="var(--ink)"/><path d="M15 18 A13.50 5.2 0 0 0 15 7.6 A10.50 5.2 0 0 1 15 18 Z" fill="var(--logo-accent)" mask="url(#lm-h)"/><circle cx="15" cy="14.2" r="1.45" fill="var(--ink)"/><circle cx="21" cy="8.3" r="1.75" fill="var(--logo-accent)"/></g></svg>
+      <span>transilience</span>
     </a>
     <nav class="nav" aria-label="Main">
       <a href="#stories">Stories</a>
@@ -742,7 +743,7 @@ section[id], details[id] { scroll-margin-top: 90px; }
 <footer>
   <div class="wrap">
     <div>
-      <a class="logo" href="#top"><span>Transilience</span></a>
+      <a class="logo" href="#top" aria-label="Transilience home"><svg width="29.3" height="22" viewBox="2.2 4.4 25 18.8" aria-hidden="true"><defs><mask id="lm-f" maskUnits="userSpaceOnUse" x="0" y="0" width="30" height="30"><rect width="30" height="30" fill="#fff"/><circle cx="21" cy="8.3" r="3.15" fill="#000"/></mask></defs><g transform="rotate(-24 15 15)"><path d="M15 10.4 A13.50 5.2 0 0 0 15 20.8 A10.50 5.2 0 0 1 15 10.4 Z" fill="var(--ink)"/><path d="M15 18 A13.50 5.2 0 0 0 15 7.6 A10.50 5.2 0 0 1 15 18 Z" fill="var(--logo-accent)" mask="url(#lm-f)"/><circle cx="15" cy="14.2" r="1.45" fill="var(--ink)"/><circle cx="21" cy="8.3" r="1.75" fill="var(--logo-accent)"/></g></svg><span>transilience</span></a>
       <p style="color:var(--muted);font-size:14px;margin-top:8px;max-width:32ch">A weekly briefing on where the next investment cycle is forming.</p>
     </div>
     <div>
