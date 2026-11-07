@@ -10,12 +10,17 @@ Version: "Split orbit, tapered" (concept 17). A refinement pass is planned.
 | `transilience-lockup.svg` | Main logo (mark + wordmark) on light backgrounds |
 | `transilience-lockup-dark.svg` | Main logo on dark backgrounds |
 | `transilience-lockup-mono-navy.svg` / `-mono-white.svg` | One-colour versions, for print or busy photos |
+| `transilience-lockup-tagline.svg` (+ `-dark`, `-mono-navy`, `-mono-white`) | Main logo with the tagline underneath, for headers, slides and banners |
 | `transilience-mark.svg` | Mark alone, light backgrounds |
 | `transilience-mark-dark.svg` | Mark alone, dark backgrounds |
 | `transilience-mark-mono-navy.svg` / `-mono-white.svg` | One-colour mark |
 | `transilience-mark-small.svg` | Heavier mark for sizes of 32 px and under |
 | `favicon.svg`, `favicon.ico` | Browser-tab icon (the SVG switches colours in dark mode) |
-| `png/` | PNG copies: marks at 512 and 1024 px, lockups 2400 px wide, `avatar-light-800.png` and `avatar-dark-800.png` for LinkedIn and Substack, `apple-touch-icon.png` for phones |
+| `png/` | PNG copies: marks at 512 and 1024 px, lockups (with and without tagline) 2400 px wide, `avatar-light-800.png` and `avatar-dark-800.png` for LinkedIn and Substack, `apple-touch-icon.png` for phones |
+
+## Tagline
+
+"Guiding through a world filled with uncertainty", set in Manrope Medium in the muted grey (`#56627A` on light, `#9BA7B8` on dark).
 
 ## Colours
 
