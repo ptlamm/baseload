@@ -83,6 +83,7 @@ p { margin: 0; }
 .mono { font-family: var(--f-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
 .eyebrow { font-family: var(--f-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
 
+[hidden] { display: none !important; } /* anything marked hidden stays hidden, whatever its other styles */
 .btn {
   display: inline-flex; align-items: center; gap: 8px;
   font: 600 12px/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase;
@@ -504,11 +505,13 @@ section[id], details[id] { scroll-margin-top: 90px; }
 .deal-table td.parties { color: var(--muted); min-width: 220px; }
 .deal-table .usd { display: block; color: var(--muted); font-size: 11px; }
 .deal-key { margin: 10px 0 0; }
-.status { display: inline-block; font: 600 10px/1 var(--f-mono); letter-spacing: .06em; text-transform: uppercase; padding: 4px 6px; border: 1px solid currentColor; white-space: nowrap; }
-.status.Closed { color: var(--live); }
-.status.Agreed { color: var(--ink); }
-.status.Open { color: var(--volt-ink); }
-.status.Cancelled { color: var(--hold); }
+/* Deal status chips. Named deal-status so they don't clash with the
+   hero's "Weekly briefing" .status badge. */
+.deal-status { display: inline-block; font: 600 10px/1 var(--f-mono); letter-spacing: .06em; text-transform: uppercase; padding: 4px 6px; border: 1px solid currentColor; white-space: nowrap; }
+.deal-status.Closed { color: var(--live); }
+.deal-status.Agreed { color: var(--ink); }
+.deal-status.Open { color: var(--volt-ink); }
+.deal-status.Cancelled { color: var(--hold); }
 .deal-facts { border: 1px solid color-mix(in srgb, var(--ink) 20%, transparent); background: var(--panel); padding: 16px 20px; display: grid; gap: 10px; justify-items: start; }
 .deal-facts dl { margin: 0; width: 100%; display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 6px 16px; font-size: 15px; }
 .deal-facts dt { font: 600 10px/1.9 var(--f-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
@@ -540,6 +543,24 @@ section[id], details[id] { scroll-margin-top: 90px; }
   .bus { padding-left: 22px; }
   .node::before { left: 0; }
   .nav { margin-left: 0; width: 100%; }
+
+  /* Deal tracker on phones: each row becomes a small card, so the amount
+     and status stay on screen without scrolling sideways. */
+  .deal-table { min-width: 0; }
+  .deal-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .deal-table tbody, .deal-table tr { display: block; }
+  .deal-table tr { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 12px; padding: 14px 16px; border-bottom: 1px solid color-mix(in srgb, var(--ink) 12%, transparent); }
+  .deal-table tr:last-child { border-bottom: 0; }
+  .deal-table td { display: block; padding: 0; border: 0; min-width: 0; max-width: none; }
+  .deal-table td.date { grid-column: 1; grid-row: 1; align-self: center; color: var(--muted); }
+  .deal-table td.state { grid-column: 2; grid-row: 1; justify-self: end; }
+  .deal-table td.deal { grid-column: 1 / -1; font-size: 16px; margin-bottom: 2px; }
+  .deal-table td.country, .deal-table td.type, .deal-table td.amt, .deal-table td.parties {
+    grid-column: 1 / -1; display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 10px; font-size: 14px; }
+  .deal-table td.country::before, .deal-table td.type::before, .deal-table td.amt::before, .deal-table td.parties::before {
+    content: attr(data-label); font: 600 10px/1.9 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .deal-table td.parties::before { content: "Parties"; }
+  .deal-table td.amt .usd { grid-column: 2; }
 }
 @media (prefers-reduced-motion: reduce) {
   .ticker-track, .flow { animation: none; }
@@ -569,7 +590,7 @@ section[id], details[id] { scroll-margin-top: 90px; }
       <a href="#deals">Deals</a>
       <a href="#tags">Tags</a>
       <a href="#about">About</a>
-      <a class="btn primary" href="#subscribe">Subscribe ▶</a>
+      <a class="btn primary" href="#subscribe" id="nav-sub" hidden>Subscribe ▶</a>
     </nav>
   </div>
 </header>
@@ -715,17 +736,13 @@ section[id], details[id] { scroll-margin-top: 90px; }
       </section>
   </div></div>
 
-  <div class="band ink"><div class="wrap">
+  <!-- Hidden until SITE.newsletterUrl is set (see A. SETTINGS) -->
+  <div class="band ink" id="sub-band" hidden><div class="wrap">
       <section id="subscribe" class="subscribe" aria-labelledby="sub-h">
         <span class="mono" style="color:var(--volt)">Stay connected</span>
         <h2 id="sub-h">One cycle briefing every Sunday</h2>
         <p>The week's strongest signals, and where each theme now sits.</p>
-        <form id="sub-form">
-          <label for="email" class="sr-only">Email address</label>
-          <input type="email" id="email" required placeholder="you@example.com" autocomplete="email">
-          <button class="btn primary" type="submit">Connect ▶</button>
-        </form>
-        <p class="msg" id="sub-msg" hidden></p>
+        <div><a class="btn primary" id="sub-link" href="#" target="_blank" rel="noopener">Subscribe on Substack ▶</a></div>
       </section>
   </div></div>
 
@@ -741,6 +758,7 @@ section[id], details[id] { scroll-margin-top: 90px; }
           <dl class="guide" id="guide"></dl>
           <p class="fine">MSc Sustainable Management &amp; Finance, Bayes Business School · CFA Level I · CFA Certificate in ESG Investing</p>
           <p class="fine">Summaries are my own reading of public reporting, with a link to every source. Nothing here is investment advice.</p>
+          <p id="about-linkedin" hidden><a class="btn" href="#" target="_blank" rel="noopener">Connect on LinkedIn ▶</a></p>
         </div>
       </section>
   </div></div>
@@ -784,8 +802,8 @@ section[id], details[id] { scroll-margin-top: 90px; }
    ================================================================ */
 const SITE = {
   name: "Transilience",
-  linkedin: "",   // paste your LinkedIn profile URL here to show the link
-  newsletterNote: "Thanks. Sign-ups are not live yet: this form will connect to a newsletter service such as Substack."
+  linkedin: "",       // paste your LinkedIn profile URL here to show the links
+  newsletterUrl: ""   // paste your Substack address (https://....substack.com) to show the Subscribe button and section
 };
 
 /* SECTIONS — the sectors this briefing covers.
@@ -898,6 +916,22 @@ const TAGS = {
     "infrastructure":      ["Grids & transmission", "Ports", "Airports", "Water & utilities", "Transport", "Digital infrastructure"],
     "technology":          ["Data centres", "Grid equipment", "Subsea cables", "Grid software"]
   }
+};
+
+/* ASSET PHOTOS — a story's thumbnail is picked by its asset tag first,
+   so a port deal shows a port. Assets not listed here (or with an empty
+   list) use their theme's photos instead. Same "photo-..." format as the
+   theme photos (see the README). Free Unsplash photos only. */
+const ASSET_PHOTOS = {
+  "Ports":                ["photo-1562892302-97faedd66f1c", "photo-1590496793907-4d66e2994b4d"],
+  "Airports":             ["photo-1683971336619-d445cbec0276"],
+  "Grids & transmission": ["photo-1473341304170-971dccb5ac1e", "photo-1509390559807-3144e7d29097", "photo-1777734794648-2bd10e93f0b2"],
+  "Grid equipment":       ["photo-1509390144018-eeaf65052242", "photo-1777734794648-2bd10e93f0b2"],
+  "Solar":                ["photo-1780445392628-d6f5b9e5609b", "photo-1680355065203-43ad84bb6e69"],
+  "Wind":                 ["photo-1771749372003-193cddcc3c6b"],
+  "Data centres":         ["photo-1584169417032-d34e8d805e8b", "photo-1564457461758-8ff96e439e83"],
+  "Gas & LNG":            [],  // add an LNG tanker or terminal photo here
+  "Water & utilities":    []   // add a water plant or reservoir photo here
 };
 
 /* Deal tracker: the deals live in their own file, deals.csv, one row
@@ -1683,12 +1717,18 @@ function seeded(text) { // the same story always gets the same picture
   return () => { h ^= h << 13; h ^= h >>> 17; h ^= h << 5; return ((h >>> 0) % 10000) / 10000; };
 }
 
-// Photos rotate through a theme's list in story order, so neighbours rarely repeat.
+// A story's photo comes from its asset tag's list (ASSET_PHOTOS) if that
+// list has photos, otherwise from its theme's list. Photos rotate in story
+// order within the list, so neighbouring cards rarely repeat.
 function photoFor(p) {
+  const asset = p.tags && p.tags.asset;
+  const byAsset = asset && ASSET_PHOTOS[asset] && ASSET_PHOTOS[asset].length;
   const t = themeOf(p.theme);
-  if (!t.photos || !t.photos.length) return null;
-  const order = POSTS.filter(q => q.theme === t.id).sort((a, b) => a.date.localeCompare(b.date) || a.slug.localeCompare(b.slug));
-  return t.photos[order.indexOf(p) % t.photos.length];
+  const list = byAsset ? ASSET_PHOTOS[asset] : t.photos;
+  if (!list || !list.length) return null;
+  const sameList = byAsset ? (q => q.tags && q.tags.asset === asset) : (q => q.theme === t.id);
+  const order = POSTS.filter(sameList).sort((a, b) => a.date.localeCompare(b.date) || a.slug.localeCompare(b.slug));
+  return list[order.indexOf(p) % list.length];
 }
 const unsplash = (id, w) => `https://images.unsplash.com/${id}?w=${w}&h=${Math.round(w * 9 / 16)}&fit=crop&q=70&auto=format`;
 
@@ -1876,14 +1916,15 @@ function renderDeals(all) {
     const name = story
       ? `<a href="#${story.slug}" data-slug="${story.slug}">${esc(d.deal)}</a>`
       : `<a href="${esc(d.source.url)}" target="_blank" rel="noopener">${esc(d.deal)} ↗</a>`;
+    // data-label names each cell on phones, where every row becomes a card
     return `<tr>
-      <td class="date">${formatDate(d.date)}</td>
-      <td class="deal">${name}</td>
-      <td>${esc(d.country)}</td>
-      <td>${esc(d.type)}</td>
-      <td class="amt">${esc(d.amount)}${note ? `<span class="usd">${note}</span>` : ""}</td>
-      <td class="parties">${esc(listOr(d.investors, "Not named"))} → ${esc(d.recipient)}</td>
-      <td><span class="status ${esc(d.status)}">${esc(d.status)}</span></td>
+      <td class="date" data-label="Date">${formatDate(d.date)}</td>
+      <td class="deal" data-label="Deal">${name}</td>
+      <td class="country" data-label="Country">${esc(d.country)}</td>
+      <td class="type" data-label="Type">${esc(d.type)}</td>
+      <td class="amt" data-label="Amount">${esc(d.amount)}${note ? `<span class="usd">${note}</span>` : ""}</td>
+      <td class="parties" data-label="Investors → recipient">${esc(listOr(d.investors, "Not named"))} → ${esc(d.recipient)}</td>
+      <td class="state" data-label="Status"><span class="deal-status ${esc(d.status)}">${esc(d.status)}</span></td>
     </tr>`;
   }).join("");
   $("deal-more").hidden = all || list.length <= DEAL_ROWS_FIRST;
@@ -1895,7 +1936,7 @@ function dealFactsInner(slug) {
     const note = usdNote(d);
     return `<aside class="deal-facts" aria-label="Deal facts"><span class="code">Deal facts</span><dl>
     <dt>Amount</dt><dd>${esc(d.amount)}${note ? ` (${note})` : ""}</dd>
-    <dt>Status</dt><dd><span class="status ${esc(d.status)}">${esc(d.status)}</span></dd>
+    <dt>Status</dt><dd><span class="deal-status ${esc(d.status)}">${esc(d.status)}</span></dd>
     <dt>Country</dt><dd>${esc(d.country)}</dd>
     <dt>Investors</dt><dd>${esc(listOr(d.investors, "Not named"))}</dd>
     <dt>Recipient</dt><dd>${esc(d.recipient)}</dd>
@@ -2101,16 +2142,15 @@ $("presets").addEventListener("click", e => {
 FIELDS.forEach(f => $(f).addEventListener("input", updateCalc));
 
 /* ================================================================
-   H. SUBSCRIBE FORM
-   To collect real emails, replace this with your newsletter
-   service's embed code (Substack, Buttondown, Mailchimp...).
+   H. SUBSCRIBE
+   The Subscribe button and section stay hidden until SITE.newsletterUrl
+   is set, so visitors never meet a form that collects nothing.
    ================================================================ */
-$("sub-form").addEventListener("submit", e => {
-  e.preventDefault();
-  $("sub-msg").textContent = SITE.newsletterNote;
-  $("sub-msg").hidden = false;
-  e.target.reset();
-});
+if (SITE.newsletterUrl) {
+  $("sub-link").href = SITE.newsletterUrl;
+  $("sub-band").hidden = false;
+  $("nav-sub").hidden = false;
+}
 
 /* ================================================================
    I. START
@@ -2129,7 +2169,10 @@ renderGuide();
 stripeBands();
 applyPreset(PRESETS[2]);
 $("year").textContent = new Date().getFullYear();
-if (SITE.linkedin) { $("linkedin").href = SITE.linkedin; $("linkedin-li").hidden = false; }
+if (SITE.linkedin) {
+  $("linkedin").href = SITE.linkedin; $("linkedin-li").hidden = false;
+  $("about-linkedin").querySelector("a").href = SITE.linkedin; $("about-linkedin").hidden = false;
+}
 
 handleHash();
 </script>

@@ -14,7 +14,7 @@ Open `index.html` on GitHub and click the pencil icon, or use a code editor such
 | Find this | What it controls |
 |---|---|
 | `1. DESIGN TOKENS` | Colours and fonts for the whole site |
-| `A. SETTINGS` | Site name, LinkedIn link, newsletter message |
+| `A. SETTINGS` | Site name, LinkedIn link, Substack address |
 | `const SECTIONS` | The sectors you cover: live or planned |
 | `const STAGES` | The five cycle stages and their wording |
 | `B. THEMES` | The cycle map: each theme and its stage |
@@ -47,6 +47,8 @@ To change or add a theme photo:
 4. Paste it into the theme's `photos` list in quotes, separated by commas.
 
 To give one story its own picture, add `image: "images/file.png"` (a file you upload to the repository) or a full image link to that story. Never use pictures copied from news articles.
+
+Photos are picked by the story's **asset tag** first. `ASSET_PHOTOS` (just below `TAGS`) lists photos for assets such as Ports, Airports, Solar and Data centres, so a port deal shows a port. An asset with no photos there uses its theme's photos instead. Add photos to `ASSET_PHOTOS` the same way as theme photos; Gas & LNG and Water & utilities still need some.
 
 A theme with no photos falls back to a drawn thumbnail made from its `icon` (sun, globe, pylon, server, bond, battery, crane or chart).
 
@@ -147,6 +149,6 @@ Edit `index.html` directly on GitHub: open the file, click the pencil icon, chan
 Later you can buy a domain (around £10 a year) and connect it in Netlify's domain settings.
 
 ## 7. Next steps
-- **Real email sign-ups:** create a free Buttondown or Substack account and replace the form in section `H` with their embed code.
+- **Email sign-ups:** once your Substack is set up, paste its address into `newsletterUrl` in `A. SETTINGS`. The Subscribe button in the menu and the Subscribe section then appear. Until then they stay hidden.
 - **Images for posts:** add image files to this repository and add `"<img src='my-chart.png' alt='Description'>"` as a body item.
 - **When the post list gets long:** move posts into a content system such as Sanity, or a static site builder such as Astro. That is a good second project.
