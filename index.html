@@ -8,9 +8,9 @@
 <meta name="description" content="Guiding through a world filled with uncertainty. A weekly briefing on where the next investment cycle is forming in energy, infrastructure and technology.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="icon" href="brand/favicon.svg" type="image/svg+xml">
-<link rel="icon" href="brand/favicon.ico" sizes="any">
-<link rel="apple-touch-icon" href="brand/png/apple-touch-icon.png">
+<link rel="icon" href="/brand/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/brand/png/apple-touch-icon.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Manrope:wght@500&family=Martian+Mono:wght@400;600&family=Public+Sans:ital,wght@0,400;0,600;1,400&display=swap">
 
 <style>
@@ -83,7 +83,9 @@ p { margin: 0; }
 .mono { font-family: var(--f-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
 .eyebrow { font-family: var(--f-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
 
-[hidden] { display: none !important; } /* anything marked hidden stays hidden, whatever its other styles */
+[hidden] { display: none !important; }
+.off-page { display: none !important; } /* sections that belong to another page */
+.nav a[aria-current="page"] { border-bottom-color: var(--ink); } /* anything marked hidden stays hidden, whatever its other styles */
 .btn {
   display: inline-flex; align-items: center; gap: 8px;
   font: 600 12px/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase;
@@ -345,6 +347,7 @@ footer .logo { font-size: 22px; }
 .stepper button[aria-selected="true"] { background: var(--volt); color: var(--on-volt); }
 .stepper button[aria-selected="true"] .n { color: var(--on-volt); }
 .stage-detail { display: grid; gap: 4px; max-width: 70ch; }
+#stages .stage-detail { margin-top: 16px; }
 .stage-detail p { font-size: 16px; }
 .stage-detail .who { color: var(--muted); font-size: 14px; }
 
@@ -542,7 +545,8 @@ section[id], details[id] { scroll-margin-top: 90px; }
   .stage-item > *, .stage-item > .code { grid-column: 1; grid-row: auto; }
   .bus { padding-left: 22px; }
   .node::before { left: 0; }
-  .nav { margin-left: 0; width: 100%; }
+  .nav { margin-left: 0; width: 100%; column-gap: 12px; }
+  .nav a { letter-spacing: .06em; }
 
   /* Deal tracker on phones: each row becomes a small card, so the amount
      and status stay on screen without scrolling sideways. */
@@ -580,23 +584,28 @@ section[id], details[id] { scroll-margin-top: 90px; }
 
 <header class="top">
   <div class="wrap">
-    <a class="logo" href="#top" aria-label="Transilience home">
+    <a class="logo" href="/" aria-label="Transilience home">
       <svg width="37.2" height="28" viewBox="2.2 4.4 25 18.8" aria-hidden="true"><defs><mask id="lm-h" maskUnits="userSpaceOnUse" x="0" y="0" width="30" height="30"><rect width="30" height="30" fill="#fff"/><circle cx="21" cy="8.3" r="3.15" fill="#000"/></mask></defs><g transform="rotate(-24 15 15)"><path d="M15 10.4 A13.50 5.2 0 0 0 15 20.8 A10.50 5.2 0 0 1 15 10.4 Z" fill="var(--ink)"/><path d="M15 18 A13.50 5.2 0 0 0 15 7.6 A10.50 5.2 0 0 1 15 18 Z" fill="var(--logo-accent)" mask="url(#lm-h)"/><circle cx="15" cy="14.2" r="1.45" fill="var(--ink)"/><circle cx="21" cy="8.3" r="1.75" fill="var(--logo-accent)"/></g></svg>
       <span class="logo-text"><span>transilience</span><small class="tagline">Guiding through a world filled with uncertainty</small></span>
     </a>
     <nav class="nav" aria-label="Main">
-      <a href="#stories">Stories</a>
-      <a href="#cycle">Cycle map</a>
-      <a href="#deals">Deals</a>
-      <a href="#tags">Tags</a>
-      <a href="#about">About</a>
-      <a class="btn primary" href="#subscribe" id="nav-sub" hidden>Subscribe ▶</a>
+      <a href="/stories" data-nav="stories">Stories</a>
+      <a href="/cycle" data-nav="cycle">Cycle map</a>
+      <a href="/deals" data-nav="deals">Deals</a>
+      <a href="/calculator" data-nav="calculator">Calculator</a>
+      <a href="/about" data-nav="about">About</a>
+      <a class="btn primary" href="/about#subscribe" id="nav-sub" hidden>Subscribe ▶</a>
     </nav>
   </div>
 </header>
 
 <main id="top">
-  <div class="band band-hero"><div class="wrap">
+  <!-- PAGES. Every block below has data-page="...": the page it shows on
+       (home, stories, cycle, deals, calculator, about). The order here is
+       the order on each page. The list of pages is PAGES in the script. -->
+
+  <!-- ===== HOME ===== -->
+  <div class="band band-hero" data-page="home"><div class="wrap">
     <!-- HERO -->
     <section class="hero">
       <div>
@@ -605,7 +614,7 @@ section[id], details[id] { scroll-margin-top: 90px; }
         <p class="lead">Climate change, AI and a shifting world order are redrawing where money flows. Each Sunday, the week's deals are placed on the investment cycle.</p>
         <div class="actions">
           <a class="btn primary" href="#latest">Read this week ▶</a>
-          <a class="btn" href="#cycle">See the cycle map</a>
+          <a class="btn" href="/cycle">See the cycle map</a>
         </div>
       </div>
 
@@ -615,18 +624,9 @@ section[id], details[id] { scroll-margin-top: 90px; }
         <li><span class="n">03</span><strong>Politics</strong><span class="d">Elections, sanctions and alliances changing where money can go</span></li>
       </ol>
     </section>
-
-    <!-- INTRO: the five stages -->
-    <section class="intro" aria-labelledby="stages-h">
-      <div class="intro-head">
-        <h2 id="stages-h">How the cycle works</h2>
-      </div>
-      <div class="stepper" role="tablist" aria-label="The five stages" id="stepper"></div>
-      <div class="stage-detail" role="tabpanel" id="stage-detail" aria-live="polite"></div>
-    </section>
   </div></div>
 
-  <div class="band"><div class="wrap">
+  <div class="band" data-page="home"><div class="wrap">
       <section id="latest" aria-labelledby="latest-h">
         <header class="node">
           <span class="eyebrow">This week · Strongest signals</span>
@@ -641,31 +641,21 @@ section[id], details[id] { scroll-margin-top: 90px; }
       </section>
   </div></div>
 
-  <!-- One band per live topic, three newest headlines each. Built by JavaScript. -->
-  <div id="stories"></div>
-
-  <div class="band"><div class="wrap">
-      <section id="deals" aria-labelledby="deals-h">
+  <div class="band" data-page="home"><div class="wrap">
+      <section id="newest" aria-labelledby="newest-h">
         <div class="topic-head">
           <header class="node">
-            <span class="eyebrow">Data · Updated weekly</span>
-            <h2 id="deals-h">Deal tracker</h2>
-            <p id="deal-summary"></p>
+            <span class="eyebrow">Newest · All sectors</span>
+            <h2 id="newest-h">Latest stories</h2>
           </header>
-          <a class="btn" href="deals.csv" download="transilience-deals.csv" id="deal-csv">Download CSV</a>
+          <a class="btn" href="/stories">All stories ▶</a>
         </div>
-        <div class="deal-table-wrap">
-          <table class="deal-table">
-            <thead><tr><th scope="col">Date</th><th scope="col">Deal</th><th scope="col">Country</th><th scope="col">Type</th><th scope="col">Amount</th><th scope="col">Investors → recipient</th><th scope="col">Status</th></tr></thead>
-            <tbody id="deal-rows"></tbody>
-          </table>
-        </div>
-        <p class="note deal-key">Deals with a Transilience story open it. Deals marked ↗ link to the original source.</p>
-        <button class="btn more" type="button" id="deal-more" hidden>Show all deals ▼</button>
+        <div class="cards" id="newest-cards"></div>
       </section>
   </div></div>
 
-  <div class="band"><div class="wrap">
+  <!-- ===== STORIES ===== -->
+  <div class="band" data-page="stories"><div class="wrap">
       <section id="tags" aria-labelledby="tags-h">
         <header class="node">
           <span class="eyebrow">Browse</span>
@@ -683,7 +673,23 @@ section[id], details[id] { scroll-margin-top: 90px; }
       </section>
   </div></div>
 
-  <div class="band"><div class="wrap">
+  <!-- One band per live sector. Built by JavaScript. -->
+  <div id="stories" data-page="stories"></div>
+
+  <!-- ===== CYCLE MAP ===== -->
+  <div class="band" data-page="cycle"><div class="wrap">
+      <section id="stages" aria-labelledby="stages-h">
+        <header class="node">
+          <span class="eyebrow">Cycle map · Five stages</span>
+          <h2 id="stages-h">How the cycle works</h2>
+          <p>Each theme moves through five stages as capital arrives. Pick a stage to see what it looks like.</p>
+        </header>
+        <div class="stepper" role="tablist" aria-label="The five stages" id="stepper"></div>
+        <div class="stage-detail" role="tabpanel" id="stage-detail" aria-live="polite"></div>
+      </section>
+  </div></div>
+
+  <div class="band" data-page="cycle"><div class="wrap">
       <section id="cycle" aria-labelledby="cycle-h">
         <header class="node">
           <span class="eyebrow">Cycle map · Updated weekly</span>
@@ -694,10 +700,33 @@ section[id], details[id] { scroll-margin-top: 90px; }
       </section>
   </div></div>
 
-  <div class="band"><div class="wrap">
+  <!-- ===== DEALS ===== -->
+  <div class="band" data-page="deals"><div class="wrap">
+      <section id="deals" aria-labelledby="deals-h">
+        <div class="topic-head">
+          <header class="node">
+            <span class="eyebrow">Data · Updated weekly</span>
+            <h2 id="deals-h">Deal tracker</h2>
+            <p id="deal-summary"></p>
+          </header>
+          <a class="btn" href="/deals.csv" download="transilience-deals.csv" id="deal-csv">Download CSV</a>
+        </div>
+        <div class="deal-table-wrap">
+          <table class="deal-table">
+            <thead><tr><th scope="col">Date</th><th scope="col">Deal</th><th scope="col">Country</th><th scope="col">Type</th><th scope="col">Amount</th><th scope="col">Investors → recipient</th><th scope="col">Status</th></tr></thead>
+            <tbody id="deal-rows"></tbody>
+          </table>
+        </div>
+        <p class="note deal-key">Deals with a Transilience story open it. Deals marked ↗ link to the original source.</p>
+        <button class="btn more" type="button" id="deal-more" hidden>Show all deals ▼</button>
+      </section>
+  </div></div>
+
+  <!-- ===== CALCULATOR ===== -->
+  <div class="band" data-page="calculator"><div class="wrap">
       <section id="bonus" aria-labelledby="bonus-h">
         <header class="node">
-          <span class="eyebrow">Bonus · Try it yourself</span>
+          <span class="eyebrow">Calculator · Try it yourself</span>
           <h2 id="bonus-h">What a maturing cycle is worth</h2>
           <p>Investors accept lower returns as a theme matures. Lower the cost of capital (WACC) to see how much cheaper that makes a solar or wind farm's power.</p>
         </header>
@@ -726,27 +755,8 @@ section[id], details[id] { scroll-margin-top: 90px; }
       </section>
   </div></div>
 
-  <div class="band"><div class="wrap">
-      <section id="drawing-board" aria-labelledby="board-h">
-        <header class="node">
-          <span class="eyebrow">Coming later</span>
-          <h2 id="board-h">On the drawing board</h2>
-        </header>
-        <div class="board" id="board"></div>
-      </section>
-  </div></div>
-
-  <!-- Hidden until SITE.newsletterUrl is set (see A. SETTINGS) -->
-  <div class="band ink" id="sub-band" hidden><div class="wrap">
-      <section id="subscribe" class="subscribe" aria-labelledby="sub-h">
-        <span class="mono" style="color:var(--volt)">Stay connected</span>
-        <h2 id="sub-h">One cycle briefing every Sunday</h2>
-        <p>The week's strongest signals, and where each theme now sits.</p>
-        <div><a class="btn primary" id="sub-link" href="#" target="_blank" rel="noopener">Subscribe on Substack ▶</a></div>
-      </section>
-  </div></div>
-
-  <div class="band"><div class="wrap">
+  <!-- ===== ABOUT ===== -->
+  <div class="band" data-page="about"><div class="wrap">
       <section id="about" aria-labelledby="about-h">
         <header class="node">
           <span class="eyebrow">About</span>
@@ -763,12 +773,33 @@ section[id], details[id] { scroll-margin-top: 90px; }
       </section>
   </div></div>
 
+  <div class="band" data-page="about"><div class="wrap">
+      <section id="drawing-board" aria-labelledby="board-h">
+        <header class="node">
+          <span class="eyebrow">Coming later</span>
+          <h2 id="board-h">On the drawing board</h2>
+        </header>
+        <div class="board" id="board"></div>
+      </section>
+  </div></div>
+
+  <!-- Home and About -->
+  <!-- Hidden until SITE.newsletterUrl is set (see A. SETTINGS) -->
+  <div class="band ink" id="sub-band" data-page="home about" hidden><div class="wrap">
+      <section id="subscribe" class="subscribe" aria-labelledby="sub-h">
+        <span class="mono" style="color:var(--volt)">Stay connected</span>
+        <h2 id="sub-h">One cycle briefing every Sunday</h2>
+        <p>The week's strongest signals, and where each theme now sits.</p>
+        <div><a class="btn primary" id="sub-link" href="#" target="_blank" rel="noopener">Subscribe on Substack ▶</a></div>
+      </section>
+  </div></div>
+
 </main>
 
 <footer>
   <div class="wrap">
     <div>
-      <a class="logo" href="#top" aria-label="Transilience home"><svg width="29.3" height="22" viewBox="2.2 4.4 25 18.8" aria-hidden="true"><defs><mask id="lm-f" maskUnits="userSpaceOnUse" x="0" y="0" width="30" height="30"><rect width="30" height="30" fill="#fff"/><circle cx="21" cy="8.3" r="3.15" fill="#000"/></mask></defs><g transform="rotate(-24 15 15)"><path d="M15 10.4 A13.50 5.2 0 0 0 15 20.8 A10.50 5.2 0 0 1 15 10.4 Z" fill="var(--ink)"/><path d="M15 18 A13.50 5.2 0 0 0 15 7.6 A10.50 5.2 0 0 1 15 18 Z" fill="var(--logo-accent)" mask="url(#lm-f)"/><circle cx="15" cy="14.2" r="1.45" fill="var(--ink)"/><circle cx="21" cy="8.3" r="1.75" fill="var(--logo-accent)"/></g></svg><span>transilience</span></a>
+      <a class="logo" href="/" aria-label="Transilience home"><svg width="29.3" height="22" viewBox="2.2 4.4 25 18.8" aria-hidden="true"><defs><mask id="lm-f" maskUnits="userSpaceOnUse" x="0" y="0" width="30" height="30"><rect width="30" height="30" fill="#fff"/><circle cx="21" cy="8.3" r="3.15" fill="#000"/></mask></defs><g transform="rotate(-24 15 15)"><path d="M15 10.4 A13.50 5.2 0 0 0 15 20.8 A10.50 5.2 0 0 1 15 10.4 Z" fill="var(--ink)"/><path d="M15 18 A13.50 5.2 0 0 0 15 7.6 A10.50 5.2 0 0 1 15 18 Z" fill="var(--logo-accent)" mask="url(#lm-f)"/><circle cx="15" cy="14.2" r="1.45" fill="var(--ink)"/><circle cx="21" cy="8.3" r="1.75" fill="var(--logo-accent)"/></g></svg><span>transilience</span></a>
       <p style="color:var(--muted);font-size:14px;margin-top:8px;max-width:32ch">Guiding through a world filled with uncertainty</p>
     </div>
     <div>
@@ -1734,7 +1765,7 @@ const unsplash = (id, w) => `https://images.unsplash.com/${id}?w=${w}&h=${Math.r
 
 function thumbHTML(p) {
   const t = themeOf(p.theme);
-  if (p.image) return `<span class="thumb"><img src="${p.image}" alt="" loading="lazy"></span>`;
+  if (p.image) return `<span class="thumb"><img src="${/^(https?:)?\//.test(p.image) ? p.image : "/" + p.image}" alt="" loading="lazy"></span>`;
   const ph = photoFor(p);
   if (ph) return `<span class="thumb"><img src="${unsplash(ph, 640)}" srcset="${unsplash(ph, 400)} 400w, ${unsplash(ph, 640)} 640w, ${unsplash(ph, 1200)} 1200w" sizes="(max-width: 640px) 100vw, 400px" alt="" loading="lazy" decoding="async"></span>`;
   const rand = seeded(p.slug);
@@ -1815,9 +1846,7 @@ function cardHTML(p) {
 }
 
 function renderNav() {
-  $("sitemap").innerHTML = [`<li><a href="#cycle">00 · Cycle map</a></li>`]
-    .concat(LIVE.map((s, i) => `<li><a href="#${s.id}">${pad(i + 1)} · ${s.name}</a></li>`))
-    .concat([`<li><a href="#about">${pad(LIVE.length + 1)} · About</a></li>`]).join("");
+  $("sitemap").innerHTML = PAGES.map((pg, i) => `<li><a href="${pg.path}">${pad(i)} · ${pg.name}</a></li>`).join("");
 }
 
 function renderBoard() {
@@ -1826,8 +1855,13 @@ function renderBoard() {
     <div class="planned" title="${s.blurb}"><h3>${s.name}</h3></div>`).join("");
 }
 
-// Home page topics: one block per live topic, newest three headlines each
-const PER_TOPIC = 3;
+// Stories page: one block per live sector, newest first
+const PER_TOPIC = 6;     // stories shown per sector before "See all"
+const NEWEST_HOME = 6;   // stories in "Latest stories" on the home page
+
+function renderNewest() {
+  $("newest-cards").innerHTML = [...LIVE_POSTS].sort(byNewest).slice(0, NEWEST_HOME).map(cardHTML).join("");
+}
 
 function renderTopics() {
   $("stories").innerHTML = LIVE.map((s, i) => {
@@ -1850,13 +1884,14 @@ function renderTopics() {
 function renderGuide() {
   const rows = LIVE.map(s => [s.id, s.name, s.blurb])
     .concat([["cycle", "Cycle map", "Where each theme sits, from first signal to mature asset, and what would move it on."]]);
-  $("guide").innerHTML = rows.map(([id, name, text]) => `<dt><a href="#${id}">${name}</a></dt><dd>${text}</dd>`).join("");
+  $("guide").innerHTML = rows.map(([id, name, text]) =>
+    `<dt><a href="${id === "cycle" ? "/cycle" : "/stories#" + id}">${name}</a></dt><dd>${text}</dd>`).join("");
 }
 
 // ---- Deal tracker -----------------------------------------------
 // The deals live in deals.csv, next to this page. The page reads the
 // file when it opens, so editing the file updates the table.
-const DEAL_ROWS_FIRST = 8;
+const DEAL_ROWS_FIRST = 50; // the Deals page lists this many before "Show all"
 let DEALS = null; // filled from deals.csv
 
 const esc = (v) => String(v ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -1947,7 +1982,7 @@ function dealFactsInner(slug) {
 const dealFactsHTML = (p) => `<div id="reader-deal" data-slug="${p.slug}">${dealFactsInner(p.slug)}</div>`;
 
 function loadDeals() {
-  fetch("deals.csv", { cache: "no-cache" })
+  fetch("/deals.csv", { cache: "no-cache" })
     .then(r => { if (!r.ok) throw new Error(r.status); return r.text(); })
     .then(text => {
       DEALS = toDeals(parseCSV(text));
@@ -1960,7 +1995,8 @@ function loadDeals() {
 
 // Alternate band backgrounds so each section stands apart
 function stripeBands() {
-  document.querySelectorAll("main .band:not(.band-hero):not(.ink):not([hidden])")
+  [...document.querySelectorAll("main .band:not(.band-hero):not(.ink)")]
+    .filter(b => !b.closest("[hidden], .off-page"))
     .forEach((b, i) => b.classList.toggle("alt", i % 2 === 0));
 }
 
@@ -2047,8 +2083,9 @@ document.addEventListener("click", e => {
   if (tag) {
     e.preventDefault();
     if (!$("reader").hidden) closePost();
+    if (currentPage !== "stories") { try { history.pushState(null, "", "/stories"); } catch (err) {} showPage("stories"); }
     showTag(tag.dataset.tag, true);
-    try { history.replaceState(null, "", "#tag-" + tagSlug(tag.dataset.tag)); } catch (err) {}
+    try { history.replaceState(null, "", "/stories#tag-" + tagSlug(tag.dataset.tag)); } catch (err) {}
     return;
   }
   if (e.target.closest("[data-tag-clear]")) { clearTag(); return; }
@@ -2064,17 +2101,79 @@ document.addEventListener("click", e => {
   }
   const st = e.target.closest("[data-stage]");
   if (st) { stageSel = +st.dataset.stage; renderStages(); return; }
+  const a = e.target.closest("a[href^='/']");
+  if (a && !a.target && !a.hasAttribute("download") && e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) {
+    const url = new URL(a.href);
+    if (pageAt(url.pathname)) {
+      e.preventDefault();
+      if (!$("reader").hidden) closePost();
+      try { history.pushState(null, "", url.pathname + url.hash); } catch (err) {}
+      route();
+    }
+  }
 });
 
-// Links ending in #story-slug open the story; #sector-id picks that tab; #theme-id opens that theme
+/* ================================================================
+   F2. PAGES
+   The site is one file, shown as several pages. Each block in <main>
+   has data-page="..." naming its page. Netlify sends every page address
+   to this file (see netlify.toml), and route() shows the right blocks.
+   To add a page: add it here, add data-page="its-id" to its blocks,
+   add a menu link, and add its address to netlify.toml.
+   ================================================================ */
+const PAGES = [
+  { id: "home",       path: "/",           name: "Home" },
+  { id: "stories",    path: "/stories",    name: "Stories" },
+  { id: "cycle",      path: "/cycle",      name: "Cycle map" },
+  { id: "deals",      path: "/deals",      name: "Deal tracker" },
+  { id: "calculator", path: "/calculator", name: "Calculator" },
+  { id: "about",      path: "/about",      name: "About" }
+];
+// Links from the old one-page site (#deals, #cycle...) and where they live now
+const OLD_ANCHORS = { latest: "home", newest: "home", stories: "stories", tags: "stories",
+  stages: "cycle", cycle: "cycle", deals: "deals", bonus: "calculator",
+  about: "about", "drawing-board": "about", subscribe: "about" };
+let currentPage = null;
+
+const normPath = (path) => (path.replace(/\/index\.html$/, "/").replace(/\/+$/, "") || "/");
+const pageAt = (path) => PAGES.find(pg => pg.path === normPath(path));
+
+function showPage(id) {
+  currentPage = id;
+  document.querySelectorAll("main [data-page]").forEach(el =>
+    el.classList.toggle("off-page", !el.dataset.page.split(" ").includes(id)));
+  document.querySelectorAll(".nav [data-nav]").forEach(a => {
+    if (a.dataset.nav === id) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
+  });
+  const pg = PAGES.find(x => x.id === id);
+  document.title = id === "home" ? "Transilience | Guiding through a world filled with uncertainty" : pg.name + " | Transilience";
+  stripeBands();
+}
+
+// Show the page for the current address, then act on any #part
+function route() {
+  showPage((pageAt(location.pathname) || PAGES[0]).id);
+  if (location.hash.length > 1) handleHash(); else window.scrollTo(0, 0);
+}
+
+// #story-slug opens the story on any page; other parts move to their page first
 function handleHash() {
   const h = decodeURIComponent(location.hash.slice(1));
+  if (!h) return;
   if (POSTS.some(p => p.slug === h)) { openPost(h); return; }
-  if (LIVE.some(s => s.id === h)) { $(h).scrollIntoView(); return; }
-  if (h.startsWith("theme-")) { openTheme(h.slice(6)); return; }
-  if (h.startsWith("tag-") && tagBySlug(h.slice(4))) showTag(tagBySlug(h.slice(4)), true);
+  const isTag = h.startsWith("tag-") && tagBySlug(h.slice(4));
+  const target = LIVE.some(s => s.id === h) || isTag ? "stories"
+    : h.startsWith("theme-") ? "cycle" : OLD_ANCHORS[h];
+  if (target && target !== currentPage) {
+    try { history.replaceState(null, "", PAGES.find(pg => pg.id === target).path + "#" + h); } catch (e) {}
+    showPage(target);
+  }
+  if (h.startsWith("theme-")) openTheme(h.slice(6));
+  else if (isTag) showTag(tagBySlug(h.slice(4)), true);
+  else if ($(h)) $(h).scrollIntoView();
 }
 window.addEventListener("hashchange", handleHash);
+window.addEventListener("popstate", route);
 
 /* ================================================================
    G. LCOE CALCULATOR
@@ -2162,6 +2261,7 @@ renderWave();
 renderStages();
 renderThemes();
 renderFeature();
+renderNewest();
 renderTopics();
 loadDeals();
 renderTagIndex();
@@ -2174,7 +2274,7 @@ if (SITE.linkedin) {
   $("about-linkedin").querySelector("a").href = SITE.linkedin; $("about-linkedin").hidden = false;
 }
 
-handleHash();
+route();
 </script>
 </body>
 </html>
