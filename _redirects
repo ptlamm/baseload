@@ -1,9 +1,10 @@
 # Page addresses for Cloudflare Pages (Netlify reads this file too).
 # The whole site is index.html; these addresses all serve it, and the
 # page script shows the right sections for each address.
-# To add a page, add one line: /address /index.html 200
-/stories     /index.html  200
-/cycle       /index.html  200
-/deals       /index.html  200
-/calculator  /index.html  200
-/about       /index.html  200
+# To add a page, add one line: /address / 200
+# (Point at "/", not "/index.html": Cloudflare redirects /index.html to /.)
+/stories     /  200
+/cycle       /  200
+/deals       /  200
+/calculator  /  200
+/about       /  200
