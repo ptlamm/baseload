@@ -4,7 +4,8 @@ One file, `index.html`, holds the whole site: design (CSS), content (the `THEMES
 
 ## 1. What is in this repository
 - `index.html`: the whole site: design, stories and behaviour.
-- `netlify.toml`: tells Netlify to check the stories, publish this folder, and serve `index.html` at each page address.
+- `_redirects`: serves `index.html` at each page address (`/stories`, `/deals`...) on Cloudflare Pages.
+- `netlify.toml`: the old Netlify settings, kept as a backup host.
 - `scripts/check-stories.js`: the story check.
 - `README.md`: this guide.
 
@@ -36,7 +37,7 @@ Commit the change on GitHub, and the live site updates in about a minute.
 
 Each block inside `<main>` in `index.html` has `data-page="..."`, the page it shows on. To move a block to another page, change that word. A block can sit on two pages: the Subscribe block has `data-page="home about"`.
 
-To add a page: add it to `PAGES` (find `F2. PAGES`), give its blocks `data-page="its-id"`, add a menu link next to the others, and copy one `[[redirects]]` block in `netlify.toml` with its address.
+To add a page: add it to `PAGES` (find `F2. PAGES`), give its blocks `data-page="its-id"`, add a menu link next to the others, and add a line for its address to `_redirects` (and to `netlify.toml`, the backup host).
 
 Links from the old one-page site still work: `/#deals` opens the Deals page, `/#energy` opens Stories at Energy, and a story link such as `/#story-slug` opens the story on any page.
 
@@ -147,23 +148,25 @@ In `C. STORIES`, copy one `{ ... },` block, paste it at the top of the list and 
 7. **Prefer the original source.** A company press release or the report itself beats a news site repeating it. Avoid paywalled links where you can.
 
 ## 6. How the site updates
-The live site is **transilienceresearch.com** (the older address infrabrief.netlify.app still works). It is built from this GitHub repository (`ptlamm/baseload`). Netlify publishes whatever is on the `main` branch.
+The live site is **transilienceresearch.com**, hosted on **Cloudflare Pages** (free plan: up to 500 updates a month). It is built from this GitHub repository (`ptlamm/baseload`). Cloudflare publishes whatever is on the `main` branch.
+
+Cloudflare build settings (in the Cloudflare dashboard, under the project's Settings): build command `node scripts/check-stories.js`, build output directory `/`, production branch `main`.
 
 ### Every Sunday (automatic)
 1. The scheduled task drafts the week's stories and opens a **pull request** in this repository, titled "Weekly briefing: <date>".
-2. Netlify builds a **deploy preview**: a private copy of the site with the new stories. The link appears in the pull request.
+2. Cloudflare builds a **preview**: a copy of the site with the new stories, at its own address. The link appears in the pull request.
 3. Read the preview. To change a story, open the pull request's **Files changed** tab, click the three dots on `index.html`, choose **Edit file**, fix the text and commit.
 4. Click **Merge pull request**. The live site updates within a minute.
 
 To skip a week, close the pull request without merging.
 
 ### Before every deploy (automatic)
-Netlify runs `scripts/check-stories.js`. If a story points to a theme or section that does not exist, or the code has a typo, the deploy stops, the live site stays as it was, and the error shows in Netlify's deploy log.
+Cloudflare runs `scripts/check-stories.js`. If a story points to a theme or section that does not exist, or the code has a typo, the build stops, the live site stays as it was, and the error shows in the build log in Cloudflare.
 
 ### Your own edits
 Edit `index.html` directly on GitHub: open the file, click the pencil icon, change the text and commit to `main`. The site updates in about a minute. Use this for theme stages, sections and the About text.
 
-Later you can buy a domain (around £10 a year) and connect it in Netlify's domain settings.
+The domain is registered with Namecheap, and its settings (DNS) are managed in Cloudflare.
 
 ## 7. Next steps
 - **Email sign-ups:** once your Substack is set up, paste its address into `newsletterUrl` in `A. SETTINGS`. The Subscribe button in the menu and the Subscribe section then appear. Until then they stay hidden.
