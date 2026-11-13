@@ -1,10 +1,10 @@
 # Transilience — your blog
 
-One file, `index.html`, holds the whole site: design (CSS), content (the `THEMES` and `POSTS` lists) and behaviour (JavaScript).
+One file, `index.html`, holds the whole site: design (CSS), content (the `THEMES` and `POSTS` lists) and behaviour (JavaScript). The file is shown as six pages: Home, Stories, Cycle map, Deals, Calculator and About.
 
 ## 1. What is in this repository
 - `index.html`: the whole site: design, stories and behaviour.
-- `netlify.toml`: tells Netlify to check the stories, then publish this folder.
+- `netlify.toml`: tells Netlify to check the stories, publish this folder, and serve `index.html` at each page address.
 - `scripts/check-stories.js`: the story check.
 - `README.md`: this guide.
 
@@ -14,14 +14,31 @@ Open `index.html` on GitHub and click the pencil icon, or use a code editor such
 | Find this | What it controls |
 |---|---|
 | `1. DESIGN TOKENS` | Colours and fonts for the whole site |
-| `A. SETTINGS` | Site name, LinkedIn link, newsletter message |
+| `A. SETTINGS` | Site name, LinkedIn link, Substack address |
 | `const SECTIONS` | The sectors you cover: live or planned |
 | `const STAGES` | The five cycle stages and their wording |
 | `B. THEMES` | The cycle map: each theme and its stage |
 | `C. STORIES` | Your news summaries |
 | `G. LCOE CALCULATOR` | The solar farm calculator and its example projects |
+| `F2. PAGES` | The list of pages and their addresses |
 
 Commit the change on GitHub, and the live site updates in about a minute.
+
+## 2b. Pages
+| Page | Address | What is on it |
+|---|---|---|
+| Home | `/` | The hero, On the wire, the six newest stories |
+| Stories | `/stories` | Browse by tag, then every live sector (six stories each, then "See all") |
+| Cycle map | `/cycle` | How the cycle works, and where each theme sits |
+| Deals | `/deals` | The deal tracker |
+| Calculator | `/calculator` | The levelised-cost calculator |
+| About | `/about` | About you, and On the drawing board |
+
+Each block inside `<main>` in `index.html` has `data-page="..."`, the page it shows on. To move a block to another page, change that word. A block can sit on two pages: the Subscribe block has `data-page="home about"`.
+
+To add a page: add it to `PAGES` (find `F2. PAGES`), give its blocks `data-page="its-id"`, add a menu link next to the others, and copy one `[[redirects]]` block in `netlify.toml` with its address.
+
+Links from the old one-page site still work: `/#deals` opens the Deals page, `/#energy` opens Stories at Energy, and a story link such as `/#story-slug` opens the story on any page.
 
 ## 3. Open, add or pause a sector
 All sectors live in one list, `SECTIONS`. Each has a `status`:
@@ -29,7 +46,7 @@ All sectors live in one list, `SECTIONS`. Each has a `status`:
 - `"planned"`: shown in "On the drawing board" as a sector coming later.
 - `"archived"`: hidden from the site and from the Sunday drafts. Its stories stay in the file, and setting it back to `"live"` brings them back. A theme whose stories are all archived also hides from the cycle map until it has a live story again.
 
-To start covering a planned sector: change `"planned"` to `"live"`. It gets its own block on the home page (three newest stories), a footer link and Sunday drafts automatically.
+To start covering a planned sector: change `"planned"` to `"live"`. It gets its own block on the Stories page, and Sunday drafts, automatically.
 
 To add a new idea: copy one line, give it a short unique `id` (lowercase, hyphens), a `name`, a one-line `blurb` and `status: "planned"`.
 
@@ -47,6 +64,8 @@ To change or add a theme photo:
 4. Paste it into the theme's `photos` list in quotes, separated by commas.
 
 To give one story its own picture, add `image: "images/file.png"` (a file you upload to the repository) or a full image link to that story. Never use pictures copied from news articles.
+
+Photos are picked by the story's **asset tag** first. `ASSET_PHOTOS` (just below `TAGS`) lists photos for assets such as Ports, Airports, Solar and Data centres, so a port deal shows a port. An asset with no photos there uses its theme's photos instead. Add photos to `ASSET_PHOTOS` the same way as theme photos; Gas & LNG and Water & utilities still need some.
 
 A theme with no photos falls back to a drawn thumbnail made from its `icon` (sun, globe, pylon, server, bond, battery, crane or chart).
 
@@ -97,7 +116,7 @@ The site's question is: where is the next investment cycle forming? Every theme 
 | 4 Crowded | Too much money, falling prices and returns, contracts replace market risk. |
 | 5 Mature | Steady cash flows, lower returns, pension funds and core funds own it. |
 
-To move a theme, change its `stage` number. The wave in the hero, the cycle map and every card update by themselves. Review the stages once a month, not every week.
+To move a theme, change its `stage` number. The cycle map and every card update by themselves. Review the stages once a month, not every week.
 
 To add a theme, copy one block and give it a short `id`, a `name`, a `stage`, `photos`, an `icon`, a one-line `thesis` and a `watch` line (what would move it to the next stage). Five to seven themes is enough.
 
@@ -147,6 +166,6 @@ Edit `index.html` directly on GitHub: open the file, click the pencil icon, chan
 Later you can buy a domain (around £10 a year) and connect it in Netlify's domain settings.
 
 ## 7. Next steps
-- **Real email sign-ups:** create a free Buttondown or Substack account and replace the form in section `H` with their embed code.
+- **Email sign-ups:** once your Substack is set up, paste its address into `newsletterUrl` in `A. SETTINGS`. The Subscribe button in the menu and the Subscribe section then appear. Until then they stay hidden.
 - **Images for posts:** add image files to this repository and add `"<img src='my-chart.png' alt='Description'>"` as a body item.
 - **When the post list gets long:** move posts into a content system such as Sanity, or a static site builder such as Astro. That is a good second project.

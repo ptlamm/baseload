@@ -5,3 +5,31 @@
 [build]
   publish = "."
   command = "node scripts/check-stories.js"
+
+# Pages. The whole site is index.html; these addresses all serve it, and
+# the page script shows the right sections for each address.
+# To add a page, copy one block and change "from".
+[[redirects]]
+  from = "/stories"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/cycle"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/deals"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/calculator"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/about"
+  to = "/index.html"
+  status = 200
